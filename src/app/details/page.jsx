@@ -5,7 +5,7 @@ export default function ProjectDetailPage({ params }) {
   const project = PROJECT1_ITEMS.find(item => item.id === projectId);
 
   if (!project) {
-    return <div className="text-center py-20">프로젝트를 찾을 수 없습니다.</div>;
+    return <div className="text-center py-20">프로젝트를 찾을 수 없습니다</div>;
   }
 
   return (
