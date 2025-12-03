@@ -1,4 +1,4 @@
-import { PROJECT1_ITEMS } from '../../../shared/constants/project1-images';
+import { PROJECT1_ITEMS } from '../../shared/constants/project1-images';
 
 export default function ProjectDetailPage({ params }) {
   const projectId = parseInt(params.id, 10);

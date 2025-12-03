@@ -145,7 +145,7 @@ export default function HomePage() {
   return (
     <div 
       ref={containerRef}
-      className="flex flex-wrap gap-x-px justify-center"
+      className="h-full flex items-center flex-wrap gap-x-px justify-center"
     >
       {numbers.map((num, index) => (
         <CagePixel key={index} num={num} brightness={pixelData[index] || 0} />
