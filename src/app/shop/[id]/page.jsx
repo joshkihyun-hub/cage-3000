@@ -4,9 +4,11 @@ import { items } from '@/shared/constants/shop-items';
 import { ProductInfo } from '@/components/product-info';
 import Image from 'next/image';
 import Link from 'next/link';
+import { use } from 'react';
 
 export default function ShopItemPage({ params }) {
-  const item = items.find((item) => item.id === parseInt(params.id));
+  const unwrappedParams = use(params);
+  const item = items.find((item) => item.id === parseInt(unwrappedParams.id));
 
   if (!item) {
     return <div className="text-center py-32">Item not found</div>;

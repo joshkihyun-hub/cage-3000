@@ -1,7 +1,7 @@
 'use client'; // 스크롤 애니메이션을 위해 클라이언트 컴포넌트로 전환합니다.
 
 import { PROJECT1_ITEMS } from '../../../shared/constants/project1-images';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, use } from 'react';
 // 1. Poppins 폰트를 가져옵니다.
 import { Poppins } from 'next/font/google';
 
@@ -34,9 +34,8 @@ const AnimatedImage = ({ src, alt }) => {
   return (
     <div
       ref={ref}
-      className={`transition-all duration-1000 ease-out ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      }`}
+      className={`transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}
     >
       <img src={src} alt={alt} className="w-full h-full object-cover" />
     </div>
@@ -46,7 +45,8 @@ const AnimatedImage = ({ src, alt }) => {
 
 // 상세 페이지의 메인 컴포넌트
 export default function ProjectDetailPage({ params }) {
-  const projectId = parseInt(params.id, 10);
+  const unwrappedParams = use(params);
+  const projectId = parseInt(unwrappedParams.id, 10);
   const project = PROJECT1_ITEMS.find(item => item.id === projectId);
 
   if (!project) {
@@ -58,8 +58,8 @@ export default function ProjectDetailPage({ params }) {
       {/* 3. 첫 번째 이미지를 먼저 표시합니다. */}
       {project.subImages.length > 0 && (
         <div className="mt-12 md:mt-16">
-          <AnimatedImage 
-            src={project.subImages[0]} 
+          <AnimatedImage
+            src={project.subImages[0]}
             alt={`${project.title} detail image 1`}
           />
         </div>
@@ -69,17 +69,17 @@ export default function ProjectDetailPage({ params }) {
       <div className="flex justify-end px-4 mt-12 md:mt-16">
         {/* 5. 폰트 크기와 간격을 줄여 더 세련되게 만듭니다. */}
         <div className="w-full md:max-w-md text-right space-y-1">
-            <h1 className={`${poppins.className} text-2xl md:text-3xl text-zinc-800`}>{project.title}</h1>
-            <p className="text-xs text-zinc-500 tracking-wider uppercase">{project.subtitle}</p>
+          <h1 className={`${poppins.className} text-2xl md:text-3xl text-zinc-800`}>{project.title}</h1>
+          <p className="text-xs text-zinc-500 tracking-wider uppercase">{project.subtitle}</p>
         </div>
       </div>
-      
+
       {/* 나머지 이미지들을 표시합니다. */}
       <div className="grid grid-cols-1 gap-y-0 mt-12 md:mt-16">
         {project.subImages.slice(1).map((src, index) => (
-          <AnimatedImage 
+          <AnimatedImage
             key={index}
-            src={src} 
+            src={src}
             alt={`${project.title} detail image ${index + 2}`}
           />
         ))}
