@@ -2,19 +2,18 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Anton } from 'next/font/google';
 import Link from 'next/link';
-
-const anton = Anton({ subsets: ['latin'], weight: ['400'] });
 
 export default function MyPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  console.log('Session object:', session);
-
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="text-zinc-500 text-sm uppercase tracking-widest">Loading...</p>
+      </div>
+    );
   }
 
   if (status === 'unauthenticated') {
@@ -23,23 +22,47 @@ export default function MyPage() {
   }
 
   return (
-    <div className="bg-white text-zinc-900 min-h-screen flex items-center justify-center">
-      <div className="max-w-md w-full p-8">
-        <h1 className={`${anton.className} text-4xl md:text-5xl font-semibold text-center mb-12 tracking-tighter`}>My Page</h1>
-        <div className="mb-6">
-          <p className="text-zinc-500 text-sm font-bold mb-2">NAME</p>
-          <p className="text-zinc-900 font-bold">{session.user.name}</p>
+    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
+      <div className="container mx-auto px-4 md:px-8 max-w-md">
+        <h1 className="font-serif text-4xl md:text-5xl text-center mb-16 text-black font-normal">
+          My Page
+        </h1>
+
+        <div className="space-y-12 mb-16">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-4">NAME</p>
+            <p className="font-serif text-xl text-black">{session.user.name}</p>
+          </div>
+
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-4">PHONE NUMBER</p>
+            <p className="font-serif text-xl text-black">{session.user.phoneNumber || '-'}</p>
+          </div>
+
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-4">EMAIL</p>
+            <p className="font-serif text-xl text-black">{session.user.email}</p>
+          </div>
+
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-4">ADDRESS</p>
+            <p className="font-serif text-xl text-black">{session.user.address || '-'}</p>
+          </div>
         </div>
-        <div className="mb-8">
-          <p className="text-zinc-500 text-sm font-bold mb-2">EMAIL</p>
-          <p className="text-zinc-900 font-bold">{session.user.email}</p>
-        </div>
-        <div className="flex flex-col items-center">
-          <Link href="/my-page/edit" className="w-full bg-zinc-900 text-white py-4 text-xl font-bold tracking-wider hover:bg-zinc-800 transition-colors mb-4 text-center">
+
+        <div className="space-y-4">
+          <Link
+            href="/my-page/edit"
+            className="block w-full bg-black text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors text-center font-serif"
+          >
             Edit Profile
           </Link>
+
           {session.user.role === 'admin' && (
-            <Link href="/admin/users" className="w-full bg-red-600 text-white py-4 text-xl font-bold tracking-wider hover:bg-red-700 transition-colors text-center">
+            <Link
+              href="/admin/users"
+              className="block w-full bg-red-600 text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-red-700 transition-colors text-center font-serif"
+            >
               Admin Mode
             </Link>
           )}

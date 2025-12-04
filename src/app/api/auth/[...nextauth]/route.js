@@ -13,7 +13,7 @@ export const authOptions = {
       name: 'Credentials',
       credentials: {
         email: { label: "Email", type: "text" },
-        password: {  label: "Password", type: "password" }
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
@@ -51,6 +51,8 @@ export const authOptions = {
         token.name = user.name;
         token.email = user.email;
         token.role = user.role;
+        token.phoneNumber = user.phoneNumber;
+        token.address = user.address;
       }
       return token;
     },
@@ -60,6 +62,8 @@ export const authOptions = {
         session.user.name = token.name;
         session.user.email = token.email;
         session.user.role = token.role;
+        session.user.phoneNumber = token.phoneNumber;
+        session.user.address = token.address;
       }
       return session;
     },

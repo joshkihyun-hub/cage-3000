@@ -1,58 +1,119 @@
 'use client';
 
 import { items } from '@/shared/constants/shop-items';
-import { useCart } from '@/shared/context/cart-context';
+import { ProductInfo } from '@/components/product-info';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function ShopItemPage({ params }) {
-  const { addToCart, clearCart } = useCart();
-  const router = useRouter();
   const item = items.find((item) => item.id === parseInt(params.id));
 
   if (!item) {
-    return <div className="text-center py-10">Item not found</div>;
+    return <div className="text-center py-32">Item not found</div>;
   }
 
-  const handleBuyNow = () => {
-    clearCart(); // Clear existing items in cart
-    addToCart(item, 1); // Add current item with quantity 1
-    router.push('/checkout');
-  };
+  const relatedItems = items.filter((i) => i.id !== item.id).slice(0, 3);
 
   return (
-    <div className="container mx-auto px-4 lg:px-0 py-12">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-        <div className="w-full border border-black">
+    <div className="min-h-screen bg-white">
+      {/* ==========================================
+          MOBILE LAYOUT (Stacked)
+          ========================================== */}
+      <div className="md:hidden flex flex-col pt-20">
+        {/* Image Section */}
+        <div className="relative w-full aspect-[3/4] bg-zinc-50">
           <Image
             src={item.imageUrl}
             alt={item.name}
-            width={1000}
-            height={1200}
-            className="object-cover w-full h-full"
+            fill
+            className="object-cover object-top"
+            priority
           />
         </div>
-        <div className="lg:sticky top-24">
-          <h1 className="text-4xl lg:text-5xl font-semibold mb-6">{item.name}</h1>
-          <p className="text-base text-gray-600 leading-relaxed mb-4">{item.description}</p>
-          <p className="text-base text-gray-600 leading-relaxed mb-8">{item.description_ko}</p>
-          <p className="text-2xl font-medium mb-10">{item.price}</p>
-          <div className="flex space-x-4">
-            <button 
-              onClick={() => addToCart(item)}
-              className="w-full border border-zinc-900 text-zinc-900 py-4 text-base font-semibold tracking-wider hover:bg-zinc-900 hover:text-white transition-colors"
-            >
-              ADD TO CART
-            </button>
-            <button 
-              onClick={handleBuyNow}
-              className="w-full bg-zinc-900 text-white py-4 text-base font-semibold tracking-wider hover:bg-zinc-800 transition-colors"
-            >
-              BUY NOW
-            </button>
+
+        {/* Info Section (Stacked below image) */}
+        <div className="w-full">
+          <ProductInfo item={item} />
+        </div>
+      </div>
+
+      {/* ==========================================
+          DESKTOP LAYOUT (Fixed Hero + Sticky Info)
+          ========================================== */}
+      <div className="hidden md:block">
+        {/* Fixed Hero Images (Background) */}
+        <div className="fixed inset-0 z-0 h-screen w-full">
+          <div className="grid grid-cols-2 h-full">
+            {/* Left Image */}
+            <div className="relative h-full w-full bg-zinc-50">
+              <Image
+                src={item.imageUrl}
+                alt={item.name}
+                fill
+                className="object-cover object-center"
+                priority
+              />
+            </div>
+
+            {/* Right Image */}
+            <div className="relative h-full w-full bg-zinc-50">
+              <Image
+                src={item.imageUrl}
+                alt={`${item.name} detail`}
+                fill
+                className="object-cover object-center"
+                priority
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Scrollable Content Wrapper */}
+        <div className="relative z-10">
+          {/* Scroll Track for Sticky Info Box */}
+          <div className="h-[150vh] w-full flex flex-col justify-end pb-0">
+            {/* Sticky Info Box */}
+            <div className="sticky bottom-0 w-full flex justify-center pb-0">
+              <ProductInfo item={item} />
+            </div>
           </div>
         </div>
       </div>
+
+      {/* ==========================================
+          SHARED: View More Section
+          ========================================== */}
+      <section className="relative z-10 bg-white py-24 px-4 md:px-8 max-w-screen-2xl mx-auto min-h-[50vh]">
+        <h2 className="text-xs font-medium uppercase tracking-[0.2em] mb-12 text-zinc-400">View More</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-12">
+          {relatedItems.map((relatedItem) => (
+            <Link key={relatedItem.id} href={`/shop/${relatedItem.id}`}>
+              <div className="group cursor-pointer flex flex-col h-full">
+                <div className="relative aspect-[3/4] bg-zinc-50 mb-4 overflow-hidden">
+                  <Image
+                    src={relatedItem.imageUrl}
+                    alt={relatedItem.name}
+                    fill
+                    className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center text-white font-light text-xs tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
+                    VIEW
+                  </div>
+                </div>
+
+                <div className="mt-auto space-y-1">
+                  <h3 className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-black">
+                    {relatedItem.name}
+                  </h3>
+                  <p className="text-[10px] md:text-xs font-medium tracking-widest text-zinc-900">
+                    {relatedItem.price}
+                  </p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

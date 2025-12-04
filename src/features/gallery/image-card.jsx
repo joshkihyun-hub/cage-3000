@@ -1,12 +1,9 @@
 import Link from 'next/link';
-// TODO: 이 컴포넌트를 사용하는 상위 파일(예: gallery.jsx)에서 Roboto Mono 폰트를 import해야 합니다.
-// import { Roboto_Mono } from 'next/font/google';
-// const robotoMono = Roboto_Mono({ subsets: ['latin'], weight: ['500'] });
 
 export const ImageCard = ({ item }) => {
   return (
     <Link href={`/details/${item.id}`} className="group block text-left">
-      <div className="relative overflow-hidden aspect-[3/4] border border-zinc-200">
+      <div className="relative overflow-hidden aspect-[3/4] bg-zinc-50 mb-6">
         {/* 기본 이미지 */}
         <img
           src={item.image}
@@ -23,14 +20,17 @@ export const ImageCard = ({ item }) => {
                      transform scale-110 group-hover:scale-100 opacity-0 group-hover:opacity-100
                      transition-all duration-700 ease-in-out"
         />
+        {/* Overlay Text (Optional, mimicking the shop style) */}
+        <div className="absolute inset-0 flex items-center justify-center text-white font-light text-xs tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/10">
+          VIEW PROJECT
+        </div>
       </div>
 
-      {/* 1. 텍스트 부분을 가로 정렬 레이아웃으로 변경하고 스타일을 다듬습니다. */}
-      <div className="mt-3 flex justify-between items-baseline font-mono">
-        <h3 className="text-sm font-medium text-zinc-900 truncate pr-4">
+      <div className="flex flex-col space-y-2">
+        <h3 className="text-lg md:text-xl font-serif font-normal uppercase tracking-wide text-black">
           {item.title}
         </h3>
-        <p className="text-xs text-zinc-500 uppercase flex-shrink-0">
+        <p className="text-[10px] md:text-xs font-medium tracking-[0.2em] text-zinc-400 uppercase">
           {item.subtitle}
         </p>
       </div>
