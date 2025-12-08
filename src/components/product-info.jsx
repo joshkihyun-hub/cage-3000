@@ -17,7 +17,7 @@ export const ProductInfo = ({ item }) => {
     };
 
     return (
-        <div className="w-full md:max-w-md bg-black text-white p-6 shadow-2xl">
+        <div className="w-full md:max-w-md bg-black/40 backdrop-blur-xl border border-white/10 text-white p-6 shadow-2xl">
             <div className="flex justify-between items-start mb-4">
                 <h1 className="text-lg md:text-xl font-serif uppercase tracking-wider">
                     {item.name}
@@ -38,15 +38,32 @@ export const ProductInfo = ({ item }) => {
                 </button>
 
                 <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isDescriptionOpen ? 'max-h-96 opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
-                    <div className="text-xs font-light text-zinc-300 leading-relaxed space-y-3 pb-3">
-                        <p>{item.description}</p>
-                        <p>{item.description_ko}</p>
+                    <div className="text-xs font-light text-white leading-relaxed space-y-3 pb-3">
+                        {item.material && (
+                            <p className="whitespace-pre-line text-white/90">
+                                {item.material}
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>
 
+            {/* Size Selector */}
+            <div className="mt-6 border-t border-white/20 pt-4">
+                <div className="flex justify-between items-center mb-2">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-300">Size</span>
+                </div>
+                <div className="flex gap-2">
+                    <button
+                        className="w-full py-3 border border-white bg-white text-black text-[10px] font-medium uppercase tracking-[0.2em] transition-colors"
+                    >
+                        One Size
+                    </button>
+                </div>
+            </div>
+
             {/* Actions */}
-            <div className="mt-4 space-y-2">
+            <div className="mt-6 space-y-2">
                 <button
                     onClick={() => addToCart(item)}
                     className="w-full bg-white text-black py-3 text-[10px] font-medium uppercase tracking-[0.2em] hover:bg-zinc-200 transition-colors duration-300"

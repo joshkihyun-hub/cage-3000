@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -34,11 +34,14 @@ export default function LookbookPage() {
     const [selectedImage, setSelectedImage] = useState(null);
     const galleryRef = useRef(null);
 
+    useEffect(() => {
+        if (isGalleryOpen && galleryRef.current) {
+            galleryRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [isGalleryOpen]);
+
     const handleMainImageClick = () => {
         setIsGalleryOpen(true);
-        setTimeout(() => {
-            galleryRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
     };
 
     return (
@@ -69,7 +72,7 @@ export default function LookbookPage() {
                     <div className="max-w-md">
                         <div className="flex items-end gap-6 mb-8">
                             <h1 className="font-serif text-4xl md:text-7xl text-black leading-tight">
-                                Inner<br />Weather
+                                green
                             </h1>
                             <div className="absolute -top-20 right-4 w-32 h-32 md:static md:w-48 md:h-48 md:mb-2 opacity-80 z-10">
                                 <Image
@@ -80,17 +83,11 @@ export default function LookbookPage() {
                                 />
                             </div>
                         </div>
-                        <div className="space-y-6 text-sm md:text-base leading-relaxed text-zinc-600 font-light">
-                            <p>
-                                I crafted nine hats. Wearing them, I experienced subtle shifts in emotion and gait.
-                            </p>
-                            <p>
-                                Fascinated by the gestures that embody these feelings and their nuances,
-                                I designed each piece to represent a distinct emotion.
-                            </p>
-                            <p>
-                                Titled 'Inner Weather,' this collection marks the debut of cage3000.
-                            </p>
+                        <div className="mt-8 space-y-1 text-xs text-zinc-400 font-light tracking-wide">
+                            <p>Design, Production: @choppycocky</p>
+                            <p>Photography: @youngikyoun</p>
+                            <p>Styling: @bluevereal</p>
+                            <p>Model: @simleeje @choppycocky</p>
                         </div>
                         {!isGalleryOpen && (
                             <button
@@ -109,39 +106,40 @@ export default function LookbookPage() {
                 {isGalleryOpen && (
                     <motion.div
                         ref={galleryRef}
-                        initial={{ opacity: 0, y: 50 }}
+                        initial={{ opacity: 0, y: 100 }}
                         animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 100 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="container mx-auto px-4 py-24"
+                        className="container mx-auto px-4"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
-                            {galleryImages.map((src, index) => (
-                                <motion.div
-                                    key={index}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: index * 0.1, duration: 0.6 }}
-                                    className={`relative ${index % 3 === 0 ? 'aspect-[3/4]' :
-                                        index % 3 === 1 ? 'aspect-[4/5]' : 'aspect-[3/4]'
-                                        } w-full bg-zinc-50 cursor-pointer group`}
-                                    onClick={() => setSelectedImage(src)}
-                                >
-                                    <Image
-                                        src={src}
-                                        alt={`Lookbook Image ${index + 1}`}
-                                        fill
-                                        className="object-cover hover:scale-[1.02] transition-transform duration-700"
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                    />
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                                </motion.div>
-                            ))}
-                        </div>
+                        <div className="py-24">
 
-                        <div className="mt-24 text-center">
-                            <p className="font-serif text-2xl text-black mb-4">cage3000</p>
-                            <p className="text-xs uppercase tracking-widest text-zinc-400">Seoul, South Korea</p>
+                            {/* Masonry Layout using CSS Columns */}
+                            <div className="columns-1 md:columns-2 lg:columns-3 gap-4 md:gap-8 space-y-4 md:space-y-8">
+                                {galleryImages.map((src, index) => (
+                                    <motion.div
+                                        key={index}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: index * 0.1, duration: 0.6 }}
+                                        className="relative w-full break-inside-avoid bg-zinc-50 cursor-pointer group"
+                                        onClick={() => setSelectedImage(src)}
+                                    >
+                                        <img
+                                            src={src}
+                                            alt={`Lookbook Image ${index + 1}`}
+                                            className="w-full h-auto object-contain hover:brightness-90 transition-all duration-700"
+                                        />
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 pointer-events-none" />
+                                    </motion.div>
+                                ))}
+                            </div>
+
+                            <div className="mt-24 text-center">
+                                <p className="font-serif text-2xl text-black mb-4">cage3000</p>
+                                <p className="text-xs uppercase tracking-widest text-zinc-400">Seoul, South Korea</p>
+                            </div>
                         </div>
                     </motion.div>
                 )}

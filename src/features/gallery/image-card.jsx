@@ -3,7 +3,7 @@ import Link from 'next/link';
 export const ImageCard = ({ item }) => {
   return (
     <Link href={`/details/${item.id}`} className="group block text-left">
-      <div className="relative overflow-hidden aspect-[3/4] bg-zinc-50 mb-6">
+      <div className="relative overflow-hidden aspect-[3/4] bg-zinc-50 mb-8">
         {/* 기본 이미지 */}
         <img
           src={item.image}
@@ -26,13 +26,11 @@ export const ImageCard = ({ item }) => {
         </div>
       </div>
 
-      <div className="flex flex-col space-y-2">
-        <h3 className="text-lg md:text-xl font-serif font-normal uppercase tracking-wide text-black">
+      {/* Title removed from list view as per request */}
+      <div className="hidden">
+        <h3 className="text-lg md:text-2xl font-serif font-light uppercase tracking-wide text-black leading-tight">
           {item.title}
         </h3>
-        <p className="text-[10px] md:text-xs font-medium tracking-[0.2em] text-zinc-400 uppercase">
-          {item.subtitle}
-        </p>
       </div>
     </Link>
   );

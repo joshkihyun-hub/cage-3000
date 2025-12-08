@@ -11,13 +11,29 @@ const playfair = Playfair_Display({
   display: 'swap',
 });
 
+export const metadata = {
+  title: 'CAGE3000',
+  description: 'CAGE3000 Official Store',
+  icons: {
+    icon: '/파비콘 1.png',
+  },
+  openGraph: {
+    title: 'CAGE3000',
+    description: 'CAGE3000 Official Store',
+    images: [
+      {
+        url: '/kl.png',
+        width: 800,
+        height: 600,
+      },
+    ],
+  },
+};
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="ko" className="scroll-smooth">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>CAGE3000</title>
-      </head>
+    <html lang="ko">
+
       <body className={`${playfair.variable} font-serif bg-background text-foreground min-h-screen flex flex-col antialiased selection:bg-primary/10 selection:text-primary`}>
         <AuthProvider>
           <CartProvider>

@@ -25,18 +25,17 @@ export default function AboutPage() {
                         </h1>
 
                         <div className="space-y-8 text-sm md:text-base leading-relaxed text-zinc-600 font-light">
-                            <p>
-                                cage3000 explores the subtle shifts in emotion and gesture.
+                            <p className="text-xl md:text-2xl font-medium text-black italic">
+                                "No room for boring"
                             </p>
-                            <p>
-                                We believe that what we wear is an extension of our inner weather—a physical manifestation of the intangible feelings that move through us.
-                            </p>
-                            <p>
-                                Our debut collection, 'Inner Weather', captures these nuances through form and texture, inviting you to experience the delicate balance between the seen and the felt.
-                            </p>
-                            <p className="pt-8 font-serif text-black text-lg">
-                                cage3000
-                            </p>
+                            <div className="pt-8 text-sm text-zinc-500 font-light">
+                                <p>Cage3000 Director Kihyun Kim based in Seoul</p>
+                                <div className="flex gap-4 mt-2">
+                                    <a href="https://instagram.com/cage3k" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors">
+                                        @cage3k
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

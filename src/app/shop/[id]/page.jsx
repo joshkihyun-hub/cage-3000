@@ -24,29 +24,39 @@ export default function ShopItemPage({ params }) {
       <div className="md:hidden flex flex-col pt-20">
         {/* Image Section */}
         {/* Image Section */}
-        <div className="w-full">
-          {item.images && item.images.length > 0 ? (
-            item.images.map((imgSrc, idx) => (
-              <div key={idx} className="relative w-full mb-1 bg-zinc-50">
+        {/* Image Slider Section */}
+        <div className="w-full relative aspect-[3/4] bg-zinc-50">
+          <div className="absolute inset-0 flex overflow-x-auto snap-x snap-mandatory no-scrollbar">
+            {item.images && item.images.length > 0 ? (
+              item.images.map((imgSrc, idx) => (
+                <div key={idx} className="relative w-full h-full flex-shrink-0 snap-center">
+                  <Image
+                    src={imgSrc}
+                    alt={`${item.name} detail ${idx + 1}`}
+                    fill
+                    className="object-cover object-center"
+                    priority={idx < 1}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="relative w-full h-full flex-shrink-0 snap-center">
                 <Image
-                  src={imgSrc}
-                  alt={`${item.name} detail ${idx + 1}`}
-                  width={1000}
-                  height={1333}
-                  className="w-full h-auto object-cover"
-                  priority={idx < 1}
+                  src={item.imageUrl}
+                  alt={item.name}
+                  fill
+                  className="object-cover object-top"
+                  priority
                 />
               </div>
-            ))
-          ) : (
-            <div className="relative w-full aspect-[3/4] bg-zinc-50">
-              <Image
-                src={item.imageUrl}
-                alt={item.name}
-                fill
-                className="object-cover object-top"
-                priority
-              />
+            )}
+          </div>
+          {/* Page Indicator (Optional - adding simple dots) */}
+          {item.images && item.images.length > 1 && (
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
+              {item.images.map((_, idx) => (
+                <div key={idx} className="w-1.5 h-1.5 rounded-full bg-white/50 backdrop-blur-sm" />
+              ))}
             </div>
           )}
         </div>
@@ -57,6 +67,9 @@ export default function ShopItemPage({ params }) {
         </div>
       </div>
 
+      {/* ==========================================
+          DESKTOP LAYOUT (Horizontal Flex)
+          ========================================== */}
       {/* ==========================================
           DESKTOP LAYOUT (Fixed Hero + Sticky Info)
           ========================================== */}
@@ -103,37 +116,7 @@ export default function ShopItemPage({ params }) {
       {/* ==========================================
           SHARED: View More Section
           ========================================== */}
-      <section className="relative z-10 bg-white py-24 px-4 md:px-8 max-w-screen-2xl mx-auto min-h-[50vh]">
-        <h2 className="text-xs font-medium uppercase tracking-[0.2em] mb-12 text-zinc-400">View More</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-12">
-          {relatedItems.map((relatedItem) => (
-            <Link key={relatedItem.id} href={`/shop/${relatedItem.id}`}>
-              <div className="group cursor-pointer flex flex-col h-full">
-                <div className="relative aspect-[3/4] bg-zinc-50 mb-4 overflow-hidden">
-                  <Image
-                    src={relatedItem.imageUrl}
-                    alt={relatedItem.name}
-                    fill
-                    className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center text-white font-light text-xs tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
-                    VIEW
-                  </div>
-                </div>
 
-                <div className="mt-auto space-y-1">
-                  <h3 className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-black">
-                    {relatedItem.name}
-                  </h3>
-                  <p className="text-[10px] md:text-xs font-medium tracking-widest text-zinc-900">
-                    {relatedItem.price}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }
