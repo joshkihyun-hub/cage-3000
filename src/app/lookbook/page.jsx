@@ -4,21 +4,29 @@ import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const mainImage = '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-03-20-36-34.jpeg';
+const mainImage = '/asset/details/lookbook/9hat/A1.jpg';
 
 const galleryImages = [
-    '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-03-19-35-22.jpeg',
-    '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-03-19-36-26 001.jpeg',
-    '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-03-19-36-26 003.jpeg',
-    '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-03-19-36-26 004.jpeg',
-    '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-03-19-36-26 005.jpeg',
-    '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-03-19-36-26 006.jpeg',
-    '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-03-19-36-26 007.jpeg',
-    '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-03-19-36-26 008.jpeg',
-    '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-03-19-36-42.jpeg',
-    '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-04-00-05-28 001.jpeg',
-    '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-04-00-05-29 002.jpeg',
-    '/asset/details/lookbook/9hat/KakaoTalk_Photo_2025-12-04-00-05-29 003.jpeg',
+    '/asset/details/lookbook/9hat/A1.jpg',
+    '/asset/details/lookbook/9hat/A2.jpg',
+    '/asset/details/lookbook/9hat/A3.jpeg',
+    '/asset/details/lookbook/9hat/B1.jpg',
+    '/asset/details/lookbook/9hat/B3.jpg',
+    '/asset/details/lookbook/9hat/C1.jpg',
+    '/asset/details/lookbook/9hat/C2.jpg',
+    '/asset/details/lookbook/9hat/D1.jpg',
+    '/asset/details/lookbook/9hat/D2.jpg',
+    '/asset/details/lookbook/9hat/D3.jpg',
+    '/asset/details/lookbook/9hat/E1.jpeg',
+    '/asset/details/lookbook/9hat/E2.jpg',
+    '/asset/details/lookbook/9hat/E3.jpg',
+    '/asset/details/lookbook/9hat/F1.jpg',
+    '/asset/details/lookbook/9hat/F2.jpg',
+    '/asset/details/lookbook/9hat/G1.jpg',
+    '/asset/details/lookbook/9hat/G2.jpg',
+    '/asset/details/lookbook/9hat/H1.jpg',
+    '/asset/details/lookbook/9hat/H2.jpg',
+    '/asset/details/lookbook/9hat/H3.jpg',
 ];
 
 export default function LookbookPage() {

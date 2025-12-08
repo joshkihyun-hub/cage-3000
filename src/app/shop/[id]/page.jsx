@@ -23,14 +23,32 @@ export default function ShopItemPage({ params }) {
           ========================================== */}
       <div className="md:hidden flex flex-col pt-20">
         {/* Image Section */}
-        <div className="relative w-full aspect-[3/4] bg-zinc-50">
-          <Image
-            src={item.imageUrl}
-            alt={item.name}
-            fill
-            className="object-cover object-top"
-            priority
-          />
+        {/* Image Section */}
+        <div className="w-full">
+          {item.images && item.images.length > 0 ? (
+            item.images.map((imgSrc, idx) => (
+              <div key={idx} className="relative w-full mb-1 bg-zinc-50">
+                <Image
+                  src={imgSrc}
+                  alt={`${item.name} detail ${idx + 1}`}
+                  width={1000}
+                  height={1333}
+                  className="w-full h-auto object-cover"
+                  priority={idx < 1}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="relative w-full aspect-[3/4] bg-zinc-50">
+              <Image
+                src={item.imageUrl}
+                alt={item.name}
+                fill
+                className="object-cover object-top"
+                priority
+              />
+            </div>
+          )}
         </div>
 
         {/* Info Section (Stacked below image) */}
@@ -43,39 +61,39 @@ export default function ShopItemPage({ params }) {
           DESKTOP LAYOUT (Fixed Hero + Sticky Info)
           ========================================== */}
       <div className="hidden md:block">
-        {/* Fixed Hero Images (Background) */}
-        <div className="fixed inset-0 z-0 h-screen w-full">
-          <div className="grid grid-cols-2 h-full">
-            {/* Left Image */}
-            <div className="relative h-full w-full bg-zinc-50">
-              <Image
-                src={item.imageUrl}
-                alt={item.name}
-                fill
-                className="object-cover object-center"
-                priority
-              />
-            </div>
-
-            {/* Right Image */}
-            <div className="relative h-full w-full bg-zinc-50">
-              <Image
-                src={item.imageUrl}
-                alt={`${item.name} detail`}
-                fill
-                className="object-cover object-center"
-                priority
-              />
-            </div>
+        <div className="grid grid-cols-2 min-h-screen">
+          {/* Scrollable Images (Left) */}
+          <div className="w-full">
+            {item.images && item.images.length > 0 ? (
+              item.images.map((imgSrc, idx) => (
+                <div key={idx} className="relative w-full mb-1">
+                  <Image
+                    src={imgSrc}
+                    alt={`${item.name} detail ${idx + 1}`}
+                    width={1000}
+                    height={1200}
+                    className="w-full h-auto object-cover"
+                    priority={idx < 2}
+                  />
+                </div>
+              ))
+            ) : (
+              // Fallback if no images array
+              <div className="relative w-full h-screen">
+                <Image
+                  src={item.imageUrl}
+                  alt={item.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            )}
           </div>
-        </div>
 
-        {/* Scrollable Content Wrapper */}
-        <div className="relative z-10">
-          {/* Scroll Track for Sticky Info Box */}
-          <div className="h-[150vh] w-full flex flex-col justify-end pb-0">
-            {/* Sticky Info Box */}
-            <div className="sticky bottom-0 w-full flex justify-center pb-0">
+          {/* Sticky Info (Right) */}
+          <div className="relative h-full">
+            <div className="sticky top-0 h-screen flex flex-col justify-center items-center">
               <ProductInfo item={item} />
             </div>
           </div>

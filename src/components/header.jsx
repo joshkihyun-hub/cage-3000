@@ -9,11 +9,11 @@ import { ShoppingBag, Menu, X, User, LogOut, LogIn } from 'lucide-react';
 
 const navItemsLeft = [
   { name: 'Shop', href: '/shop' },
-  { name: 'Projects', href: '/projects' },
+  { name: 'Lookbook', href: '/lookbook' },
 ];
 
 const navItemsRight = [
-  { name: 'Lookbook', href: '/lookbook' },
+  { name: 'Projects', href: '/projects' },
   { name: 'About', href: '/about' },
 ];
 
