@@ -36,7 +36,7 @@ export default function HomePage() {
         </Link>
       </section>
 
-      {/* Shop Section - Minimalist Grid */}
+      {/* Shop Section */}
       <section id="shop" className="hidden md:block py-32 px-4 md:px-8 max-w-screen-2xl mx-auto">
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-12">
