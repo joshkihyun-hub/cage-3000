@@ -15,7 +15,7 @@ export const metadata = {
   title: 'CAGE3000',
   description: 'CAGE3000 Official Store',
   icons: {
-    icon: '/파비콘 1.png',
+    icon: '/favicon-v2.png',
   },
   openGraph: {
     title: 'CAGE3000',
