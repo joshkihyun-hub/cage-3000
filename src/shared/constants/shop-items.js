@@ -122,6 +122,7 @@ export const items = [
       '/asset/details/shop/9hat/hat7/shop_hat7_sub2.jpg',
       '/asset/details/shop/9hat/hat7/shop_hat7_lookbook1.jpg',
       '/asset/details/shop/9hat/hat7/shop_hat7_lookbook2.jpg',
+      '/asset/details/shop/9hat/hat7/shop_hat7_lookbook3.jpeg',
     ]
   },
   {

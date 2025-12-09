@@ -76,22 +76,44 @@ export default function LookbookPage() {
                 </div>
 
                 {/* Right: Content */}
-                <div className="w-full md:w-1/2 min-h-[40vh] md:h-screen flex flex-col justify-center px-8 md:px-24 bg-white py-12 md:py-0 relative">
-                    <div className="max-w-md relative">
+                <div className="w-full md:w-1/2 min-h-[40vh] md:h-screen flex flex-col justify-center px-8 md:px-24 bg-white py-12 md:py-0 relative md:overflow-hidden">
+                    {/* Bird Logo - Positioned Absolute */}
+                    <div className="absolute top-0 right-8 w-32 h-32 -translate-y-[60%] md:top-1/2 md:right-0 md:w-[48rem] md:h-[48rem] md:-translate-y-1/2 md:translate-x-1/4 opacity-90 z-10 pointer-events-none">
+                        <Image
+                            src="/kl.png"
+                            alt="Logo"
+                            fill
+                            className="object-contain"
+                        />
+                    </div>
+
+                    <div className="max-w-md relative z-20">
                         <div className="flex items-end gap-6 mb-8">
-                            <h1 className="font-serif text-4xl md:text-7xl text-black leading-tight">
-                                green
-                            </h1>
-                            <div className="absolute -top-20 right-4 w-32 h-32 md:static md:w-72 md:h-72 md:mb-4 md:translate-x-8 opacity-90 z-10 pointer-events-none">
-                                <Image
-                                    src="/kl.png"
-                                    alt="Logo"
-                                    fill
-                                    className="object-contain"
-                                />
-                            </div>
+                            <motion.h1
+                                initial={{ opacity: 0, y: 40 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
+                                className="font-serif text-4xl md:text-7xl leading-tight flex gap-1"
+                            >
+                                {['g', 'r', 'e', 'e', 'n'].map((letter, i) => (
+                                    <motion.span
+                                        key={i}
+                                        initial={{ color: '#000000' }}
+                                        animate={{ color: '#D0F0F4' }}
+                                        transition={{
+                                            duration: 3,
+                                            delay: i * 0.2,
+                                            repeat: Infinity,
+                                            repeatType: "reverse",
+                                            ease: "easeInOut"
+                                        }}
+                                    >
+                                        {letter}
+                                    </motion.span>
+                                ))}
+                            </motion.h1>
                         </div>
-                        <div className="mt-8 space-y-1 text-xs text-zinc-400 font-light tracking-wide">
+                        <div className="mt-8 space-y-1 text-[10px] md:text-xs text-zinc-400 font-light tracking-wide">
                             <p>Design, Production: @choppycocky</p>
                             <p>Photography: @youngikyoun</p>
                             <p>Styling: @bluevereal</p>
