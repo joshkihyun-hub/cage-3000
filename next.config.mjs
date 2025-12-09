@@ -10,6 +10,13 @@ const nextConfig = {
 
     return config;
   },
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  poweredByHeader: false,
 };
 
 // module.exports를 export default로 변경

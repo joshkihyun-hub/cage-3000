@@ -37,8 +37,15 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 20);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -46,12 +53,12 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${scrolled || isMobileMenuOpen
-        ? 'bg-white/95 backdrop-blur-md py-2 border-b border-zinc-100'
-        : 'bg-transparent py-6'
-        }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ease-in-out pointer-events-none ${scrolled || isMobileMenuOpen
+        ? 'bg-white/95 backdrop-blur-md border-b border-zinc-100'
+        : 'bg-transparent'
+        } py-4`}
     >
-      <div className="max-w-screen-2xl mx-auto px-6 md:px-12">
+      <div className="max-w-screen-2xl mx-auto px-6 md:px-12 pointer-events-auto">
         <div className="flex justify-between items-center h-20 md:h-24 relative">
 
           {/* Mobile Menu Button */}
@@ -65,7 +72,7 @@ export default function Header() {
           </div>
 
           {/* Desktop Nav - Left Split */}
-          <div className="hidden md:flex flex-1 justify-end pr-24 items-center gap-x-8">
+          <div className="hidden md:flex flex-1 justify-end pr-24 items-center gap-x-8 z-40 relative">
             {navItemsLeft.map((item) => (
               <Link
                 key={item.name}
@@ -92,7 +99,7 @@ export default function Header() {
           </div>
 
           {/* Desktop Nav - Right Split */}
-          <div className="hidden md:flex flex-1 justify-start pl-24 items-center gap-x-8">
+          <div className="hidden md:flex flex-1 justify-start pl-24 items-center gap-x-8 z-40 relative">
             {navItemsRight.map((item) => (
               <Link
                 key={item.name}
@@ -106,7 +113,7 @@ export default function Header() {
           </div>
 
           {/* Actions (Cart, Auth) - Absolute Right */}
-          <div className="hidden md:flex absolute right-0 top-1/2 transform -translate-y-1/2 items-center space-x-6">
+          <div className="hidden md:flex absolute right-0 top-1/2 transform -translate-y-1/2 items-center space-x-6 z-50">
             <div className="flex items-center space-x-4">
               <CartIcon />
               {session ? (
@@ -127,7 +134,7 @@ export default function Header() {
           </div>
 
           {/* Mobile Cart Icon (Right) */}
-          <div className="md:hidden flex-1 flex justify-end z-20">
+          <div className="md:hidden flex-1 flex justify-end z-50">
             <CartIcon />
           </div>
         </div>

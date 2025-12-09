@@ -20,9 +20,7 @@ export default function AboutPage() {
                 {/* Right: Content */}
                 <div className="w-full md:w-1/2 flex flex-col justify-center px-8 md:px-24 py-16 md:py-0 bg-white">
                     <div className="max-w-md">
-                        <h1 className="font-serif text-4xl md:text-5xl text-black mb-12">
-                            About
-                        </h1>
+
 
                         <div className="space-y-8 text-sm md:text-base leading-relaxed text-zinc-600 font-light">
                             <p className="text-xl md:text-2xl font-medium text-black italic">

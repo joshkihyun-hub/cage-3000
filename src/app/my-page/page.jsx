@@ -66,6 +66,28 @@ export default function MyPage() {
               Admin Mode
             </Link>
           )}
+
+          <button
+            onClick={async () => {
+              if (confirm('Are you sure you want to withdraw? This action cannot be undone.')) {
+                try {
+                  const res = await fetch('/api/user/delete', { method: 'DELETE' });
+                  if (res.ok) {
+                    alert('Account deleted successfully.');
+                    window.location.href = '/'; // Force redirect to refresh session state
+                  } else {
+                    alert('Failed to delete account.');
+                  }
+                } catch (err) {
+                  console.error(err);
+                  alert('An error occurred.');
+                }
+              }
+            }}
+            className="block w-full border border-zinc-200 text-zinc-400 py-4 text-xs uppercase tracking-[0.2em] hover:text-red-500 hover:border-red-500 transition-colors text-center font-serif"
+          >
+            Withdrawal
+          </button>
         </div>
       </div>
     </div>

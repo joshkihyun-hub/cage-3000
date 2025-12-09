@@ -21,6 +21,7 @@ export default function HomePage() {
               src="/asset/details/main/C-6.jpg"
               alt="CAGE3000 Hero Desktop"
               fill
+              sizes="100vw"
               className="object-cover object-center"
               priority
               quality={100}
@@ -33,6 +34,7 @@ export default function HomePage() {
               src="/asset/details/lookbook/9hat/A1.jpg"
               alt="CAGE3000 Hero Mobile"
               fill
+              sizes="100vw"
               className="object-cover object-center"
               priority
               quality={100}
