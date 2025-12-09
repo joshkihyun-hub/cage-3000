@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { useCart } from '../shared/context/cart-context';
-import { ShoppingBag, Menu, X, User, LogOut, LogIn } from 'lucide-react';
+import { ShoppingBag, Menu, X, User, LogOut, LogIn, Shield } from 'lucide-react';
 
 const navItemsLeft = [
   { name: 'Shop', href: '/shop' },
@@ -118,6 +118,11 @@ export default function Header() {
               <CartIcon />
               {session ? (
                 <div className="flex items-center space-x-2">
+                  {session.user?.role === 'admin' && (
+                    <Link href="/admin/users" className="p-2 text-zinc-600 hover:text-black transition-colors" title="Admin">
+                      <Shield className="w-5 h-5" />
+                    </Link>
+                  )}
                   <Link href="/my-page" className="p-2 text-zinc-600 hover:text-black transition-colors" title="My Page">
                     <User className="w-5 h-5" />
                   </Link>
@@ -162,6 +167,11 @@ export default function Header() {
                 <Link href="/my-page" onClick={() => setIsMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-zinc-600 hover:text-black">
                   My Page
                 </Link>
+                {session.user?.role === 'admin' && (
+                  <Link href="/admin/users" onClick={() => setIsMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-zinc-600 hover:text-black">
+                    Admin
+                  </Link>
+                )}
                 <button onClick={() => signOut()} className="text-sm uppercase tracking-widest text-zinc-600 hover:text-black">
                   Sign Out
                 </button>
