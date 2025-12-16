@@ -1,4 +1,5 @@
 import './globals.css';
+import { Analytics } from "@vercel/analytics/react"
 import { Playfair_Display } from 'next/font/google';
 import AuthProvider from './auth-provider';
 import Header from '../components/header';
@@ -46,6 +47,7 @@ export default function RootLayout({ children }) {
             </footer>
           </CartProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
