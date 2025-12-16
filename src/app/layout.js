@@ -1,5 +1,5 @@
 import './globals.css';
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/next"
 import { Playfair_Display } from 'next/font/google';
 import AuthProvider from './auth-provider';
 import Header from '../components/header';
