@@ -1,14 +1,14 @@
 import './globals.css';
 import { Analytics } from "@vercel/analytics/next"
-import { Playfair_Display } from 'next/font/google';
+import { Bodoni_Moda } from 'next/font/google';
 import AuthProvider from './auth-provider';
 import Header from '../components/header';
 import { CartProvider } from '../shared/context/cart-context';
 
 // 본문용 폰트 설정
-const playfair = Playfair_Display({
+const bodoni = Bodoni_Moda({
   subsets: ['latin'],
-  variable: '--font-playfair',
+  variable: '--font-bodoni',
   display: 'swap',
 });
 
@@ -35,7 +35,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko">
 
-      <body className={`${playfair.variable} font-serif bg-background text-foreground min-h-screen flex flex-col antialiased selection:bg-primary/10 selection:text-primary`}>
+      <body className={`${bodoni.variable} font-serif bg-background text-foreground min-h-screen flex flex-col antialiased selection:bg-primary/10 selection:text-primary`}>
         <AuthProvider>
           <CartProvider>
             <Header />

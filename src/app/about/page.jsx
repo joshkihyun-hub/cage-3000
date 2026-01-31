@@ -1,43 +1,78 @@
 'use client';
 
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 export default function AboutPage() {
     return (
-        <div className="bg-white text-zinc-900 min-h-screen">
-            <div className="flex flex-col md:flex-row min-h-screen">
-                {/* Left: Image */}
-                <div className="w-full md:w-1/2 h-[60vh] md:h-screen relative">
-                    <Image
-                        src="/IMG_1399.png"
-                        alt="About cage3000"
-                        fill
-                        className="object-cover"
-                        priority
-                    />
-                </div>
+        <div className="bg-white text-zinc-900 min-h-screen relative overflow-hidden">
 
-                {/* Right: Content */}
-                <div className="w-full md:w-1/2 flex flex-col justify-center px-8 md:px-24 py-16 md:py-0 bg-white">
-                    <div className="max-w-md">
+            {/* Crow Illustration - Floating Top Right */}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
+                className="absolute top-[15%] right-[10%] md:right-[15%] w-64 h-64 md:w-96 md:h-96 z-10 opacity-90 mix-blend-multiply"
+            >
+                <Image
+                    src="/about_crow.png"
+                    alt="Flying Crow"
+                    fill
+                    className="object-contain"
+                    priority
+                />
+            </motion.div>
+
+            {/* Scattered Text 1 - Top Left */}
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 1.4, delay: 0.2, ease: [0.19, 1, 0.22, 1] }}
+                className="absolute top-[25%] left-[10%] md:left-[15%] z-20"
+            >
+                <h2 className="font-serif text-lg md:text-xl text-zinc-500 font-light italic tracking-widest leading-relaxed">
+                    Until the day
+                </h2>
+            </motion.div>
+
+            {/* Scattered Text 2 - Overlapping/Middle */}
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.4, delay: 0.5, ease: [0.19, 1, 0.22, 1] }}
+                className="absolute top-[45%] left-[20%] md:left-[35%] z-20"
+            >
+                <h2 className="font-serif text-2xl md:text-4xl text-black font-normal tracking-tight leading-none mix-blend-darken">
+                    <span className="italic font-light text-zinc-400 mr-2">3000 birds</span>
+                    fly us
+                </h2>
+            </motion.div>
 
 
-                        <div className="space-y-8 text-sm md:text-base leading-relaxed text-zinc-600 font-light">
-                            <p className="text-xl md:text-2xl font-medium text-black italic">
-                                "No room for boring"
-                            </p>
-                            <div className="pt-8 text-sm text-zinc-500 font-light">
-                                <p>Cage3000 Director Kihyun Kim based in Seoul</p>
-                                <div className="flex gap-4 mt-2">
-                                    <a href="https://instagram.com/cage3k" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors">
-                                        @cage3k
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {/* Scattered Text 3 - Bottom Right */}
+            <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 1.4, delay: 0.8, ease: [0.19, 1, 0.22, 1] }}
+                className="absolute bottom-[20%] right-[10%] md:right-[20%] z-20 text-right"
+            >
+                <h2 className="font-serif text-xl md:text-3xl text-zinc-800 font-light leading-relaxed">
+                    into the sky.
+                </h2>
+                <div className="w-12 h-px bg-zinc-300 ml-auto mt-6 mb-3"></div>
+                <p className="text-sm font-serif italic text-zinc-600">
+                    Director Kihyun Kim
+                </p>
+                <a
+                    href="https://instagram.com/cage3k"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-[9px] uppercase tracking-[0.2em] text-zinc-300 hover:text-black transition-colors mt-1"
+                >
+                    @cage3k
+                </a>
+            </motion.div>
+
         </div>
     );
 }

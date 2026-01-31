@@ -80,17 +80,22 @@ export default function ProjectDetailPage({ params }) {
             </div>
           </div>
 
-          {/* Shared Info Block (Below Grid for Exoskeletal) */}
           <div className="flex justify-start px-4 mt-12 md:mt-16 pb-32">
-            <div className="w-full md:max-w-md text-left space-y-2">
-              <h1 className="font-serif text-3xl md:text-4xl text-zinc-900 uppercase tracking-wide">{project.title}</h1>
-              <p className="text-xs text-zinc-500 tracking-wider uppercase">{project.subtitle}</p>
+            <div className="w-full md:max-w-md text-left space-y-4">
+              <h1 className="font-serif text-xl md:text-3xl text-zinc-900 uppercase tracking-wide leading-tight">
+                {project.title}
+              </h1>
+
+              <p className="text-xs md:text-sm text-zinc-500 tracking-widest font-serif">
+                {project.subtitle?.replace('FASHION / ', '')}
+              </p>
+
               {/* Credits */}
               {project.credits && (
-                <div className="pt-4 space-y-1">
+                <div className="pt-8 space-y-1 border-t border-zinc-100 mt-8">
                   {project.credits.map((credit, idx) => (
-                    <p key={idx} className="text-[10px] md:text-xs text-zinc-400 font-light tracking-wide">
-                      <span className="font-normal text-zinc-600">{credit.role}</span> - {credit.name}
+                    <p key={idx} className="text-[10px] md:text-xs text-zinc-400 font-serif tracking-wide">
+                      <span className="font-medium text-zinc-600">{credit.role}</span> - {credit.name}
                     </p>
                   ))}
                 </div>
@@ -146,14 +151,20 @@ export default function ProjectDetailPage({ params }) {
 
           {/* 2. Info Block */}
           <div className="flex justify-start px-4 mt-12 md:mt-16">
-            <div className="w-full md:max-w-md text-left space-y-2">
-              <h1 className="font-serif text-3xl md:text-4xl text-zinc-900 uppercase tracking-wide">{project.title}</h1>
-              <p className="text-xs text-zinc-500 tracking-wider uppercase">{project.subtitle}</p>
+            <div className="w-full md:max-w-md text-left space-y-4">
+              <h1 className="font-serif text-xl md:text-3xl text-zinc-900 uppercase tracking-wide leading-tight">
+                {project.title}
+              </h1>
+
+              <p className="text-xs md:text-sm text-zinc-500 tracking-widest font-serif">
+                {project.subtitle?.replace('FASHION / ', '')}
+              </p>
+
               {project.credits && (
-                <div className="pt-4 space-y-1">
+                <div className="pt-8 space-y-1 border-t border-zinc-100 mt-8">
                   {project.credits.map((credit, idx) => (
-                    <p key={idx} className="text-[10px] md:text-xs text-zinc-400 font-light tracking-wide">
-                      <span className="font-normal text-zinc-600">{credit.role}</span> - {credit.name}
+                    <p key={idx} className="text-[10px] md:text-xs text-zinc-400 font-serif tracking-wide">
+                      <span className="font-medium text-zinc-600">{credit.role}</span> - {credit.name}
                     </p>
                   ))}
                 </div>

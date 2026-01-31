@@ -4,7 +4,109 @@ import { items } from '@/shared/constants/shop-items';
 import { ProductInfo } from '@/components/product-info';
 import Image from 'next/image';
 import Link from 'next/link';
-import { use } from 'react';
+import { use, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+
+function DesktopCarousel({ item }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const images = item.images && item.images.length > 0 ? item.images : [item.imageUrl];
+
+  const variants = {
+    enter: (direction) => ({
+      x: direction > 0 ? '100%' : '-100%',
+      opacity: 0,
+      scale: 1,
+      zIndex: 1
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1,
+      scale: 1
+    },
+    exit: (direction) => ({
+      zIndex: 0,
+      x: direction < 0 ? '25%' : '-25%',
+      opacity: 0,
+      scale: 0.9,
+    })
+  };
+
+  const paginate = (newDirection) => {
+    setDirection(newDirection);
+    setCurrentIndex((prev) => (prev + newDirection + images.length) % images.length);
+  };
+
+  return (
+    <div className="relative w-full h-full group bg-zinc-50 overflow-hidden">
+      <AnimatePresence initial={false} custom={direction}>
+        <motion.div
+          key={currentIndex}
+          custom={direction}
+          variants={variants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{
+            x: { type: "tween", ease: [0.32, 0.72, 0, 1], duration: 0.8 },
+            opacity: { duration: 0.5 },
+            scale: { duration: 0.8, ease: [0.32, 0.72, 0, 1] }
+          }}
+          className="absolute inset-0 w-full h-full"
+        >
+          <Image
+            src={images[currentIndex]}
+            alt={`${item.name} view ${currentIndex + 1}`}
+            fill
+            sizes="50vw"
+            className="object-cover object-center"
+            priority
+          />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Navigation Buttons - Only show if multiple images */}
+      {/* Navigation - Minimal and refined */}
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={() => paginate(-1)}
+            className="absolute left-8 top-1/2 -translate-y-1/2 group/nav focus:outline-none z-10"
+          >
+            <div className="p-4 rounded-full bg-black/5 hover:bg-black/10 backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100 flex items-center justify-center">
+              <ArrowLeft className="w-6 h-6 text-black/80 stroke-[1px] transition-transform duration-300 group-hover/nav:-translate-x-0.5" />
+            </div>
+          </button>
+          <button
+            onClick={() => paginate(1)}
+            className="absolute right-8 top-1/2 -translate-y-1/2 group/nav focus:outline-none z-10"
+          >
+            <div className="p-4 rounded-full bg-black/5 hover:bg-black/10 backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100 flex items-center justify-center">
+              <ArrowRight className="w-6 h-6 text-black/80 stroke-[1px] transition-transform duration-300 group-hover/nav:translate-x-0.5" />
+            </div>
+          </button>
+
+          {/* Indicators */}
+          <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-10">
+            {images.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  setDirection(idx > currentIndex ? 1 : -1);
+                  setCurrentIndex(idx);
+                }}
+                className={`w-2 h-2 rounded-full transition-all duration-300 drop-shadow-md ${idx === currentIndex ? 'bg-white w-6' : 'bg-white/50 hover:bg-white/80'
+                  }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function ShopItemPage({ params }) {
   const unwrappedParams = use(params);
@@ -75,33 +177,9 @@ export default function ShopItemPage({ params }) {
           ========================================== */}
       <div className="hidden md:block">
         <div className="grid grid-cols-2 min-h-screen">
-          {/* Scrollable Images (Left) */}
-          <div className="w-full">
-            {item.images && item.images.length > 0 ? (
-              item.images.map((imgSrc, idx) => (
-                <div key={idx} className="relative w-full mb-1">
-                  <Image
-                    src={imgSrc}
-                    alt={`${item.name} detail ${idx + 1}`}
-                    width={1000}
-                    height={1200}
-                    className="w-full h-auto object-cover"
-                    priority={idx < 2}
-                  />
-                </div>
-              ))
-            ) : (
-              // Fallback if no images array
-              <div className="relative w-full h-screen">
-                <Image
-                  src={item.imageUrl}
-                  alt={item.name}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-            )}
+          {/* Carousel Images (Left) */}
+          <div className="relative w-full h-[calc(100vh-80px)] top-[80px] bg-zinc-50 flex items-center justify-center overflow-hidden">
+            <DesktopCarousel item={item} />
           </div>
 
           {/* Sticky Info (Right) */}

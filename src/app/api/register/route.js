@@ -6,9 +6,9 @@ import { NextResponse } from 'next/server';
 const prisma = new PrismaClient();
 
 export async function POST(req) {
-  const { name, phoneNumber, email, address, password } = await req.json();
+  const { name, phoneNumber, email, address, detailAddress, zipCode, marketingConsent, password } = await req.json();
 
-  if (!name || !phoneNumber || !email || !address || !password) {
+  if (!name || !phoneNumber || !email || !password) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
 
@@ -39,6 +39,9 @@ export async function POST(req) {
         hashedPassword,
         phoneNumber,
         address,
+        detailAddress,
+        zipCode,
+        marketingConsent
       },
     });
     return NextResponse.json(user, { status: 201 });

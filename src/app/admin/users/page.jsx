@@ -71,20 +71,30 @@ export default function AdminUsersPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-zinc-200">
+                  <th className="py-4 px-4 text-xs uppercase tracking-widest text-zinc-500 font-normal">Joined</th>
                   <th className="py-4 px-4 text-xs uppercase tracking-widest text-zinc-500 font-normal">Name</th>
                   <th className="py-4 px-4 text-xs uppercase tracking-widest text-zinc-500 font-normal">Email</th>
                   <th className="py-4 px-4 text-xs uppercase tracking-widest text-zinc-500 font-normal">Phone</th>
                   <th className="py-4 px-4 text-xs uppercase tracking-widest text-zinc-500 font-normal">Address</th>
+                  <th className="py-4 px-4 text-xs uppercase tracking-widest text-zinc-500 font-normal">Mkt</th>
                   <th className="py-4 px-4 text-xs uppercase tracking-widest text-zinc-500 font-normal">Role</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((user) => (
                   <tr key={user.id} className="border-b border-zinc-100 hover:bg-zinc-50 transition-colors">
-                    <td className="py-4 px-4 text-sm">{user.name}</td>
-                    <td className="py-4 px-4 text-sm">{user.email}</td>
-                    <td className="py-4 px-4 text-sm">{user.phoneNumber || '-'}</td>
-                    <td className="py-4 px-4 text-sm truncate max-w-xs">{user.address || '-'}</td>
+                    <td className="py-4 px-4 text-xs text-zinc-500">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="py-4 px-4 text-sm font-medium">{user.name}</td>
+                    <td className="py-4 px-4 text-sm text-zinc-600">{user.email}</td>
+                    <td className="py-4 px-4 text-sm text-zinc-600">{user.phoneNumber || '-'}</td>
+                    <td className="py-4 px-4 text-sm text-zinc-600 truncate max-w-xs">
+                      {user.address ? `(${user.zipCode || ''}) ${user.address} ${user.detailAddress || ''}` : '-'}
+                    </td>
+                    <td className="py-4 px-4 text-sm text-center">
+                      {user.marketingConsent ? <span className="text-green-600 text-xs">Yes</span> : <span className="text-zinc-300 text-xs">No</span>}
+                    </td>
                     <td className="py-4 px-4 text-sm uppercase text-xs tracking-wider">{user.role}</td>
                   </tr>
                 ))}

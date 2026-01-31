@@ -17,6 +17,10 @@ model User {
   hashedPassword  String?
   phoneNumber     String?   @unique
   address         String?
+  detailAddress   String?
+  zipCode         String?
+  marketingConsent Boolean  @default(false)
+  createdAt       DateTime  @default(now())
   role            String    @default("user")
   accounts        Account[]
   sessions        Session[]

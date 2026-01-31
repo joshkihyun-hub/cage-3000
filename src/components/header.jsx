@@ -5,10 +5,70 @@ import Image from 'next/image';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { useCart } from '../shared/context/cart-context';
-import { ShoppingBag, Menu, X, User, LogOut, LogIn, Shield } from 'lucide-react';
+import { ShoppingBag, Menu, X, User, LogOut, LogIn, Shield, ChevronDown } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const DURATION = 0.25;
+const STAGGER = 0.025;
+
+const RandomHoverLink = ({ href, text, className }) => {
+  return (
+    <Link
+      href={href}
+      className={`relative block overflow-hidden whitespace-nowrap group ${className}`}
+    >
+      <div className="relative">
+        {text.split("").map((l, i) => (
+          <motion.span
+            key={i}
+            variants={{
+              initial: { y: 0 },
+              hover: { y: "-100%" },
+            }}
+            transition={{
+              duration: DURATION,
+              ease: "easeInOut",
+              delay: STAGGER * i + Math.random() * 0.1, // Randomized delay for "unpredictable" feel
+            }}
+            className="inline-block"
+          >
+            {l === " " ? "\u00A0" : l}
+          </motion.span>
+        ))}
+      </div>
+      <div className="absolute inset-0">
+        {text.split("").map((l, i) => (
+          <motion.span
+            key={i}
+            variants={{
+              initial: { y: "100%" },
+              hover: { y: 0 },
+            }}
+            transition={{
+              duration: DURATION,
+              ease: "easeInOut",
+              delay: STAGGER * i + Math.random() * 0.1, // Same random delay seed if possible, or just random enough
+            }}
+            className="inline-block"
+          >
+            {l === " " ? "\u00A0" : l}
+          </motion.span>
+        ))}
+      </div>
+    </Link>
+  );
+};
 
 const navItemsLeft = [
-  { name: 'Shop', href: '/shop' },
+  {
+    name: 'Shop',
+    href: '/shop',
+    subItems: [
+      { name: 'All', href: '/shop' },
+      { name: 'Clothes', href: '/shop?category=clothes' },
+      { name: 'Accessories', href: '/shop?category=accessories' },
+    ]
+  },
   { name: 'Lookbook', href: '/lookbook' },
 ];
 
@@ -35,6 +95,11 @@ export default function Header() {
   const { data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [openSubMenu, setOpenSubMenu] = useState(null);
+
+  const toggleSubMenu = (name) => {
+    setOpenSubMenu(openSubMenu === name ? null : name);
+  };
 
   useEffect(() => {
     let ticking = false;
@@ -74,22 +139,44 @@ export default function Header() {
           {/* Desktop Nav - Left Split */}
           <div className="hidden md:flex flex-1 justify-end pr-24 items-center gap-x-8 z-40 relative">
             {navItemsLeft.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-xs uppercase tracking-[0.2em] text-zinc-600 hover:text-black transition-colors relative group py-2 font-medium"
-              >
-                {item.name}
-                <span className="absolute left-0 bottom-0 w-full h-[1px] bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out origin-center"></span>
-              </Link>
+              <div key={item.name} className="relative group h-full flex items-center">
+                <motion.div
+                  initial="initial"
+                  whileHover="hover"
+                  className="relative py-2"
+                >
+                  <RandomHoverLink
+                    href={item.href}
+                    text={item.name}
+                    className="text-xs uppercase tracking-[0.2em] text-zinc-600 font-medium"
+                  />
+                </motion.div>
+
+                {/* Dropdown Menu */}
+                {item.subItems && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-[cubic-bezier(0.32,0.725,0.25,1)]">
+                    <div className="bg-white/90 backdrop-blur-md border border-zinc-100/50 shadow-xl rounded-sm py-2 min-w-[140px] flex flex-col gap-1 ring-1 ring-black/5">
+                      {item.subItems.map((subItem) => (
+                        <Link
+                          key={subItem.name}
+                          href={subItem.href}
+                          className="px-6 py-2 text-[10px] uppercase tracking-[0.15em] text-zinc-500 hover:text-black hover:bg-zinc-50 transition-colors whitespace-nowrap text-center"
+                        >
+                          {subItem.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
 
           {/* Logo - Centered & Large */}
           <div className="flex-none z-30 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <Link href="/" className="relative w-48 h-16 md:w-64 md:h-24 block transition-transform hover:scale-105 duration-500">
+            <Link href="/" className="relative w-20 h-20 md:w-24 md:h-24 block transition-transform hover:scale-105 duration-500">
               <Image
-                src="/IMG_1403.png"
+                src="/logo_new.png"
                 alt="CAGE3000"
                 fill
                 className="object-contain"
@@ -101,14 +188,18 @@ export default function Header() {
           {/* Desktop Nav - Right Split */}
           <div className="hidden md:flex flex-1 justify-start pl-24 items-center gap-x-8 z-40 relative">
             {navItemsRight.map((item) => (
-              <Link
+              <motion.div
                 key={item.name}
-                href={item.href}
-                className="text-xs uppercase tracking-[0.2em] text-zinc-600 hover:text-black transition-colors relative group py-2 font-medium"
+                initial="initial"
+                whileHover="hover"
+                className="relative py-2"
               >
-                {item.name}
-                <span className="absolute left-0 bottom-0 w-full h-[1px] bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out origin-center"></span>
-              </Link>
+                <RandomHoverLink
+                  href={item.href}
+                  text={item.name}
+                  className="text-xs uppercase tracking-[0.2em] text-zinc-600 font-medium"
+                />
+              </motion.div>
             ))}
           </div>
 
@@ -151,15 +242,50 @@ export default function Header() {
         >
           <nav className="flex flex-col items-center gap-y-6 py-8 bg-white/10 backdrop-blur-lg rounded-2xl mt-2 border border-white/20">
             {[...navItemsLeft, ...navItemsRight].map((item, idx) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-lg uppercase tracking-[0.2em] text-zinc-800 hover:text-black transition-colors"
-                style={{ transitionDelay: `${idx * 50}ms` }}
-              >
-                {item.name}
-              </Link>
+              <div key={item.name} className="flex flex-col items-center w-full">
+                {item.subItems ? (
+                  <button
+                    onClick={() => toggleSubMenu(item.name)}
+                    className="text-lg uppercase tracking-[0.2em] text-zinc-800 hover:text-black transition-colors flex items-center gap-2"
+                    style={{ transitionDelay: `${idx * 50}ms` }}
+                  >
+                    {item.name}
+                    <div className={`transition-transform duration-300 ${openSubMenu === item.name ? 'rotate-180' : ''}`}>
+                      <ChevronDown size={16} />
+                    </div>
+                  </button>
+                ) : (
+                  <Link
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-lg uppercase tracking-[0.2em] text-zinc-800 hover:text-black transition-colors"
+                    style={{ transitionDelay: `${idx * 50}ms` }}
+                  >
+                    {item.name}
+                  </Link>
+                )}
+
+                {/* Mobile Submenu Accordion */}
+                {item.subItems && (
+                  <div
+                    className={`grid transition-all duration-300 ease-in-out ${openSubMenu === item.name ? 'grid-rows-[1fr] opacity-100 mt-3 mb-2' : 'grid-rows-[0fr] opacity-0 mt-0 mb-0'
+                      }`}
+                  >
+                    <div className="overflow-hidden flex flex-col items-center gap-y-3">
+                      {item.subItems.map((subItem) => (
+                        <Link
+                          key={subItem.name}
+                          href={subItem.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="text-xs uppercase tracking-[0.15em] text-zinc-500 hover:text-black transition-colors"
+                        >
+                          {subItem.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
             <div className="w-12 h-px bg-zinc-200 my-2"></div>
             {session ? (

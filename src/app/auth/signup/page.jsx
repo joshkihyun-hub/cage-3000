@@ -10,7 +10,10 @@ export default function SignUp() {
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
+  const [zipCode, setZipCode] = useState('');
   const [address, setAddress] = useState('');
+  const [detailAddress, setDetailAddress] = useState('');
+  const [marketingConsent, setMarketingConsent] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,6 +22,7 @@ export default function SignUp() {
 
   const handleCompletePostcode = (data) => {
     setAddress(data.address);
+    setZipCode(data.zonecode);
     setIsPostcodeOpen(false);
   };
 
@@ -34,7 +38,16 @@ export default function SignUp() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, phoneNumber, email, address, password }),
+        body: JSON.stringify({
+          name,
+          phoneNumber,
+          email,
+          address,
+          detailAddress,
+          zipCode,
+          marketingConsent,
+          password
+        }),
       });
 
       if (response.ok) {
@@ -117,36 +130,63 @@ export default function SignUp() {
             <label className="block text-xs uppercase tracking-[0.2em] text-zinc-800 mb-2" htmlFor="address">
               Address
             </label>
-            <div className="flex items-end gap-4">
+            <div className="space-y-4">
+              <div className="flex gap-4">
+                <input
+                  className="w-32 border-b border-zinc-200 py-2 text-base focus:outline-none focus:border-black transition-colors bg-transparent rounded-none"
+                  placeholder="Zip Code"
+                  value={zipCode}
+                  readOnly
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsPostcodeOpen(true)}
+                  className="bg-black text-white py-2 px-6 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors"
+                >
+                  Search
+                </button>
+              </div>
               <input
-                className="flex-1 border-b border-zinc-200 py-2 text-base focus:outline-none focus:border-black transition-colors bg-transparent rounded-none"
-                id="address"
-                type="text"
+                className="w-full border-b border-zinc-200 py-2 text-base focus:outline-none focus:border-black transition-colors bg-transparent rounded-none"
+                placeholder="Basic Address"
                 value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                readOnly
               />
-              <button
-                type="button"
-                onClick={() => setIsPostcodeOpen(true)}
-                className="bg-black text-white py-2 px-6 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors"
-              >
-                Find
-              </button>
+              <input
+                className="w-full border-b border-zinc-200 py-2 text-base focus:outline-none focus:border-black transition-colors bg-transparent rounded-none"
+                placeholder="Detail Address (e.g. Apt, Suite, Unit)"
+                value={detailAddress}
+                onChange={(e) => setDetailAddress(e.target.value)}
+              />
             </div>
             {isPostcodeOpen && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                <div className="bg-white p-4 w-full max-w-md">
-                  <DaumPostcode onComplete={handleCompletePostcode} />
+                <div className="bg-white p-4 w-full max-w-md relative">
                   <button
                     type="button"
                     onClick={() => setIsPostcodeOpen(false)}
-                    className="mt-4 w-full bg-black text-white py-3 text-xs uppercase tracking-widest hover:bg-zinc-800 transition-colors"
+                    className="absolute top-2 right-2 p-2 hover:bg-zinc-100 rounded-full"
                   >
-                    Close
+                    ✕
                   </button>
+                  <DaumPostcode onComplete={handleCompletePostcode} className="h-[400px]" />
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Marketing Consent */}
+          <div className="flex items-start gap-3 pt-2">
+            <input
+              type="checkbox"
+              id="marketing"
+              checked={marketingConsent}
+              onChange={(e) => setMarketingConsent(e.target.checked)}
+              className="mt-1 w-4 h-4 accent-black"
+            />
+            <label htmlFor="marketing" className="text-xs text-zinc-600 leading-relaxed cursor-pointer select-none">
+              (Optional) I agree to receive marketing communications, updates, and news via email and SMS.
+            </label>
           </div>
 
           {/* Password */}
