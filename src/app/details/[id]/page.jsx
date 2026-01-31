@@ -33,6 +33,8 @@ const AnimatedImage = ({ src, alt }) => {
       <img
         src={src}
         alt={alt}
+        loading="lazy"
+        decoding="async"
         className="w-full h-auto object-cover block"
       />
     </div>
