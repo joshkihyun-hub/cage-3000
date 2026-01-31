@@ -27,15 +27,16 @@ const AnimatedImage = ({ src, alt }) => {
   return (
     <div
       ref={ref}
-      className={`relative w-full h-full transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      className={`relative w-full transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
     >
       <Image
         src={src}
         alt={alt}
-        fill
-        sizes="(max-width: 768px) 100vw, 100vw"
-        className="object-cover"
+        width={0}
+        height={0}
+        sizes="100vw"
+        style={{ width: '100%', height: 'auto' }}
       />
     </div>
   );
