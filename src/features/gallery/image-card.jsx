@@ -13,14 +13,14 @@ export const ImageCard = ({ item }) => {
         whileHover="hover"
         animate="rest"
       >
-        {/* Main Image Container - Gunshot Zoom (Instant Snap) */}
+        {/* Main Image Container - Slow Cinematic Zoom */}
         <motion.div
           className="absolute inset-0 z-10 will-change-transform"
           variants={{
             rest: { scale: 1 },
             hover: { scale: 1.05 }
           }}
-          transition={{ type: "spring", stiffness: 400, damping: 20 }} // Optimized stiffness
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} // Slow ease out
         >
           <Image
             src={item.image}
@@ -31,7 +31,7 @@ export const ImageCard = ({ item }) => {
           />
         </motion.div>
 
-        {/* Hover Image (Instant Cut) - Optional, only if item.image_hover exists */}
+        {/* Hover Image (Cinematic Crossfade) */}
         {item.image_hover && (
           <motion.div
             className="absolute inset-0 z-10 will-change-transform"
@@ -39,7 +39,7 @@ export const ImageCard = ({ item }) => {
               rest: { opacity: 0, scale: 1 },
               hover: { opacity: 1, scale: 1.05 }
             }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
             <Image
               src={item.image_hover}
@@ -51,26 +51,26 @@ export const ImageCard = ({ item }) => {
           </motion.div>
         )}
 
-        {/* WHITE FLASH Overlay (Lightning Effect) - Simplified opacity fade */}
+        {/* Darkening Overlay (Luxurious Feel) */}
         <motion.div
-          className="absolute inset-0 bg-white z-20 pointer-events-none"
+          className="absolute inset-0 bg-black/40 z-20 pointer-events-none"
           variants={{
             rest: { opacity: 0 },
-            hover: { opacity: [0.6, 0] } // Flash from bright to transparent
+            hover: { opacity: 1 }
           }}
-          transition={{ duration: 0.15 }} // Very fast flash
+          transition={{ duration: 0.5, ease: "easeOut" }}
         />
 
-        {/* Text Reveal (Hard Cut / Glitchy) */}
-        <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+        {/* Text Reveal (Elegant Slide Up) */}
+        <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none px-4 text-center">
           <motion.div
             variants={{
-              rest: { opacity: 0, scale: 0.9 },
-              hover: { opacity: 1, scale: 1 }
+              rest: { y: 20, opacity: 0, filter: "blur(4px)" },
+              hover: { y: 0, opacity: 1, filter: "blur(0px)" }
             }}
-            transition={{ duration: 0.05 }} // Instant appearance
+            transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span className="text-white font-black italic text-2xl uppercase tracking-tighter drop-shadow-md">
+            <span className="text-white font-serif text-xs md:text-sm uppercase tracking-[0.3em] font-light">
               View Project
             </span>
           </motion.div>
