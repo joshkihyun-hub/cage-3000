@@ -31,7 +31,7 @@ export default function HomePage() {
           {/* Mobile Image */}
           <div className="md:hidden absolute inset-0">
             <Image
-              src="/asset/details/lookbook/9hat/A1.jpg"
+              src="/asset/details/shop/9hat/hat6/shop_hat6_lookbook1.jpg"
               alt="CAGE3000 Hero Mobile"
               fill
               sizes="100vw"
