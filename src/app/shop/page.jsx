@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+
 import Link from 'next/link';
 import { items } from '@/shared/constants/shop-items';
 import { ShopItemCard } from '@/components/shop-item-card';
@@ -16,27 +16,7 @@ function ShopContent() {
   if (category === 'clothes') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] relative overflow-hidden">
-        {/* Crow Image - Pulsing / Floating */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-          className="relative w-64 h-64 md:w-96 md:h-96 mb-8 mix-blend-multiply"
-        >
-          <motion.div
-            animate={{ y: [0, -20, 0], rotate: [0, -2, 2, 0], scale: [1, 1.02, 1] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="w-full h-full relative"
-          >
-            <Image
-              src="/clothes_crow.png"
-              alt="The Flock"
-              fill
-              className="object-contain"
-              priority
-            />
-          </motion.div>
-        </motion.div>
+
 
         {/* Text Container */}
         <div className="text-center z-10 flex flex-col gap-4">

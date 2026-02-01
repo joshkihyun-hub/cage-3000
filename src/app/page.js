@@ -18,7 +18,7 @@ export default function HomePage() {
           {/* Desktop Image */}
           <div className="hidden md:block absolute inset-0">
             <Image
-              src="/asset/details/main/C-6.jpg"
+              src="/asset/details/lookbook/9hat/A3.jpeg"
               alt="CAGE3000 Hero Desktop"
               fill
               sizes="100vw"

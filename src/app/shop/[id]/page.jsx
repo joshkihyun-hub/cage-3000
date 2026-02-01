@@ -40,7 +40,7 @@ function DesktopCarousel({ item }) {
   };
 
   return (
-    <div className="relative w-full h-full group bg-zinc-50 overflow-hidden">
+    <div className="relative w-full h-full group bg-white overflow-hidden">
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={currentIndex}
@@ -127,7 +127,7 @@ export default function ShopItemPage({ params }) {
         {/* Image Section */}
         {/* Image Section */}
         {/* Image Slider Section */}
-        <div className="w-full relative aspect-[3/4] bg-zinc-50">
+        <div className="w-full relative aspect-[3/4] bg-white">
           <div className="absolute inset-0 flex overflow-x-auto snap-x snap-mandatory no-scrollbar">
             {item.images && item.images.length > 0 ? (
               item.images.map((imgSrc, idx) => (
@@ -178,7 +178,7 @@ export default function ShopItemPage({ params }) {
       <div className="hidden md:block">
         <div className="grid grid-cols-2 min-h-screen">
           {/* Carousel Images (Left) */}
-          <div className="relative w-full h-[calc(100vh-80px)] top-[80px] bg-zinc-50 flex items-center justify-center overflow-hidden">
+          <div className="relative w-full h-[calc(100vh-80px)] top-[80px] bg-white flex items-center justify-center overflow-hidden">
             <DesktopCarousel item={item} />
           </div>
 

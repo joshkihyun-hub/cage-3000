@@ -52,7 +52,7 @@ export const ShopItemCard = ({ item }) => {
                 onMouseEnter={handleMouseEnter}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                className="relative aspect-[3/4] bg-zinc-50 mb-4 overflow-hidden"
+                className="relative aspect-[3/4] bg-white mb-4 overflow-hidden"
             >
                 {/* Always render the primary image (index 0) */}
                 <div

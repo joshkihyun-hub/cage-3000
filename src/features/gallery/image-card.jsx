@@ -8,7 +8,7 @@ export const ImageCard = ({ item }) => {
   return (
     <Link href={`/details/${item.id}`} className="block w-full">
       <motion.div
-        className="relative overflow-hidden aspect-[3/4] bg-zinc-100 cursor-pointer group will-change-transform"
+        className="relative overflow-hidden aspect-[3/4] bg-white cursor-pointer group will-change-transform"
         initial="rest"
         whileHover="hover"
         animate="rest"

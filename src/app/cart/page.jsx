@@ -30,7 +30,7 @@ export default function CartPage() {
               <ul className="space-y-12">
                 {cart.map((item) => (
                   <li key={item.id} className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start border-b border-zinc-100 pb-12 last:border-0">
-                    <div className="md:col-span-4 relative aspect-[3/4] bg-zinc-50">
+                    <div className="md:col-span-4 relative aspect-[3/4] bg-white">
                       <Image
                         src={item.imageUrl}
                         alt={item.name}

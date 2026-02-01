@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../shared/context/cart-context';
 import { ShoppingBag, Menu, X, User, LogOut, LogIn, Shield, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -95,33 +95,46 @@ export default function Header() {
   const { data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState(null);
+  const scrollTimeoutRef = useRef(null);
 
   const toggleSubMenu = (name) => {
     setOpenSubMenu(openSubMenu === name ? null : name);
   };
 
   useEffect(() => {
-    let ticking = false;
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setScrolled(window.scrollY > 20);
-          ticking = false;
-        });
-        ticking = true;
+      setScrolled(window.scrollY > 20);
+      setIsScrolling(true);
+
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
       }
+
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrolling(false);
+      }, 1000); // 1 second delay before becoming transparent
     };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
   }, []);
+
+  // Show glass effect only when:
+  // 1. Mobile menu is open OR
+  // 2. We are scrolled down AND currently scrolling
+  const showGlass = isMobileMenuOpen || (scrolled && isScrolling);
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ease-in-out pointer-events-none ${scrolled || isMobileMenuOpen
-        ? 'bg-white/95 backdrop-blur-md border-b border-zinc-100'
-        : 'bg-transparent'
-        } py-4`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ease-[cubic-bezier(0.32,0.725,0.25,1)] pointer-events-none ${showGlass
+        ? 'bg-white/60 backdrop-blur-3xl backdrop-brightness-105 border-b border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]'
+        : 'bg-transparent border-transparent'
+        } ${scrolled ? 'py-4' : 'py-6'}`}
     >
       <div className="max-w-screen-2xl mx-auto px-6 md:px-12 pointer-events-auto">
         <div className="flex justify-between items-center h-20 md:h-24 relative">
