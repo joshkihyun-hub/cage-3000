@@ -57,6 +57,7 @@ export default function RootLayout({ children }) {
                     <p><span className="text-zinc-600 font-medium">대표자</span> &nbsp;김기현</p>
                     <p><span className="text-zinc-600 font-medium">사업자등록번호</span> &nbsp;830-32-01740</p>
                     <p><span className="text-zinc-600 font-medium">사업장 주소</span> &nbsp;서울특별시 서대문구 연희로11사길 13 (연희동)</p>
+                    <p><span className="text-zinc-600 font-medium">전화번호</span> &nbsp;010-4890-9497</p>
                     <p><span className="text-zinc-600 font-medium">이메일</span> &nbsp;contact@cage3000.com</p>
                   </div>
 
