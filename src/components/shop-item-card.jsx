@@ -99,7 +99,7 @@ export const ShopItemCard = ({ item }) => {
                         {item.name}
                     </h3>
                     <p className="text-[10px] md:text-xs font-medium tracking-widest text-zinc-900">
-                        {item.price}
+                        {item.name === '03' || item.name === '07' ? item.price : 'ORDER MADE'}
                     </p>
                 </div>
                 <div className="w-2 h-2 bg-black rounded-full mb-2 shrink-0"></div>

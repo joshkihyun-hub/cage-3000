@@ -11,7 +11,11 @@ export default function CartPage() {
   const router = useRouter();
 
   const getTotalPrice = () => {
-    return cart.reduce((acc, item) => acc + item.quantity * parseFloat(item.price.replace('$', '')), 0).toFixed(2);
+    const total = cart.reduce((acc, item) => {
+      const price = item.priceNum || parseFloat(item.price.replace(/[^0-9.]/g, '')) || 0;
+      return acc + item.quantity * price;
+    }, 0);
+    return new Intl.NumberFormat('ko-KR').format(total);
   };
 
   const handleCheckout = () => {
@@ -41,7 +45,9 @@ export default function CartPage() {
                     <div className="md:col-span-8 flex flex-col justify-between h-full space-y-4">
                       <div className="space-y-2">
                         <h2 className="font-serif text-xl text-black">{item.name}</h2>
-                        <p className="text-xs tracking-widest text-zinc-500">{item.price}</p>
+                        <p className="text-xs tracking-widest text-zinc-500">
+                          {item.name === '03' || item.name === '07' ? item.price : 'ORDER MADE'}
+                        </p>
                         <p className="text-xs tracking-widest text-zinc-500">QUANTITY: {item.quantity}</p>
                       </div>
                       <button
@@ -57,7 +63,7 @@ export default function CartPage() {
               <div className="mt-16 border-t border-zinc-200 pt-8">
                 <div className="flex justify-between items-center mb-8">
                   <span className="text-xs uppercase tracking-widest text-zinc-500">Total</span>
-                  <span className="font-serif text-xl text-black">${getTotalPrice()}</span>
+                  <span className="font-serif text-xl text-black">₩{getTotalPrice()}</span>
                 </div>
                 <button
                   onClick={handleCheckout}

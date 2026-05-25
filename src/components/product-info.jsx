@@ -23,7 +23,7 @@ export const ProductInfo = ({ item }) => {
                     {item.name}
                 </h1>
                 <p className="text-sm font-light tracking-widest text-zinc-300 whitespace-nowrap ml-4">
-                    {item.price}
+                    {item.name === '03' || item.name === '07' ? item.price : 'ORDER MADE'}
                 </p>
             </div>
 
