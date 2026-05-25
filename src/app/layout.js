@@ -12,29 +12,113 @@ const bodoni = Bodoni_Moda({
   display: 'swap',
 });
 
+const SITE_URL = 'https://cage3000.com';
+const SITE_NAME = 'CAGE3000';
+const SITE_DESCRIPTION =
+  'CAGE3000 — 서울 기반 모자 브랜드. 디자이너 김기현이 이끄는 made-to-order 밀리너리 컬렉션. Sculpted felt caps, asymmetric brims, avant-garde headwear in Suri Alpaca & wool.';
+
 export const metadata = {
-  title: 'CAGE3000',
-  description: 'CAGE3000 Official Store',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'CAGE3000 — Sculpted Headwear from Seoul',
+    template: '%s · CAGE3000',
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    'CAGE3000',
+    '케이지3000',
+    '케이에이치엔',
+    'KHN',
+    '김기현',
+    'Kihyun Kim',
+    '모자 브랜드',
+    '디자이너 모자',
+    '밀리너리',
+    'millinery',
+    'made-to-order hat',
+    'sculpted felt cap',
+    'avant-garde hat',
+    'Seoul fashion brand',
+    'Suri Alpaca hat',
+  ],
+  authors: [{ name: 'Kihyun Kim' }],
+  creator: 'Kihyun Kim',
+  publisher: 'KHN (케이에이치엔)',
+  category: 'fashion',
+  alternates: {
+    canonical: '/',
+  },
   icons: {
     icon: '/favicon-v2.png',
+    apple: '/favicon-v2.png',
   },
   openGraph: {
-    title: 'CAGE3000',
-    description: 'CAGE3000 Official Store',
+    type: 'website',
+    locale: 'ko_KR',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: 'CAGE3000 — Sculpted Headwear from Seoul',
+    description: SITE_DESCRIPTION,
     images: [
       {
         url: '/kl.png',
         width: 800,
         height: 600,
+        alt: 'CAGE3000',
       },
     ],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CAGE3000 — Sculpted Headwear from Seoul',
+    description: SITE_DESCRIPTION,
+    images: ['/kl.png'],
+    creator: '@cage3k',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+};
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'CAGE3000',
+  alternateName: ['케이지3000', 'KHN', '케이에이치엔'],
+  url: SITE_URL,
+  logo: `${SITE_URL}/logo_new.png`,
+  email: 'contact@cage3000.com',
+  founder: {
+    '@type': 'Person',
+    name: 'Kihyun Kim',
+    sameAs: 'https://instagram.com/cage3k',
+  },
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: '서울특별시 서대문구',
+    streetAddress: '연희로11사길 13 (연희동)',
+    addressCountry: 'KR',
+  },
+  sameAs: ['https://instagram.com/cage3k'],
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
-
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+      </head>
       <body className={`${bodoni.variable} font-serif bg-background text-foreground min-h-screen flex flex-col antialiased selection:bg-primary/10 selection:text-primary`}>
         <AuthProvider>
           <CartProvider>

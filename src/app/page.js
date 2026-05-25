@@ -44,15 +44,15 @@ export default function HomePage() {
       </section>
 
       {/* Shop Section */}
-      <section id="shop" className="hidden md:block py-32 px-4 md:px-8 max-w-screen-2xl mx-auto">
+      <section id="shop" className="py-20 md:py-32 px-4 md:px-8 max-w-screen-2xl mx-auto">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-12">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 md:gap-y-12">
           {items.map((item) => (
             <ShopItemCard key={item.id} item={item} />
           ))}
         </div>
 
-        <div className="mt-24 flex justify-center">
+        <div className="mt-16 md:mt-24 flex justify-center">
           <Link href="/shop" className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-zinc-400 hover:text-black transition-colors border-b border-transparent hover:border-black pb-1">
             View All Collections
           </Link>
