@@ -99,11 +99,17 @@ export async function POST(req) {
     });
 
     // 메일 발송은 실패해도 가입 자체는 성공시킨다 — 사용자가 추후 재발송하면 됨.
+    // 단, 진단을 위해 자세한 에러 정보를 Vercel logs에 남긴다.
     try {
       const token = await issueEmailToken({ userId: user.id, purpose: 'email_verify' });
       await sendVerificationEmail({ to: user.email, name: user.name, token });
+      console.log(`[register] verification email sent to ${user.email}`);
     } catch (emailErr) {
-      console.error('Verification email send failed:', emailErr);
+      console.error('[register] verification email failed for', user.email, {
+        message: emailErr?.message,
+        stack: emailErr?.stack,
+        name: emailErr?.name,
+      });
     }
 
     return NextResponse.json(user, { status: 201 });

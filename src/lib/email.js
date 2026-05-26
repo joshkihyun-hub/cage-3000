@@ -28,13 +28,22 @@ export async function sendEmail({ to, subject, html, text }) {
   const client = getClient();
   const payload = {
     from: FROM,
-    to,
+    to: Array.isArray(to) ? to : [to],
     subject,
     html,
     text,
   };
-  if (REPLY_TO) payload.reply_to = REPLY_TO;
-  return client.emails.send(payload);
+  // Resend SDK v4+ uses camelCase (`replyTo`, not `reply_to`).
+  if (REPLY_TO) payload.replyTo = REPLY_TO;
+
+  const { data, error } = await client.emails.send(payload);
+  if (error) {
+    // Surface real error so caller logs/admins can see what went wrong
+    // (was previously swallowed silently).
+    const msg = error.message || JSON.stringify(error);
+    throw new Error(`Resend send failed: ${msg}`);
+  }
+  return data;
 }
 
 function shellTemplate({ headline, body, ctaLabel, ctaUrl, footnote }) {
@@ -104,21 +113,23 @@ function shellTemplate({ headline, body, ctaLabel, ctaUrl, footnote }) {
 
 export async function sendVerificationEmail({ to, name, token }) {
   const url = `${SITE_URL}/auth/verify-email?token=${encodeURIComponent(token)}`;
+  const greeting = name ? `${name}님,` : '안녕하세요,';
   const html = shellTemplate({
-    headline: 'Verify your email',
+    headline: 'Welcome to CAGE3000',
     body: `
-      <p style="margin:0 0 16px 0;">${name ? `${name}님, ` : ''}CAGE3000에 가입해 주셔서 감사합니다.</p>
-      <p style="margin:0 0 16px 0;">아래 버튼을 눌러 이메일 주소를 인증해 주세요. 이 링크는 <strong>24시간</strong> 동안 유효합니다.</p>
+      <p style="margin:0 0 20px 0;">${greeting}</p>
+      <p style="margin:0 0 20px 0;">CAGE3000 가족이 되어 주셔서 진심으로 감사드립니다. 서울에서 한 점 한 점 손으로 다듬어 만든 모자를, 이제 가장 먼저 만나보실 수 있어요.</p>
+      <p style="margin:0 0 20px 0;">계정을 활성화하려면 아래 버튼으로 이메일을 인증해 주세요. 링크는 <strong>24시간</strong> 동안 유효합니다.</p>
     `,
     ctaLabel: 'Verify Email',
     ctaUrl: url,
-    footnote: '본인이 가입하지 않았다면 이 메일은 무시해 주세요. 계정이 활성화되지 않습니다.',
+    footnote: '본인이 가입하지 않으셨다면 이 메일은 무시해 주세요. 계정은 활성화되지 않습니다. 문의는 contact@cage3000.com 으로 부탁드립니다.',
   });
   return sendEmail({
     to,
-    subject: '[CAGE3000] 이메일 인증을 완료해 주세요',
+    subject: '[CAGE3000] 가입을 환영합니다 — 이메일 인증을 완료해 주세요',
     html,
-    text: `이메일 인증 링크: ${url}\n링크는 24시간 동안 유효합니다.`,
+    text: `${greeting}\n\nCAGE3000에 가입해 주셔서 감사합니다.\n계정 활성화를 위해 아래 링크로 이메일을 인증해 주세요. (24시간 유효)\n\n${url}`,
   });
 }
 
