@@ -223,7 +223,7 @@ export default function Header() {
               {session ? (
                 <div className="flex items-center space-x-2">
                   {session.user?.role === 'admin' && (
-                    <Link href="/admin/users" className="p-2 text-zinc-600 hover:text-black transition-colors" title="Admin">
+                    <Link href="/admin" className="p-2 text-zinc-600 hover:text-black transition-colors" title="Admin">
                       <Shield className="w-5 h-5" />
                     </Link>
                   )}
@@ -307,7 +307,7 @@ export default function Header() {
                   My Page
                 </Link>
                 {session.user?.role === 'admin' && (
-                  <Link href="/admin/users" onClick={() => setIsMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-zinc-600 hover:text-black">
+                  <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-zinc-600 hover:text-black">
                     Admin
                   </Link>
                 )}

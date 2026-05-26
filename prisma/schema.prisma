@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,37 +7,74 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserStatus {
+  active
+  suspended
+  withdrawn
+}
+
+enum OrderStatus {
+  pending
+  paid
+  preparing
+  shipped
+  delivered
+  cancelled
+  refunded
+  failed
+}
+
+enum EmailTokenPurpose {
+  email_verify
+  password_reset
+}
+
 model User {
-  id              String    @id @default(cuid())
-  name            String
-  email           String?   @unique
-  emailVerified   DateTime?
-  image           String?
-  hashedPassword  String?
-  phoneNumber     String?   @unique
-  address         String?
-  detailAddress   String?
-  zipCode         String?
-  marketingConsent Boolean  @default(false)
-  createdAt       DateTime  @default(now())
-  role            String    @default("user")
-  accounts        Account[]
-  sessions        Session[]
+  id                String       @id @default(cuid())
+  name              String
+  email             String?      @unique
+  emailVerified     DateTime?
+  image             String?
+  hashedPassword    String?
+  phoneNumber       String?      @unique
+  address           String?
+  detailAddress     String?
+  zipCode           String?
+  birthDate         DateTime?
+  marketingConsent  Boolean      @default(false)
+  termsAgreedAt     DateTime?
+  privacyAgreedAt   DateTime?
+  marketingAgreedAt DateTime?
+  lastLoginAt       DateTime?
+  loginCount        Int          @default(0)
+  status            UserStatus   @default(active)
+  adminNote         String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @default(now()) @updatedAt
+  role              String       @default("user")
+  accounts          Account[]
+  sessions          Session[]
+  orders            Order[]
+  emailTokens       EmailToken[]
+  posts             Post[]
+
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?
-  access_token       String?
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -68,4 +104,88 @@ model VerificationRequest {
   expires     DateTime
 
   @@unique([phoneNumber, token])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique
+  userId        String
+  status        OrderStatus @default(pending)
+  currency      String      @default("KRW")
+  subtotal      Int
+  shippingFee   Int         @default(0)
+  totalAmount   Int
+  paymentId     String?     @unique
+  paymentMethod String?
+  paidAt        DateTime?
+  cancelledAt   DateTime?
+  shippedAt     DateTime?
+  deliveredAt   DateTime?
+
+  recipientName   String
+  recipientPhone  String
+  shippingZipCode String?
+  shippingAddress String
+  shippingDetail  String?
+  customerNote    String?
+
+  trackingCarrier String?
+  trackingNumber  String?
+
+  adminNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  items OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model EmailToken {
+  id         String            @id @default(cuid())
+  userId     String
+  token      String            @unique
+  purpose    EmailTokenPurpose
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime          @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String
+  productId    String
+  productName  String
+  productImage String?
+  unitPrice    Int
+  quantity     Int
+  subtotal     Int
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// 기존 prod DB에 존재하던 모델 — 데이터 보존을 위해 schema에 그대로 유지.
+model Post {
+  id        String   @id
+  title     String
+  content   String?
+  excerpt   String?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  authorId  String?
+  image     String?
+  author    User?    @relation(fields: [authorId], references: [id])
 }

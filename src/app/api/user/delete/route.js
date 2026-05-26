@@ -1,31 +1,42 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { requireActiveUser } from '@/lib/auth-guards';
 
-export async function DELETE(req) {
+// Soft delete: 회원 탈퇴 시 개인정보는 익명화하지만 주문 이력은 보존한다.
+// (전자상거래법상 계약/결제 기록은 5년 이상 보관 의무가 있음.)
+export async function DELETE() {
+    const { session, error } = await requireActiveUser();
+    if (error) return error;
+
+    const userId = session.user.id;
+    const anonStamp = Date.now();
+
     try {
-        const session = await getServerSession(authOptions);
+        await prisma.$transaction([
+            prisma.account.deleteMany({ where: { userId } }),
+            prisma.session.deleteMany({ where: { userId } }),
+            prisma.user.update({
+                where: { id: userId },
+                data: {
+                    name: '탈퇴한 회원',
+                    email: `withdrawn-${anonStamp}-${userId}@deleted.cage3000.local`,
+                    phoneNumber: `__deleted_${anonStamp}_${userId}`,
+                    hashedPassword: null,
+                    address: null,
+                    detailAddress: null,
+                    zipCode: null,
+                    birthDate: null,
+                    marketingConsent: false,
+                    marketingAgreedAt: null,
+                    image: null,
+                    status: 'withdrawn',
+                },
+            }),
+        ]);
 
-        if (!session || !session.user?.email) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        // Delete the user
-        // Relations (Account, Session) should cascade delete if configured in schema.
-        // If not, we might need to delete them manually first, but usually Prisma handles cascade if defined in DB or Schema.
-        // Looking at schema from context, Account/Session have onDelete: Cascade.
-
-        await prisma.user.delete({
-            where: {
-                email: session.user.email,
-            },
-        });
-
-        return NextResponse.json({ message: 'User deleted successfully' }, { status: 200 });
-    } catch (error) {
-        console.error('Delete user error:', error);
-        // Determine if error is a foreign key constraint or something else
-        return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
+        return NextResponse.json({ message: 'Account withdrawn successfully' });
+    } catch (err) {
+        console.error('Withdraw error:', err);
+        return NextResponse.json({ error: '탈퇴 처리에 실패했습니다.' }, { status: 500 });
     }
 }

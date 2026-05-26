@@ -10,20 +10,29 @@ export const authOptions = {
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" }
+        email: { label: 'Email', type: 'text' },
+        password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
+        const email = credentials.email.trim().toLowerCase();
+
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+          where: { email },
         });
 
         if (!user || !user.hashedPassword) {
           return null;
+        }
+
+        if (user.status === 'suspended') {
+          throw new Error('SUSPENDED');
+        }
+        if (user.status === 'withdrawn') {
+          throw new Error('WITHDRAWN');
         }
 
         const isPasswordCorrect = await bcrypt.compare(
@@ -31,26 +40,58 @@ export const authOptions = {
           user.hashedPassword
         );
 
-        if (isPasswordCorrect) {
-          return user;
+        if (!isPasswordCorrect) {
+          return null;
         }
 
-        return null;
-      }
-    })
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            lastLoginAt: new Date(),
+            loginCount: { increment: 1 },
+          },
+        });
+
+        return user;
+      },
+    }),
   ],
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
+    maxAge: 60 * 60 * 24 * 14, // 14 days
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.role = user.role;
-        token.phoneNumber = user.phoneNumber;
-        token.address = user.address;
+      }
+      // On every JWT regeneration (including session refresh), re-fetch user from DB
+      // so that profile edits and status changes propagate without re-login.
+      if (token.id && (user || trigger === 'update' || !token.role)) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            status: true,
+            phoneNumber: true,
+            address: true,
+            detailAddress: true,
+            zipCode: true,
+          },
+        });
+        if (dbUser) {
+          token.name = dbUser.name;
+          token.email = dbUser.email;
+          token.role = dbUser.role;
+          token.status = dbUser.status;
+          token.phoneNumber = dbUser.phoneNumber;
+          token.address = dbUser.address;
+          token.detailAddress = dbUser.detailAddress;
+          token.zipCode = dbUser.zipCode;
+        }
       }
       return token;
     },
@@ -60,8 +101,11 @@ export const authOptions = {
         session.user.name = token.name;
         session.user.email = token.email;
         session.user.role = token.role;
+        session.user.status = token.status;
         session.user.phoneNumber = token.phoneNumber;
         session.user.address = token.address;
+        session.user.detailAddress = token.detailAddress;
+        session.user.zipCode = token.zipCode;
       }
       return session;
     },
