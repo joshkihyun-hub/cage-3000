@@ -5,7 +5,16 @@ import Image from 'next/image';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../shared/context/cart-context';
-import { ShoppingBag, Menu, X, User, LogOut, LogIn, Shield, ChevronDown } from 'lucide-react';
+import {
+  IconBag,
+  IconUser,
+  IconLogIn,
+  IconLogOut,
+  IconShield,
+  IconMenu,
+  IconClose,
+  IconChevronDown,
+} from './icons';
 import { motion } from 'framer-motion';
 
 const DURATION = 0.25;
@@ -81,9 +90,9 @@ function CartIcon() {
   const { cart } = useCart();
   return (
     <Link href="/cart" className="relative group p-2">
-      <ShoppingBag className="w-5 h-5 text-zinc-800 group-hover:text-black transition-colors" />
+      <IconBag className="w-6 h-6 text-zinc-800 group-hover:text-black transition-colors" />
       {cart.length > 0 && (
-        <span className="absolute top-0 right-0 bg-black text-white text-[10px] font-medium rounded-full h-4 w-4 flex items-center justify-center">
+        <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-[10px] font-medium rounded-full h-4 w-4 flex items-center justify-center">
           {cart.reduce((acc, item) => acc + item.quantity, 0)}
         </span>
       )}
@@ -145,7 +154,7 @@ export default function Header() {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-zinc-900 p-2 hover:bg-zinc-100 rounded-full transition-colors"
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMobileMenuOpen ? <IconClose className="w-6 h-6" /> : <IconMenu className="w-6 h-6" />}
             </button>
           </div>
 
@@ -224,19 +233,19 @@ export default function Header() {
                 <div className="flex items-center space-x-2">
                   {session.user?.role === 'admin' && (
                     <Link href="/admin" className="p-2 text-zinc-600 hover:text-black transition-colors" title="Admin">
-                      <Shield className="w-5 h-5" />
+                      <IconShield className="w-6 h-6" />
                     </Link>
                   )}
                   <Link href="/my-page" className="p-2 text-zinc-600 hover:text-black transition-colors" title="My Page">
-                    <User className="w-5 h-5" />
+                    <IconUser className="w-6 h-6" />
                   </Link>
                   <button onClick={() => signOut()} className="p-2 text-zinc-600 hover:text-black transition-colors" title="Sign Out">
-                    <LogOut className="w-5 h-5" />
+                    <IconLogOut className="w-6 h-6" />
                   </button>
                 </div>
               ) : (
                 <Link href="/auth/signin" className="p-2 text-zinc-600 hover:text-black transition-colors" title="Sign In">
-                  <LogIn className="w-5 h-5" />
+                  <IconLogIn className="w-6 h-6" />
                 </Link>
               )}
             </div>
@@ -264,7 +273,7 @@ export default function Header() {
                   >
                     {item.name}
                     <div className={`transition-transform duration-300 ${openSubMenu === item.name ? 'rotate-180' : ''}`}>
-                      <ChevronDown size={16} />
+                      <IconChevronDown className="w-4 h-4" />
                     </div>
                   </button>
                 ) : (
