@@ -19,7 +19,7 @@ export default function ProjectsPage() {
                             <li key={item.id}>
                                 <Link
                                     href={`/details/${item.id}`}
-                                    className="group inline-flex flex-wrap items-center gap-x-4 md:gap-x-6 gap-y-2 hover:opacity-60 transition-opacity"
+                                    className="group inline-flex flex-wrap items-center gap-x-4 md:gap-x-6 gap-y-2 blur-[5px] hover:blur-0 transition-[filter] duration-500 ease-out"
                                 >
                                     <span className="font-sans text-3xl md:text-5xl lg:text-6xl leading-none tracking-tight text-black">
                                         {item.title}
