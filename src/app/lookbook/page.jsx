@@ -70,8 +70,8 @@ export default function LookbookPage() {
     return (
         <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-40">
             {/* Sticky side credit — anchored to the viewport center while you scroll. */}
-            <aside className="hidden lg:block fixed left-8 xl:left-12 top-1/2 -translate-y-1/2 z-30 select-none pointer-events-none max-w-[150px]">
-                <h1 className="relative text-xl xl:text-2xl leading-none text-black mb-3">
+            <aside className="hidden lg:block fixed left-8 xl:left-12 top-1/2 -translate-y-1/2 z-30 select-none pointer-events-none max-w-[180px]">
+                <h1 className="relative text-xl xl:text-2xl leading-none text-black mb-5">
                     <span
                         aria-hidden="true"
                         className="absolute inset-0 -translate-x-[4px] text-zinc-200/70 pointer-events-none"
@@ -86,11 +86,11 @@ export default function LookbookPage() {
                     ['Styling', '@bluevereal'],
                     ['Model', '@simleeje @choppycocky'],
                 ].map(([role, who]) => (
-                    <div key={role} className="mt-1.5 first:mt-0 leading-tight">
-                        <p className="text-[8px] uppercase tracking-[0.18em] text-zinc-400">
+                    <div key={role} className="mt-3 first:mt-0">
+                        <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400 leading-relaxed">
                             {role}
                         </p>
-                        <p className="text-[10px] text-zinc-900 font-medium tracking-wide">
+                        <p className="text-[11px] text-zinc-900 font-medium tracking-wide leading-snug mt-0.5">
                             {who}
                         </p>
                     </div>
