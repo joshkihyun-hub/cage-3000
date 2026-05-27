@@ -89,35 +89,34 @@ export default function LookbookPage() {
 
                     <div className="max-w-md relative z-20">
                         <div className="flex items-end gap-6 mb-8">
-                            <motion.h1
-                                initial={{ opacity: 0, y: 40 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
-                                className="text-4xl md:text-7xl leading-tight flex gap-1"
-                            >
-                                {['g', 'r', 'e', 'e', 'n'].map((letter, i) => (
-                                    <motion.span
-                                        key={i}
-                                        initial={{ color: '#000000' }}
-                                        animate={{ color: '#D0F0F4' }}
-                                        transition={{
-                                            duration: 3,
-                                            delay: i * 0.2,
-                                            repeat: Infinity,
-                                            repeatType: "reverse",
-                                            ease: "easeInOut"
-                                        }}
-                                    >
-                                        {letter}
-                                    </motion.span>
-                                ))}
-                            </motion.h1>
+                            {/* Title with ghost-offset duplicate — matches About / Shop labels. */}
+                            <h1 className="relative text-4xl md:text-7xl leading-tight text-black select-none">
+                                <span
+                                    aria-hidden="true"
+                                    className="absolute inset-0 -translate-x-[10px] text-zinc-200/70 pointer-events-none"
+                                >
+                                    green
+                                </span>
+                                <span className="relative">green</span>
+                            </h1>
                         </div>
-                        <div className="mt-8 space-y-1 text-[10px] md:text-xs text-zinc-400 font-light tracking-wide">
-                            <p>Design, Production: @choppycocky</p>
-                            <p>Photography: @youngikyoun</p>
-                            <p>Styling: @bluevereal</p>
-                            <p>Model: @simleeje @choppycocky</p>
+                        <div className="mt-8 space-y-1 text-[10px] md:text-xs text-zinc-400 font-light tracking-wide select-none">
+                            {[
+                                'Design, Production: @choppycocky',
+                                'Photography: @youngikyoun',
+                                'Styling: @bluevereal',
+                                'Model: @simleeje @choppycocky',
+                            ].map((line) => (
+                                <p key={line} className="relative">
+                                    <span
+                                        aria-hidden="true"
+                                        className="absolute inset-0 -translate-x-[3px] text-zinc-200/70 pointer-events-none"
+                                    >
+                                        {line}
+                                    </span>
+                                    <span className="relative">{line}</span>
+                                </p>
+                            ))}
                         </div>
                         {!isGalleryOpen && (
                             <button
