@@ -262,13 +262,13 @@ export default function Header() {
           className={`md:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.32,0.725,0.25,1)] ${isMobileMenuOpen ? 'max-h-[600px] opacity-100 mt-4' : 'max-h-0 opacity-0 mt-0'
             }`}
         >
-          <nav className="flex flex-col items-center gap-y-6 py-8 bg-white/10 backdrop-blur-lg rounded-2xl mt-2 border border-white/20">
+          <nav className="flex flex-col items-center gap-y-4 py-6 bg-white/10 backdrop-blur-lg rounded-2xl mt-2 border border-white/20">
             {[...navItemsLeft, ...navItemsRight].map((item, idx) => (
               <div key={item.name} className="flex flex-col items-center w-full">
                 {item.subItems ? (
                   <button
                     onClick={() => toggleSubMenu(item.name)}
-                    className="font-serif text-lg uppercase tracking-[0.2em] text-zinc-800 hover:text-black transition-colors flex items-center gap-2"
+                    className="font-serif text-sm uppercase tracking-[0.2em] text-zinc-800 hover:text-black transition-colors flex items-center gap-2"
                     style={{ transitionDelay: `${idx * 50}ms` }}
                   >
                     {item.name}
@@ -280,7 +280,7 @@ export default function Header() {
                   <Link
                     href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="font-serif text-lg uppercase tracking-[0.2em] text-zinc-800 hover:text-black transition-colors"
+                    className="font-serif text-sm uppercase tracking-[0.2em] text-zinc-800 hover:text-black transition-colors"
                     style={{ transitionDelay: `${idx * 50}ms` }}
                   >
                     {item.name}
@@ -312,20 +312,20 @@ export default function Header() {
             <div className="w-12 h-px bg-zinc-200 my-2"></div>
             {session ? (
               <div className="flex flex-col items-center gap-y-4">
-                <Link href="/my-page" onClick={() => setIsMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-zinc-600 hover:text-black">
+                <Link href="/my-page" onClick={() => setIsMobileMenuOpen(false)} className="text-xs uppercase tracking-widest text-zinc-600 hover:text-black">
                   My Page
                 </Link>
                 {session.user?.role === 'admin' && (
-                  <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-zinc-600 hover:text-black">
+                  <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="text-xs uppercase tracking-widest text-zinc-600 hover:text-black">
                     Admin
                   </Link>
                 )}
-                <button onClick={() => signOut()} className="text-sm uppercase tracking-widest text-zinc-600 hover:text-black">
+                <button onClick={() => signOut()} className="text-xs uppercase tracking-widest text-zinc-600 hover:text-black">
                   Sign Out
                 </button>
               </div>
             ) : (
-              <Link href="/auth/signin" onClick={() => setIsMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-zinc-600 hover:text-black">
+              <Link href="/auth/signin" onClick={() => setIsMobileMenuOpen(false)} className="text-xs uppercase tracking-widest text-zinc-600 hover:text-black">
                 Sign In
               </Link>
             )}
