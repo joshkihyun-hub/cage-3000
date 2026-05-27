@@ -109,7 +109,7 @@ model VerificationRequest {
 model Order {
   id            String      @id @default(cuid())
   orderNumber   String      @unique
-  userId        String
+  userId        String?
   status        OrderStatus @default(pending)
   currency      String      @default("KRW")
   subtotal      Int
@@ -121,6 +121,12 @@ model Order {
   cancelledAt   DateTime?
   shippedAt     DateTime?
   deliveredAt   DateTime?
+
+  // Guest checkout: when userId is null, these identify the buyer.
+  // guestToken is a server-issued opaque secret used to prove ownership
+  // of the order from a logged-out client (passed via httpOnly cookie).
+  guestEmail String?
+  guestToken String? @unique
 
   recipientName   String
   recipientPhone  String
@@ -137,12 +143,13 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user  User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  user  User?       @relation(fields: [userId], references: [id], onDelete: Restrict)
   items OrderItem[]
 
   @@index([userId])
   @@index([status])
   @@index([createdAt])
+  @@index([guestEmail])
 }
 
 model EmailToken {

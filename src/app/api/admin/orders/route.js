@@ -26,6 +26,7 @@ export async function GET(req) {
       { recipientPhone: { contains: q } },
       { user: { email: { contains: q, mode: 'insensitive' } } },
       { user: { name: { contains: q, mode: 'insensitive' } } },
+      { guestEmail: { contains: q, mode: 'insensitive' } },
     ];
   }
   if (status && VALID_STATUSES.includes(status)) where.status = status;
@@ -52,6 +53,7 @@ export async function GET(req) {
         shippedAt: true,
         deliveredAt: true,
         user: { select: { id: true, name: true, email: true } },
+        guestEmail: true,
         items: { select: { productName: true, quantity: true } },
       },
     }),

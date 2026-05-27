@@ -10,6 +10,7 @@ function SignInForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
   const registered = searchParams.get('registered') === '1';
+  const fromCheckout = callbackUrl === '/checkout';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -61,7 +62,20 @@ function SignInForm() {
   return (
     <div className="bg-white text-zinc-900 min-h-screen flex items-center justify-center pt-20">
       <div className="max-w-sm w-full p-8">
-        <h1 className="font-serif text-3xl text-center mb-12 text-black uppercase">Login</h1>
+        <h1 className="font-serif text-3xl text-center mb-4 text-black uppercase">Login</h1>
+
+        {fromCheckout && (
+          <p className="text-center mb-10 text-[11px] text-zinc-500 leading-relaxed">
+            계정 없이 구매하실 수 있어요.{' '}
+            <Link
+              href="/checkout"
+              className="text-black underline hover:text-zinc-600"
+            >
+              비회원으로 주문하기
+            </Link>
+          </p>
+        )}
+        {!fromCheckout && <div className="mb-12" />}
 
         {registered && (
           <p className="text-emerald-700 text-center mb-6 text-xs bg-emerald-50 border border-emerald-100 py-3 leading-relaxed">

@@ -2,11 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import * as PortOne from '@portone/browser-sdk/v2';
 import DaumPostcode from 'react-daum-postcode';
 import { useCart } from '../../shared/context/cart-context';
-import { formatKrPhone, isValidKrPhone } from '@/lib/validation';
+import { formatKrPhone, isValidEmail, isValidKrPhone } from '@/lib/validation';
 
 const STORE_ID = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || '';
 const CHANNEL_CARD = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_CARD || '';
@@ -18,21 +19,19 @@ const CheckoutClientPage = () => {
   const { data: session, status: authStatus } = useSession();
   const { cart, clearCart } = useCart();
 
+  const isAuthed = authStatus === 'authenticated';
+  const isGuest = authStatus === 'unauthenticated';
+
   const [recipientName, setRecipientName] = useState('');
   const [recipientPhone, setRecipientPhone] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [address, setAddress] = useState('');
   const [detailAddress, setDetailAddress] = useState('');
   const [customerNote, setCustomerNote] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (authStatus === 'unauthenticated') {
-      router.replace('/auth/signin?callbackUrl=/checkout');
-    }
-  }, [authStatus, router]);
 
   // Prefill from session profile once it loads.
   useEffect(() => {
@@ -68,7 +67,8 @@ const CheckoutClientPage = () => {
   const shippingValid =
     recipientName.trim().length >= 2 &&
     isValidKrPhone(recipientPhone) &&
-    address.trim().length >= 4;
+    address.trim().length >= 4 &&
+    (isAuthed || isValidEmail(guestEmail));
 
   const handleCompletePostcode = (data) => {
     setAddress(data.address);
@@ -83,7 +83,11 @@ const CheckoutClientPage = () => {
       return;
     }
     if (!shippingValid) {
-      setError('배송 정보를 모두 입력해 주세요.');
+      setError(
+        isGuest && !isValidEmail(guestEmail)
+          ? '이메일과 배송 정보를 모두 입력해 주세요.'
+          : '배송 정보를 모두 입력해 주세요.'
+      );
       return;
     }
     if (!STORE_ID || !channelKey) {
@@ -99,6 +103,7 @@ const CheckoutClientPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: cart.map((item) => ({ id: item.id, quantity: item.quantity })),
+          guestEmail: isAuthed ? undefined : guestEmail.trim().toLowerCase(),
           shipping: {
             recipientName,
             recipientPhone,
@@ -130,7 +135,7 @@ const CheckoutClientPage = () => {
         customer: {
           fullName: recipientName,
           phoneNumber: recipientPhone,
-          email: session?.user?.email || undefined,
+          email: session?.user?.email || guestEmail || undefined,
         },
         customData: { orderId },
       });
@@ -176,9 +181,24 @@ const CheckoutClientPage = () => {
   return (
     <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
       <div className="container mx-auto px-4 md:px-8 max-w-screen-lg">
-        <h1 className="font-serif text-3xl md:text-4xl text-center mb-16 text-black uppercase">
+        <h1 className="font-serif text-3xl md:text-4xl text-center mb-6 text-black uppercase">
           Checkout
         </h1>
+
+        {/* Guest banner — login is optional; users can complete checkout with an email only. */}
+        {isGuest && (
+          <p className="text-center text-[11px] text-zinc-500 mb-12">
+            이미 회원이신가요?{' '}
+            <Link
+              href="/auth/signin?callbackUrl=/checkout"
+              className="text-black underline hover:text-zinc-600"
+            >
+              로그인
+            </Link>{' '}
+            · 또는 비회원으로 계속 진행하세요.
+          </p>
+        )}
+        {isAuthed && <div className="mb-12" />}
 
         {error && (
           <p className="text-red-500 text-xs text-center bg-red-50 border border-red-100 py-3 mb-8">
@@ -225,6 +245,26 @@ const CheckoutClientPage = () => {
 
           {/* Shipping + Payment */}
           <div className="space-y-12">
+            {/* Guest email — only when not signed in */}
+            {isGuest && (
+              <div>
+                <h2 className="font-serif text-xl text-black mb-8 border-b border-zinc-200 pb-4">
+                  이메일 (영수증·주문 조회)
+                </h2>
+                <input
+                  type="email"
+                  autoComplete="email"
+                  className="w-full border-b border-zinc-200 py-2 text-sm focus:outline-none focus:border-black bg-transparent"
+                  placeholder="you@example.com"
+                  value={guestEmail}
+                  onChange={(e) => setGuestEmail(e.target.value)}
+                />
+                <p className="mt-3 text-[10px] text-zinc-400 leading-relaxed">
+                  주문 확인 메일이 이 주소로 발송됩니다. 비회원 주문 조회 시에도 필요합니다.
+                </p>
+              </div>
+            )}
+
             <div>
               <h2 className="font-serif text-xl text-black mb-8 border-b border-zinc-200 pb-4">
                 배송 정보

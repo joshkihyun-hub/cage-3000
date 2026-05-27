@@ -147,6 +147,60 @@ export async function sendVerificationEmail({ to, name, token }) {
   });
 }
 
+export async function sendOrderConfirmationEmail({
+  to,
+  name,
+  orderNumber,
+  totalAmount,
+  items = [],
+}) {
+  const formatKRW = (n) =>
+    new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(Number(n) || 0);
+  const greeting = name ? `${name}님,` : '안녕하세요,';
+
+  const itemsRows = items
+    .map(
+      (it) => `
+        <tr>
+          <td style="padding:10px 0;border-bottom:1px solid #f4f4f5;font-size:13px;color:#27272a;">${it.productName} <span style="color:#a1a1aa;">× ${it.quantity}</span></td>
+          <td style="padding:10px 0;border-bottom:1px solid #f4f4f5;font-size:13px;color:#27272a;text-align:right;">${formatKRW(it.subtotal)}</td>
+        </tr>`
+    )
+    .join('');
+
+  const lookupUrl = `${SITE_URL}/my-page`;
+
+  const body = `
+    <p style="margin:0 0 20px 0;">${greeting}</p>
+    <p style="margin:0 0 20px 0;">CAGE3000에서 주문을 접수했습니다. 결제가 정상적으로 완료되었음을 확인했어요.</p>
+    <p style="margin:0 0 24px 0;font-size:13px;color:#71717a;">주문번호 <strong style="color:#000;letter-spacing:0.05em;">${orderNumber}</strong></p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e4e4e7;margin:0 0 8px 0;">
+      ${itemsRows}
+      <tr>
+        <td style="padding:16px 0 0 0;font-size:13px;font-weight:600;color:#000;">합계</td>
+        <td style="padding:16px 0 0 0;font-size:15px;font-weight:600;color:#000;text-align:right;">${formatKRW(totalAmount)}</td>
+      </tr>
+    </table>
+    <p style="margin:24px 0 0 0;font-size:13px;color:#52525b;">상품은 준비 완료되는 대로 안내드릴게요. 추가 문의는 contact@cage3000.com 으로 회신 주세요.</p>
+  `;
+
+  const html = shellTemplate({
+    headline: 'Order Confirmed',
+    body,
+    ctaLabel: 'View Order',
+    ctaUrl: lookupUrl,
+    footnote:
+      '본 메일은 결제 완료 시 자동 발송됩니다. 회신을 통해 언제든 문의해 주세요.',
+  });
+
+  return sendEmail({
+    to,
+    subject: `[CAGE3000] 주문이 접수되었습니다 — ${orderNumber}`,
+    html,
+    text: `${greeting}\n주문이 접수되었습니다.\n주문번호: ${orderNumber}\n합계: ${formatKRW(totalAmount)}\n\n주문 상세는 ${lookupUrl} 에서 확인하실 수 있습니다.`,
+  });
+}
+
 export async function sendPasswordResetEmail({ to, name, token }) {
   const url = `${SITE_URL}/auth/reset-password?token=${encodeURIComponent(token)}`;
   const html = shellTemplate({

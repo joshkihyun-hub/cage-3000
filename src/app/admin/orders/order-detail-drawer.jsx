@@ -123,12 +123,28 @@ export default function OrderDetailDrawer({ orderId, onClose, onUpdated }) {
             <>
               {/* Customer */}
               <section>
-                <h3 className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 mb-4">Customer</h3>
+                <h3 className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 mb-4">
+                  Customer
+                  {!order.user && (
+                    <span className="ml-2 text-[9px] tracking-widest text-zinc-500 border border-zinc-200 px-1.5 py-0.5">
+                      Guest
+                    </span>
+                  )}
+                </h3>
                 <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
-                  <Field label="Name" value={order.user?.name} />
-                  <Field label="Email" value={order.user?.email} />
-                  <Field label="Phone" value={order.user?.phoneNumber} />
-                  <Field label="Joined" value={order.user?.createdAt ? formatDateTime(order.user.createdAt) : '-'} />
+                  <Field label="Name" value={order.user?.name || order.recipientName} />
+                  <Field label="Email" value={order.user?.email || order.guestEmail} />
+                  <Field label="Phone" value={order.user?.phoneNumber || order.recipientPhone} />
+                  <Field
+                    label={order.user ? 'Joined' : 'Order Type'}
+                    value={
+                      order.user?.createdAt
+                        ? formatDateTime(order.user.createdAt)
+                        : !order.user
+                          ? '비회원 주문'
+                          : '-'
+                    }
+                  />
                 </div>
               </section>
 

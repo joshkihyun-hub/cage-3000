@@ -244,8 +244,15 @@ export default function AdminOrdersPage() {
                     <td className="py-4 px-3 text-xs text-zinc-500">{formatDate(order.createdAt)}</td>
                     <td className="py-4 px-3 font-mono text-xs text-zinc-700">{order.orderNumber}</td>
                     <td className="py-4 px-3">
-                      <p className="font-medium text-sm">{order.recipientName}</p>
-                      <p className="text-[11px] text-zinc-400">{order.user?.email || '-'}</p>
+                      <p className="font-medium text-sm">
+                        {order.recipientName}
+                        {!order.user && (
+                          <span className="ml-2 text-[9px] uppercase tracking-widest text-zinc-400 border border-zinc-200 px-1.5 py-0.5">
+                            Guest
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-[11px] text-zinc-400">{order.user?.email || order.guestEmail || '-'}</p>
                     </td>
                     <td className="py-4 px-3 text-xs text-zinc-600 hidden md:table-cell">
                       {order.items.map((i) => `${i.productName}×${i.quantity}`).join(', ')}

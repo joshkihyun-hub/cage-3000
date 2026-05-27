@@ -1,15 +1,24 @@
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import { requireActiveUser } from '@/lib/auth-guards';
 import { getProductById, getProductUnitPrice, generateOrderNumber } from '@/lib/catalog';
-import { isValidKrPhone } from '@/lib/validation';
+import { isValidEmail, isValidKrPhone } from '@/lib/validation';
+
+// Cookie that proves a logged-out client owns a freshly created order.
+// Read by /api/payment/confirm to authorize the payment transition.
+const GUEST_COOKIE = 'cage_guest_order';
+const GUEST_COOKIE_MAX_AGE = 60 * 60; // 1 hour — long enough for any payment flow.
 
 // POST /api/orders — create a pending Order from a cart + shipping info.
-// Returns { orderId, orderNumber, totalAmount } so the client can hand them
-// to PortOne. Pricing is computed server-side; client cart prices are ignored.
+// Auth is OPTIONAL: logged-in users get their order linked to their account;
+// guests must provide an email so we can send the receipt and look the order
+// up later. Pricing is computed server-side; client cart prices are ignored.
 export async function POST(req) {
-  const { session, user, error } = await requireActiveUser();
-  if (error) return error;
+  const session = await getServerSession(authOptions);
+  const isGuest = !session?.user?.id;
 
   let body;
   try {
@@ -18,7 +27,7 @@ export async function POST(req) {
     return NextResponse.json({ error: '잘못된 요청 형식입니다.' }, { status: 400 });
   }
 
-  const { items, shipping } = body || {};
+  const { items, shipping, guestEmail } = body || {};
 
   if (!Array.isArray(items) || items.length === 0) {
     return NextResponse.json({ error: '장바구니가 비어 있습니다.' }, { status: 400 });
@@ -43,6 +52,26 @@ export async function POST(req) {
   }
   if (shippingAddress.length < 4) {
     return NextResponse.json({ error: '배송지 주소를 입력해 주세요.' }, { status: 400 });
+  }
+
+  // Guest: require a usable email for the receipt + order-status lookup.
+  let normalizedGuestEmail = null;
+  if (isGuest) {
+    normalizedGuestEmail = String(guestEmail || '').trim().toLowerCase();
+    if (!isValidEmail(normalizedGuestEmail)) {
+      return NextResponse.json(
+        { error: '비회원 주문은 이메일이 필요합니다. (영수증 및 주문 조회용)' },
+        { status: 400 }
+      );
+    }
+  }
+
+  // If logged in, also confirm the account is in good standing — reuses
+  // the same guard the previous version used, so suspended/withdrawn
+  // accounts still can't place orders.
+  if (!isGuest) {
+    const { error: guardError } = await requireActiveUser();
+    if (guardError) return guardError;
   }
 
   // Server-side price lookup
@@ -92,11 +121,15 @@ export async function POST(req) {
     orderNumber = generateOrderNumber();
   }
 
+  const guestToken = isGuest ? crypto.randomBytes(32).toString('hex') : null;
+
   try {
     const order = await prisma.order.create({
       data: {
         orderNumber,
-        userId: session.user.id,
+        userId: isGuest ? null : session.user.id,
+        guestEmail: isGuest ? normalizedGuestEmail : null,
+        guestToken,
         status: 'pending',
         currency: 'KRW',
         subtotal,
@@ -116,14 +149,31 @@ export async function POST(req) {
         totalAmount: true,
       },
     });
-    return NextResponse.json(order, { status: 201 });
+
+    const res = NextResponse.json(order, { status: 201 });
+
+    // Bind the guest order to this browser via an httpOnly cookie. The
+    // value is `<orderId>:<token>` — opaque to JS, validated server-side
+    // in /api/payment/confirm.
+    if (isGuest && guestToken) {
+      res.cookies.set(GUEST_COOKIE, `${order.id}:${guestToken}`, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: GUEST_COOKIE_MAX_AGE,
+      });
+    }
+
+    return res;
   } catch (err) {
     console.error('Order creation error:', err);
     return NextResponse.json({ error: '주문 생성 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }
 
-// GET /api/orders — current user's own order history.
+// GET /api/orders — current user's own order history (auth-only).
+// Guest orders are not listed here; guests look orders up via email + orderNumber.
 export async function GET() {
   const { session, error } = await requireActiveUser();
   if (error) return error;

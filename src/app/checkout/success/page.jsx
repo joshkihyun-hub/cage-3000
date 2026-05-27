@@ -1,57 +1,70 @@
 'use client';
 
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
-function SuccessMessage() {
+// Success page is reached by:
+// 1) The checkout client redirecting after server-side payment verification.
+//    In this case ?order=<orderNumber> is present and the order is already PAID.
+// 2) PortOne's external redirect for some payment methods (NaverPay/KakaoPay
+//    sometimes redirect from their own domain). Verification has already been
+//    attempted by the client; if the redirect hits us cold we still want to
+//    show a graceful "we've got your order, check email" screen.
+function SuccessBody() {
   const searchParams = useSearchParams();
-  const paymentKey = searchParams.get('paymentKey');
-  const orderId = searchParams.get('orderId');
-  const amount = searchParams.get('amount');
-  const [message, setMessage] = useState('Processing payment...');
+  const orderNumber = searchParams.get('order');
 
-  useEffect(() => {
-    const confirmPayment = async () => {
-      try {
-        const response = await fetch('/api/payment/confirm', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ paymentKey, orderId, amount }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          setMessage(`Payment successful! Order ID: ${data.orderId}`);
-        } else {
-          setMessage(`Payment failed: ${data.message}`);
-        }
-      } catch (error) {
-        setMessage('An error occurred while confirming the payment.');
-        console.error(error);
-      }
-    };
-
-    if (paymentKey && orderId && amount) {
-      confirmPayment();
-    }
-  }, [paymentKey, orderId, amount]);
-
-  return <p>{message}</p>;
-}
-
-const SuccessPage = () => {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Payment Status</h1>
-      <Suspense fallback={<div>Processing payment...</div>}>
-        <SuccessMessage />
-      </Suspense>
+    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
+      <div className="container mx-auto px-4 md:px-8 max-w-screen-sm text-center">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-6">
+          Order Confirmed
+        </p>
+        <h1 className="font-serif text-3xl md:text-4xl text-black mb-8 leading-tight">
+          주문이 접수되었습니다.
+        </h1>
+        <p className="text-sm text-zinc-600 leading-relaxed mb-10">
+          결제가 정상적으로 완료되었습니다.<br />
+          주문 확인 메일을 발송했으니 받은 편지함을 확인해 주세요.
+        </p>
+
+        {orderNumber && (
+          <div className="border-y border-zinc-200 py-6 mb-10">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 mb-2">
+              Order Number
+            </p>
+            <p className="font-serif text-lg text-black tracking-wide">{orderNumber}</p>
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href="/shop"
+            className="bg-black text-white py-3 px-8 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors"
+          >
+            계속 쇼핑하기
+          </Link>
+          <Link
+            href="/my-page"
+            className="border border-black text-black py-3 px-8 text-[11px] uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors"
+          >
+            주문 내역
+          </Link>
+        </div>
+
+        <p className="mt-12 text-[10px] text-zinc-400 leading-relaxed">
+          문의는 contact@cage3000.com 으로 부탁드립니다.
+        </p>
+      </div>
     </div>
   );
-};
+}
 
-export default SuccessPage;
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <SuccessBody />
+    </Suspense>
+  );
+}
