@@ -10,9 +10,9 @@ import { useCart } from '../../shared/context/cart-context';
 import { formatKrPhone, isValidEmail, isValidKrPhone } from '@/lib/validation';
 
 const STORE_ID = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || '';
-const CHANNEL_CARD = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_CARD || '';
-const CHANNEL_KAKAO = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KAKAOPAY || '';
-const CHANNEL_NAVER = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_NAVERPAY || '';
+// 단일 KCP V2 채널로 카드 + 간편결제(KakaoPay/NaverPay/TossPay/...) 모두 처리.
+// 환경에 따라 테스트연동/실연동 채널 키를 환경변수로 주입한다.
+const CHANNEL_KCP = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KCP || '';
 
 const CheckoutClientPage = () => {
   const router = useRouter();
@@ -76,7 +76,7 @@ const CheckoutClientPage = () => {
     setIsPostcodeOpen(false);
   };
 
-  const handlePayment = async (channelKey, payMethod) => {
+  const handlePayment = async (payMethod) => {
     setError('');
     if (cart.length === 0) {
       setError('장바구니가 비어 있습니다.');
@@ -90,7 +90,7 @@ const CheckoutClientPage = () => {
       );
       return;
     }
-    if (!STORE_ID || !channelKey) {
+    if (!STORE_ID || !CHANNEL_KCP) {
       setError('결제 채널이 설정되지 않았습니다. 관리자에게 문의해 주세요.');
       return;
     }
@@ -122,10 +122,11 @@ const CheckoutClientPage = () => {
 
       const { id: orderId, orderNumber, totalAmount } = orderData;
 
-      // 2) PortOne payment with the server-issued orderNumber/totalAmount
+      // 2) PortOne payment with the server-issued orderNumber/totalAmount.
+      // 단일 KCP V2 채널 — payMethod로 카드/간편결제를 분기한다.
       const response = await PortOne.requestPayment({
         storeId: STORE_ID,
-        channelKey,
+        channelKey: CHANNEL_KCP,
         paymentId: orderNumber,
         orderName,
         totalAmount,
@@ -327,28 +328,24 @@ const CheckoutClientPage = () => {
               <h2 className="font-serif text-xl text-black mb-8 border-b border-zinc-200 pb-4">
                 결제 수단
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <button
                   disabled={submitting || !shippingValid || cart.length === 0}
-                  onClick={() => handlePayment(CHANNEL_CARD, 'CARD')}
+                  onClick={() => handlePayment('CARD')}
                   className="w-full bg-black text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors disabled:bg-zinc-300 disabled:cursor-not-allowed"
                 >
-                  신용카드 결제
+                  신용카드
                 </button>
                 <button
                   disabled={submitting || !shippingValid || cart.length === 0}
-                  onClick={() => handlePayment(CHANNEL_NAVER, 'NAVERPAY')}
-                  className="w-full bg-[#03C75A] text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-[#02b350] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => handlePayment('EASY_PAY')}
+                  className="w-full border border-black text-black py-4 text-xs uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  네이버페이
+                  간편결제
                 </button>
-                <button
-                  disabled={submitting || !shippingValid || cart.length === 0}
-                  onClick={() => handlePayment(CHANNEL_KAKAO, 'KAKAOPAY')}
-                  className="w-full bg-[#FEE500] text-black py-4 text-xs uppercase tracking-[0.2em] hover:bg-[#e6cf00] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  카카오페이
-                </button>
+                <p className="text-[10px] text-zinc-400 text-center pt-1">
+                  간편결제: 카카오페이 · 네이버페이 · 토스페이 · 페이코
+                </p>
               </div>
               <p className="mt-6 text-[10px] text-zinc-400 text-center leading-relaxed">
                 결제 진행 시{' '}
