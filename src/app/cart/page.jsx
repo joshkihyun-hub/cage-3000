@@ -26,33 +26,34 @@ export default function CartPage() {
     <PageContainer>
       <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
         <div className="container mx-auto px-4 md:px-8 max-w-screen-lg">
-          <h1 className="font-serif text-3xl md:text-4xl text-center mb-16 text-black uppercase">Your Cart</h1>
+          <h1 className="font-serif text-3xl md:text-4xl text-center mb-12 text-black uppercase">Your Cart</h1>
           {cart.length === 0 ? (
             <p className="text-center text-zinc-500 text-sm tracking-widest uppercase">Your cart is empty.</p>
           ) : (
             <div className="max-w-3xl mx-auto">
-              <ul className="space-y-12">
+              <ul className="space-y-10">
                 {cart.map((item) => (
-                  <li key={item.id} className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start border-b border-zinc-100 pb-12 last:border-0">
-                    <div className="md:col-span-4 relative aspect-[3/4] bg-white">
+                  <li key={item.id} className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] gap-6 md:gap-10 items-start border-b border-zinc-100 pb-10 last:border-0">
+                    <div className="relative aspect-[3/4] bg-white">
                       <Image
                         src={item.imageUrl}
                         alt={item.name}
                         fill
+                        sizes="(max-width: 768px) 120px, 160px"
                         className="object-cover"
                       />
                     </div>
-                    <div className="md:col-span-8 flex flex-col justify-between h-full space-y-4">
-                      <div className="space-y-2">
-                        <h2 className="font-serif text-xl text-black">{item.name}</h2>
-                        <p className="text-xs tracking-widest text-zinc-500">
-                          {item.name === '03' || item.name === '07' ? item.price : 'ORDER MADE'}
-                        </p>
-                        <p className="text-xs tracking-widest text-zinc-500">QUANTITY: {item.quantity}</p>
-                      </div>
+                    <div className="flex flex-col">
+                      <h2 className="font-serif text-lg md:text-xl text-black">{item.name}</h2>
+                      <p className="text-xs tracking-widest text-zinc-500 mt-2">
+                        {item.name === '03' || item.name === '07' ? item.price : 'ORDER MADE'}
+                      </p>
+                      <p className="text-[11px] tracking-widest text-zinc-400 uppercase mt-1">
+                        Quantity {item.quantity}
+                      </p>
                       <button
                         onClick={() => removeFromCart(item.id)}
-                        className="text-[10px] uppercase tracking-widest text-zinc-400 hover:text-black transition-colors self-start border-b border-transparent hover:border-black pb-0.5"
+                        className="mt-6 text-[10px] uppercase tracking-widest text-zinc-400 hover:text-black transition-colors self-start border-b border-transparent hover:border-black pb-0.5"
                       >
                         Remove
                       </button>
@@ -60,10 +61,10 @@ export default function CartPage() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-16 border-t border-zinc-200 pt-8">
-                <div className="flex justify-between items-center mb-8">
-                  <span className="text-xs uppercase tracking-widest text-zinc-500">Total</span>
-                  <span className="font-serif text-xl text-black">₩{getTotalPrice()}</span>
+              <div className="mt-12 border-t border-zinc-200 pt-8">
+                <div className="flex justify-between items-baseline mb-6">
+                  <span className="text-[11px] uppercase tracking-widest text-zinc-500">Total</span>
+                  <span className="font-serif text-2xl text-black">₩{getTotalPrice()}</span>
                 </div>
                 <button
                   onClick={handleCheckout}

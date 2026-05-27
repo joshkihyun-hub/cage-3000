@@ -72,25 +72,36 @@ export default function MyPage() {
 
   if (status !== 'authenticated') return null;
 
+  const zipPart = session.user.zipCode ? `(${session.user.zipCode}) ` : '';
+  const detailPart = session.user.detailAddress ? ` ${session.user.detailAddress}` : '';
   const fullAddress = session.user.address
-    ? `(${session.user.zipCode || ''}) ${session.user.address} ${session.user.detailAddress || ''}`.trim()
+    ? `${zipPart}${session.user.address}${detailPart}`.trim()
     : '-';
+
+  // 010-1234-5678 형태로 보여주기 위한 가벼운 포매터. 11자리 숫자만 처리.
+  const formatPhoneDisplay = (raw) => {
+    if (!raw) return '-';
+    const digits = String(raw).replace(/\D/g, '');
+    if (digits.length === 11) return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+    if (digits.length === 10) return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+    return raw;
+  };
 
   return (
     <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
       <div className="container mx-auto px-4 md:px-8 max-w-3xl">
-        <h1 className="font-serif text-4xl md:text-5xl text-center mb-16 text-black font-normal">
+        <h1 className="font-serif text-3xl md:text-4xl text-center mb-12 text-black font-normal">
           My Page
         </h1>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-12 mb-16">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12 mb-12">
           <Field label="Name" value={session.user.name} />
-          <Field label="Phone" value={session.user.phoneNumber} />
+          <Field label="Phone" value={formatPhoneDisplay(session.user.phoneNumber)} />
           <Field label="Email" value={session.user.email} />
           <Field label="Address" value={fullAddress} />
         </section>
 
-        <div className="space-y-4 mb-20">
+        <div className="space-y-3 mb-16">
           <Link
             href="/my-page/edit"
             className="block w-full bg-black text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors text-center"
@@ -134,9 +145,9 @@ export default function MyPage() {
         </div>
 
         {/* Order History */}
-        <section className="border-t border-zinc-100 pt-16">
+        <section className="border-t border-zinc-100 pt-12">
           <div className="flex items-baseline justify-between mb-8">
-            <h2 className="font-serif text-xl uppercase tracking-wide">Order History</h2>
+            <h2 className="font-serif text-2xl uppercase tracking-wide">Order History</h2>
             <p className="text-[10px] uppercase tracking-widest text-zinc-400">
               {orders.length}건
             </p>
@@ -193,8 +204,8 @@ export default function MyPage() {
 function Field({ label, value }) {
   return (
     <div>
-      <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-3">{label}</p>
-      <p className="font-serif text-lg text-black break-words">{value || '-'}</p>
+      <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-2">{label}</p>
+      <p className="font-serif text-base text-black break-words leading-snug">{value || '-'}</p>
     </div>
   );
 }
