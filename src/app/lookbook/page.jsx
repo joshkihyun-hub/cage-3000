@@ -90,24 +90,27 @@ export default function LookbookPage() {
                     <div className="max-w-md relative z-20">
                         <div className="flex items-end gap-6 mb-8">
                             {/* Title with ghost-offset duplicate — matches About / Shop labels. */}
-                            <h1 className="relative text-4xl md:text-7xl leading-tight text-black select-none">
+                            <h1 className="relative text-3xl md:text-5xl leading-tight text-black select-none">
                                 <span
                                     aria-hidden="true"
-                                    className="absolute inset-0 -translate-x-[10px] text-zinc-200/70 pointer-events-none"
+                                    className="absolute inset-0 -translate-x-[6px] text-zinc-200/70 pointer-events-none"
                                 >
                                     green
                                 </span>
                                 <span className="relative">green</span>
                             </h1>
                         </div>
-                        <div className="mt-8 space-y-1 text-[10px] md:text-xs text-zinc-400 font-light tracking-wide select-none">
+                        <div className="mt-8 space-y-2 select-none">
                             {[
                                 'Design, Production: @choppycocky',
                                 'Photography: @youngikyoun',
                                 'Styling: @bluevereal',
                                 'Model: @simleeje @choppycocky',
                             ].map((line) => (
-                                <p key={line} className="relative">
+                                <p
+                                    key={line}
+                                    className="relative text-zinc-900 font-sans text-xs md:text-sm font-medium leading-relaxed tracking-wider"
+                                >
                                     <span
                                         aria-hidden="true"
                                         className="absolute inset-0 -translate-x-[3px] text-zinc-200/70 pointer-events-none"
