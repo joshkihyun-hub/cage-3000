@@ -30,6 +30,7 @@ const CheckoutClientPage = () => {
   const [customerNote, setCustomerNote] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
+  const [isEasyPayOpen, setIsEasyPayOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -76,7 +77,7 @@ const CheckoutClientPage = () => {
     setIsPostcodeOpen(false);
   };
 
-  const handlePayment = async (payMethod) => {
+  const handlePayment = async (payMethod, easyPayProvider) => {
     setError('');
     if (cart.length === 0) {
       setError('장바구니가 비어 있습니다.');
@@ -124,6 +125,7 @@ const CheckoutClientPage = () => {
 
       // 2) PortOne payment with the server-issued orderNumber/totalAmount.
       // 단일 KCP V2 채널 — payMethod로 카드/간편결제를 분기한다.
+      // EASY_PAY는 KCP V2에서 easyPayProvider를 반드시 함께 보내야 동작한다.
       const response = await PortOne.requestPayment({
         storeId: STORE_ID,
         channelKey: CHANNEL_KCP,
@@ -132,6 +134,9 @@ const CheckoutClientPage = () => {
         totalAmount,
         currency: 'KRW',
         payMethod,
+        ...(payMethod === 'EASY_PAY' && easyPayProvider
+          ? { easyPay: { easyPayProvider } }
+          : {}),
         redirectUrl: `${window.location.origin}/checkout/success`,
         customer: {
           fullName: recipientName,
@@ -338,14 +343,11 @@ const CheckoutClientPage = () => {
                 </button>
                 <button
                   disabled={submitting || !shippingValid || cart.length === 0}
-                  onClick={() => handlePayment('EASY_PAY')}
+                  onClick={() => setIsEasyPayOpen(true)}
                   className="w-full border border-black text-black py-4 text-xs uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   간편결제
                 </button>
-                <p className="text-[10px] text-zinc-400 text-center pt-1">
-                  간편결제: 카카오페이 · 네이버페이 · 토스페이 · 페이코
-                </p>
               </div>
               <p className="mt-6 text-[10px] text-zinc-400 text-center leading-relaxed">
                 결제 진행 시{' '}
@@ -373,6 +375,55 @@ const CheckoutClientPage = () => {
                 ✕
               </button>
               <DaumPostcode onComplete={handleCompletePostcode} className="h-[400px]" />
+            </div>
+          </div>
+        )}
+
+        {/* Easy-pay provider selector. KCP V2 requires easyPayProvider to be
+            specified when payMethod is EASY_PAY — the modal collects that
+            choice before kicking off the PortOne flow. */}
+        {isEasyPayOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            onClick={() => setIsEasyPayOpen(false)}
+          >
+            <div
+              className="bg-white w-full max-w-sm relative p-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => setIsEasyPayOpen(false)}
+                className="absolute top-3 right-3 p-2 hover:bg-zinc-100 rounded-full text-zinc-500"
+                aria-label="닫기"
+              >
+                ✕
+              </button>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-2 text-center">
+                Easy Pay
+              </p>
+              <h3 className="font-serif text-xl text-black mb-8 text-center">
+                간편결제 선택
+              </h3>
+              <div className="space-y-3">
+                {[
+                  { label: '카카오페이', provider: 'KAKAOPAY' },
+                  { label: '네이버페이', provider: 'NAVERPAY' },
+                  { label: '토스페이', provider: 'TOSSPAY' },
+                ].map(({ label, provider }) => (
+                  <button
+                    key={provider}
+                    disabled={submitting}
+                    onClick={() => {
+                      setIsEasyPayOpen(false);
+                      handlePayment('EASY_PAY', provider);
+                    }}
+                    className="w-full border border-zinc-200 text-black py-4 text-xs uppercase tracking-[0.2em] hover:border-black transition-colors disabled:opacity-50"
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
