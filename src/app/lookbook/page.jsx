@@ -69,68 +69,6 @@ export default function LookbookPage() {
 
     return (
         <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-40">
-            {/* Sticky side credit — anchored to the viewport center while you scroll. */}
-            <aside className="hidden lg:block fixed left-8 xl:left-12 top-1/2 -translate-y-1/2 z-30 select-none pointer-events-none max-w-[180px]">
-                <h1 className="relative text-xl xl:text-2xl leading-none text-black mb-5">
-                    <span
-                        aria-hidden="true"
-                        className="absolute inset-0 -translate-x-[4px] text-zinc-200/70 pointer-events-none"
-                    >
-                        green
-                    </span>
-                    <span className="relative">green</span>
-                </h1>
-                {[
-                    ['Design, Production', '@choppycocky'],
-                    ['Photography', '@youngikyoun'],
-                    ['Styling', '@bluevereal'],
-                    ['Model', '@simleeje @choppycocky'],
-                ].map(([role, who]) => (
-                    <div key={role} className="mt-3 first:mt-0">
-                        <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400 leading-relaxed">
-                            {role}
-                        </p>
-                        <p className="text-[11px] text-zinc-900 font-medium tracking-wide leading-snug mt-0.5">
-                            {who}
-                        </p>
-                    </div>
-                ))}
-            </aside>
-
-            {/* Mobile / small-screen intro — sits above the gallery instead of being sticky. */}
-            <div className="lg:hidden max-w-md mx-auto px-6 mb-16 select-none">
-                <h1 className="relative text-3xl leading-tight text-black mb-6">
-                    <span
-                        aria-hidden="true"
-                        className="absolute inset-0 -translate-x-[5px] text-zinc-200/70 pointer-events-none"
-                    >
-                        green
-                    </span>
-                    <span className="relative">green</span>
-                </h1>
-                <div className="space-y-2">
-                    {[
-                        'Design, Production: @choppycocky',
-                        'Photography: @youngikyoun',
-                        'Styling: @bluevereal',
-                        'Model: @simleeje @choppycocky',
-                    ].map((line) => (
-                        <p
-                            key={line}
-                            className="relative text-zinc-900 font-sans text-xs md:text-sm font-medium leading-relaxed tracking-wider"
-                        >
-                            <span
-                                aria-hidden="true"
-                                className="absolute inset-0 -translate-x-[3px] text-zinc-200/70 pointer-events-none"
-                            >
-                                {line}
-                            </span>
-                            <span className="relative">{line}</span>
-                        </p>
-                    ))}
-                </div>
-            </div>
-
             {/* Image stack — full vertical scroll-driven gallery. */}
             <div className="px-4 md:px-8 space-y-24 md:space-y-32">
                 {galleryImages.map((img, idx) => (
