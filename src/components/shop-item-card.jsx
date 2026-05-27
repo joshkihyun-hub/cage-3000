@@ -94,13 +94,33 @@ export const ShopItemCard = ({ item }) => {
             </div>
 
             <div className="mt-auto flex justify-between items-end">
-                <div className="space-y-1">
-                    <h3 className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-black">
-                        {item.name}
+                <div className="space-y-1 select-none">
+                    {/* Ghost-offset labels: same misregistration trick used on /about
+                        — a faded duplicate sits a few pixels to the left of the real
+                        text so it reads like a slightly mis-printed press proof. */}
+                    <h3 className="relative text-[10px] md:text-xs font-medium uppercase tracking-widest text-black">
+                        <span
+                            aria-hidden="true"
+                            className="absolute inset-0 -translate-x-[3px] text-zinc-200/70 pointer-events-none"
+                        >
+                            {item.name}
+                        </span>
+                        <span className="relative">{item.name}</span>
                     </h3>
-                    <p className="text-[10px] md:text-xs font-medium tracking-widest text-zinc-900">
-                        {item.name === '03' || item.name === '07' ? item.price : 'ORDER MADE'}
-                    </p>
+                    {(() => {
+                        const priceText = item.name === '03' || item.name === '07' ? item.price : 'ORDER MADE';
+                        return (
+                            <p className="relative text-[10px] md:text-xs font-medium tracking-widest text-zinc-900">
+                                <span
+                                    aria-hidden="true"
+                                    className="absolute inset-0 -translate-x-[3px] text-zinc-200/70 pointer-events-none"
+                                >
+                                    {priceText}
+                                </span>
+                                <span className="relative">{priceText}</span>
+                            </p>
+                        );
+                    })()}
                 </div>
                 <div className="w-2 h-2 bg-black rounded-full mb-2 shrink-0"></div>
             </div>
