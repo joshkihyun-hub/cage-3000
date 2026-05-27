@@ -3,7 +3,7 @@ import { PortOneClient } from '@portone/server-sdk';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
-import { sendOrderConfirmationEmail } from '@/lib/email';
+import { sendOrderConfirmationEmail, sendOrderNotificationToSeller } from '@/lib/email';
 
 const GUEST_COOKIE = 'cage_guest_order';
 
@@ -131,35 +131,70 @@ export async function POST(request) {
         orderNumber: true,
         totalAmount: true,
         paidAt: true,
+        paymentMethod: true,
         guestEmail: true,
         userId: true,
         recipientName: true,
+        recipientPhone: true,
+        shippingZipCode: true,
+        shippingAddress: true,
+        shippingDetail: true,
+        customerNote: true,
         items: { select: { productName: true, quantity: true, subtotal: true } },
       },
     });
 
-    // Fire-and-forget order confirmation email. We resolve the recipient
-    // address from either the linked user account or the guest email.
+    // Fire-and-forget order emails. Both the buyer receipt and the seller
+    // notification are best-effort — payment success must never block on
+    // email delivery problems.
     try {
-      let toEmail = updated.guestEmail;
-      let toName = updated.recipientName;
-      if (!toEmail && updated.userId) {
+      let buyerEmail = updated.guestEmail;
+      let buyerName = updated.recipientName;
+      if (!buyerEmail && updated.userId) {
         const u = await prisma.user.findUnique({
           where: { id: updated.userId },
           select: { email: true, name: true },
         });
-        toEmail = u?.email || null;
-        toName = u?.name || toName;
+        buyerEmail = u?.email || null;
+        buyerName = u?.name || buyerName;
       }
-      if (toEmail) {
+
+      const shippingForEmail = {
+        recipientName: updated.recipientName,
+        recipientPhone: updated.recipientPhone,
+        zipCode: updated.shippingZipCode,
+        address: updated.shippingAddress,
+        detail: updated.shippingDetail,
+        customerNote: updated.customerNote,
+      };
+
+      // Buyer receipt
+      if (buyerEmail) {
         await sendOrderConfirmationEmail({
-          to: toEmail,
-          name: toName,
+          to: buyerEmail,
+          name: buyerName,
           orderNumber: updated.orderNumber,
           totalAmount: updated.totalAmount,
           items: updated.items,
+          shipping: shippingForEmail,
         });
       }
+
+      // Seller notification
+      await sendOrderNotificationToSeller({
+        orderNumber: updated.orderNumber,
+        totalAmount: updated.totalAmount,
+        paymentMethod: updated.paymentMethod,
+        paidAt: updated.paidAt,
+        isGuest: !updated.userId,
+        buyer: {
+          name: buyerName,
+          email: buyerEmail,
+          phone: updated.recipientPhone,
+        },
+        shipping: shippingForEmail,
+        items: updated.items,
+      });
     } catch (mailErr) {
       // Never block payment success on email problems — just log.
       console.error('[payment/confirm] order email failed', {

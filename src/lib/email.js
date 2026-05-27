@@ -147,15 +147,25 @@ export async function sendVerificationEmail({ to, name, token }) {
   });
 }
 
+const formatKRW = (n) =>
+  new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(Number(n) || 0);
+
+function joinAddress({ zipCode, address, detail }) {
+  const parts = [];
+  if (zipCode) parts.push(`(${zipCode})`);
+  if (address) parts.push(address);
+  if (detail) parts.push(detail);
+  return parts.join(' ');
+}
+
 export async function sendOrderConfirmationEmail({
   to,
   name,
   orderNumber,
   totalAmount,
   items = [],
+  shipping = null, // { recipientName, recipientPhone, zipCode, address, detail, customerNote }
 }) {
-  const formatKRW = (n) =>
-    new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(Number(n) || 0);
   const greeting = name ? `${name}님,` : '안녕하세요,';
 
   const itemsRows = items
@@ -170,6 +180,17 @@ export async function sendOrderConfirmationEmail({
 
   const lookupUrl = `${SITE_URL}/my-page`;
 
+  const shippingBlock = shipping
+    ? `
+    <p style="margin:24px 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">Shipping To</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;color:#27272a;line-height:1.7;">
+      <tr><td>${shipping.recipientName || ''} · ${shipping.recipientPhone || ''}</td></tr>
+      <tr><td style="color:#52525b;">${joinAddress({ zipCode: shipping.zipCode, address: shipping.address, detail: shipping.detail })}</td></tr>
+      ${shipping.customerNote ? `<tr><td style="padding-top:6px;color:#71717a;font-size:12px;">메모: ${shipping.customerNote}</td></tr>` : ''}
+    </table>
+  `
+    : '';
+
   const body = `
     <p style="margin:0 0 20px 0;">${greeting}</p>
     <p style="margin:0 0 20px 0;">CAGE3000에서 주문을 접수했습니다. 결제가 정상적으로 완료되었음을 확인했어요.</p>
@@ -181,6 +202,7 @@ export async function sendOrderConfirmationEmail({
         <td style="padding:16px 0 0 0;font-size:15px;font-weight:600;color:#000;text-align:right;">${formatKRW(totalAmount)}</td>
       </tr>
     </table>
+    ${shippingBlock}
     <p style="margin:24px 0 0 0;font-size:13px;color:#52525b;">상품은 준비 완료되는 대로 안내드릴게요. 추가 문의는 contact@cage3000.com 으로 회신 주세요.</p>
   `;
 
@@ -198,6 +220,109 @@ export async function sendOrderConfirmationEmail({
     subject: `[CAGE3000] 주문이 접수되었습니다 — ${orderNumber}`,
     html,
     text: `${greeting}\n주문이 접수되었습니다.\n주문번호: ${orderNumber}\n합계: ${formatKRW(totalAmount)}\n\n주문 상세는 ${lookupUrl} 에서 확인하실 수 있습니다.`,
+  });
+}
+
+// 판매자(운영자) 알림 메일. 결제 완료 직후 발송돼서 새 주문을 즉시 인지하고
+// 어드민 페이지로 바로 진입할 수 있게 한다. 받는 주소는 ORDER_NOTIFY_EMAIL 환경변수
+// (콤마로 다중 지정 가능). 기본값은 contact@cage3000.com.
+export async function sendOrderNotificationToSeller({
+  orderNumber,
+  totalAmount,
+  paymentMethod,
+  paidAt,
+  isGuest,
+  buyer, // { name, email, phone }
+  shipping, // { recipientName, recipientPhone, zipCode, address, detail, customerNote }
+  items = [],
+}) {
+  const rawRecipients = process.env.ORDER_NOTIFY_EMAIL || 'contact@cage3000.com';
+  const recipients = rawRecipients
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (recipients.length === 0) {
+    console.warn('[email] ORDER_NOTIFY_EMAIL produced no valid recipients');
+    return null;
+  }
+
+  const adminUrl = `${SITE_URL}/admin/orders`;
+
+  const itemsRows = items
+    .map(
+      (it) => `
+        <tr>
+          <td style="padding:10px 0;border-bottom:1px solid #f4f4f5;font-size:13px;color:#27272a;">${it.productName} <span style="color:#a1a1aa;">× ${it.quantity}</span></td>
+          <td style="padding:10px 0;border-bottom:1px solid #f4f4f5;font-size:13px;color:#27272a;text-align:right;">${formatKRW(it.subtotal)}</td>
+        </tr>`
+    )
+    .join('');
+
+  const guestBadge = isGuest
+    ? `<span style="margin-left:8px;padding:2px 6px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#71717a;border:1px solid #e4e4e7;">Guest</span>`
+    : '';
+
+  const body = `
+    <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">New Order</p>
+    <p style="margin:0 0 24px 0;font-size:14px;color:#27272a;">새 주문이 결제 완료되었습니다.</p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e4e4e7;border-bottom:1px solid #e4e4e7;margin:0 0 24px 0;">
+      <tr>
+        <td style="padding:10px 0;font-size:12px;color:#71717a;width:90px;">주문번호</td>
+        <td style="padding:10px 0;font-size:13px;color:#000;font-weight:600;letter-spacing:0.05em;">${orderNumber}</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 0;font-size:12px;color:#71717a;">결제수단</td>
+        <td style="padding:10px 0;font-size:13px;color:#27272a;">${paymentMethod || '-'}</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 0;font-size:12px;color:#71717a;">결제시각</td>
+        <td style="padding:10px 0;font-size:13px;color:#27272a;">${paidAt ? new Date(paidAt).toLocaleString('ko-KR') : '-'}</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 0;font-size:12px;color:#71717a;">합계</td>
+        <td style="padding:10px 0;font-size:15px;color:#000;font-weight:600;">${formatKRW(totalAmount)}</td>
+      </tr>
+    </table>
+
+    <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">Customer ${guestBadge}</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;">
+      <tr><td style="padding:4px 0;font-size:13px;color:#27272a;">${buyer?.name || '-'}</td></tr>
+      <tr><td style="padding:4px 0;font-size:13px;color:#52525b;">${buyer?.email || '-'}</td></tr>
+      <tr><td style="padding:4px 0;font-size:13px;color:#52525b;">${buyer?.phone || '-'}</td></tr>
+    </table>
+
+    <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">Shipping</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;font-size:13px;color:#27272a;line-height:1.7;">
+      <tr><td>${shipping?.recipientName || '-'} · ${shipping?.recipientPhone || '-'}</td></tr>
+      <tr><td style="color:#52525b;">${joinAddress({ zipCode: shipping?.zipCode, address: shipping?.address, detail: shipping?.detail })}</td></tr>
+      ${shipping?.customerNote ? `<tr><td style="padding-top:6px;color:#71717a;font-size:12px;">메모: ${shipping.customerNote}</td></tr>` : ''}
+    </table>
+
+    <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">Items</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e4e4e7;margin:0 0 8px 0;">
+      ${itemsRows}
+      <tr>
+        <td style="padding:16px 0 0 0;font-size:13px;font-weight:600;color:#000;">합계</td>
+        <td style="padding:16px 0 0 0;font-size:15px;font-weight:600;color:#000;text-align:right;">${formatKRW(totalAmount)}</td>
+      </tr>
+    </table>
+  `;
+
+  const html = shellTemplate({
+    headline: 'New Order Received',
+    body,
+    ctaLabel: 'Open Admin',
+    ctaUrl: adminUrl,
+    footnote:
+      '본 메일은 결제 완료 시 운영자에게 자동 발송됩니다. 어드민에서 주문 처리 후 배송 정보를 입력해 주세요.',
+  });
+
+  return sendEmail({
+    to: recipients,
+    subject: `[CAGE3000] 새 주문 — ${orderNumber} · ${buyer?.name || '-'} · ${formatKRW(totalAmount)}`,
+    html,
+    text: `새 주문 결제 완료\n주문번호: ${orderNumber}\n구매자: ${buyer?.name || '-'} (${buyer?.email || '-'} / ${buyer?.phone || '-'})\n배송지: ${joinAddress({ zipCode: shipping?.zipCode, address: shipping?.address, detail: shipping?.detail })}\n합계: ${formatKRW(totalAmount)}\n\n어드민: ${adminUrl}`,
   });
 }
 
