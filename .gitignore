@@ -55,3 +55,7 @@ next-env.d.ts
 # Local Prisma artifacts — production uses prisma db push, not migrations
 /prisma/dev.db
 /prisma/migrations/
+
+# Next.js auto-discovers favicon from src/app/icon.png — never commit
+# a separate favicon.ico (the legacy Vercel default kept regenerating).
+src/app/favicon.ico
