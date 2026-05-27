@@ -19,7 +19,7 @@ export const ProductInfo = ({ item }) => {
     return (
         <div className="w-full md:max-w-md bg-transparent text-zinc-900 p-6 md:p-0">
             <div className="flex flex-col mb-6">
-                <h1 className="text-2xl md:text-3xl font-serif tracking-normal text-black font-light leading-tight">
+                <h1 className="text-2xl md:text-3xl tracking-normal text-black font-light leading-tight">
                     {item.name}
                 </h1>
                 <p className="text-sm font-light tracking-widest text-zinc-500 mt-2">

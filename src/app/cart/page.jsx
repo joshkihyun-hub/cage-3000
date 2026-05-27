@@ -26,7 +26,7 @@ export default function CartPage() {
     <PageContainer>
       <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
         <div className="container mx-auto px-4 md:px-8 max-w-screen-lg">
-          <h1 className="font-serif text-3xl md:text-4xl text-center mb-12 text-black uppercase">Your Cart</h1>
+          <h1 className="text-3xl md:text-4xl text-center mb-12 text-black uppercase">Your Cart</h1>
           {cart.length === 0 ? (
             <p className="text-center text-zinc-500 text-sm tracking-widest uppercase">Your cart is empty.</p>
           ) : (
@@ -44,7 +44,7 @@ export default function CartPage() {
                       />
                     </div>
                     <div className="flex flex-col">
-                      <h2 className="font-serif text-lg md:text-xl text-black">{item.name}</h2>
+                      <h2 className="text-lg md:text-xl text-black">{item.name}</h2>
                       <p className="text-xs tracking-widest text-zinc-500 mt-2">
                         {item.name === '03' || item.name === '07' ? item.price : 'ORDER MADE'}
                       </p>
@@ -64,7 +64,7 @@ export default function CartPage() {
               <div className="mt-12 border-t border-zinc-200 pt-8">
                 <div className="flex justify-between items-baseline mb-6">
                   <span className="text-[11px] uppercase tracking-widest text-zinc-500">Total</span>
-                  <span className="font-serif text-2xl text-black">₩{getTotalPrice()}</span>
+                  <span className="text-2xl text-black">₩{getTotalPrice()}</span>
                 </div>
                 <button
                   onClick={handleCheckout}

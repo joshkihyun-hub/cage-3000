@@ -170,7 +170,7 @@ export default function Header() {
                   <RandomHoverLink
                     href={item.href}
                     text={item.name}
-                    className="text-xs uppercase tracking-[0.2em] text-zinc-600 font-medium"
+                    className="font-serif text-xs uppercase tracking-[0.2em] text-zinc-600 font-medium"
                   />
                 </motion.div>
 
@@ -182,7 +182,7 @@ export default function Header() {
                         <Link
                           key={subItem.name}
                           href={subItem.href}
-                          className="px-6 py-2 text-[10px] uppercase tracking-[0.15em] text-zinc-500 hover:text-black hover:bg-zinc-50 transition-colors whitespace-nowrap text-center"
+                          className="font-serif px-6 py-2 text-[10px] uppercase tracking-[0.15em] text-zinc-500 hover:text-black hover:bg-zinc-50 transition-colors whitespace-nowrap text-center"
                         >
                           {subItem.name}
                         </Link>
@@ -268,7 +268,7 @@ export default function Header() {
                 {item.subItems ? (
                   <button
                     onClick={() => toggleSubMenu(item.name)}
-                    className="text-lg uppercase tracking-[0.2em] text-zinc-800 hover:text-black transition-colors flex items-center gap-2"
+                    className="font-serif text-lg uppercase tracking-[0.2em] text-zinc-800 hover:text-black transition-colors flex items-center gap-2"
                     style={{ transitionDelay: `${idx * 50}ms` }}
                   >
                     {item.name}
@@ -280,7 +280,7 @@ export default function Header() {
                   <Link
                     href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-lg uppercase tracking-[0.2em] text-zinc-800 hover:text-black transition-colors"
+                    className="font-serif text-lg uppercase tracking-[0.2em] text-zinc-800 hover:text-black transition-colors"
                     style={{ transitionDelay: `${idx * 50}ms` }}
                   >
                     {item.name}
@@ -299,7 +299,7 @@ export default function Header() {
                           key={subItem.name}
                           href={subItem.href}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-xs uppercase tracking-[0.15em] text-zinc-500 hover:text-black transition-colors"
+                          className="font-serif text-xs uppercase tracking-[0.15em] text-zinc-500 hover:text-black transition-colors"
                         >
                           {subItem.name}
                         </Link>

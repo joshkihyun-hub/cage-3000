@@ -93,7 +93,7 @@ export default function LookbookPage() {
                                 initial={{ opacity: 0, y: 40 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
-                                className="font-serif text-4xl md:text-7xl leading-tight flex gap-1"
+                                className="text-4xl md:text-7xl leading-tight flex gap-1"
                             >
                                 {['g', 'r', 'e', 'e', 'n'].map((letter, i) => (
                                     <motion.span
@@ -174,7 +174,7 @@ export default function LookbookPage() {
                             </div>
 
                             <div className="mt-24 text-center">
-                                <p className="font-serif text-2xl text-black mb-4">cage3000</p>
+                                <p className="text-2xl text-black mb-4">cage3000</p>
                                 <p className="text-xs uppercase tracking-widest text-zinc-400">Seoul, South Korea</p>
                             </div>
                         </div>

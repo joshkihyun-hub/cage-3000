@@ -128,7 +128,7 @@ export default function UserDetailDrawer({ userId, onClose, onUpdated, currentAd
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
       <aside className="relative w-full max-w-2xl bg-white h-full overflow-y-auto shadow-2xl">
         <div className="sticky top-0 bg-white border-b border-zinc-100 z-10 flex items-center justify-between px-8 py-5">
-          <h2 className="font-serif text-lg uppercase tracking-wide">
+          <h2 className="text-lg uppercase tracking-wide">
             Customer Detail
           </h2>
           <button onClick={onClose} className="p-2 hover:bg-zinc-100 rounded-full">
@@ -189,13 +189,13 @@ export default function UserDetailDrawer({ userId, onClose, onUpdated, currentAd
                   <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-2">
                     Lifetime orders
                   </p>
-                  <p className="font-serif text-2xl">{detail.stats.lifetimeOrders}</p>
+                  <p className="text-2xl">{detail.stats.lifetimeOrders}</p>
                 </div>
                 <div className="border border-zinc-100 p-4">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-2">
                     Lifetime revenue
                   </p>
-                  <p className="font-serif text-2xl">
+                  <p className="text-2xl">
                     {formatKRW(detail.stats.lifetimeRevenue)}
                   </p>
                 </div>
@@ -290,7 +290,7 @@ export default function UserDetailDrawer({ userId, onClose, onUpdated, currentAd
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="font-serif text-base">
+                            <p className="text-base">
                               {formatKRW(order.totalAmount)}
                             </p>
                             <p className="text-[10px] uppercase tracking-widest text-zinc-500 mt-1">

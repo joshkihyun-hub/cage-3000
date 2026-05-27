@@ -163,7 +163,7 @@ export default function AdminUsersPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
             <div>
-              <h1 className="font-serif text-3xl uppercase">User Management</h1>
+              <h1 className="text-3xl uppercase">User Management</h1>
               <p className="text-xs text-zinc-400 mt-2 tracking-wide">
                 회원 검색·필터·상태 변경·주문 이력 관리
               </p>
@@ -191,7 +191,7 @@ export default function AdminUsersPage() {
                 <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-2">
                   {card.label}
                 </p>
-                <p className="font-serif text-2xl text-black">{card.value}</p>
+                <p className="text-2xl text-black">{card.value}</p>
               </div>
             ))}
           </div>

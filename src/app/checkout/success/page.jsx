@@ -21,7 +21,7 @@ function SuccessBody() {
         <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-6">
           Order Confirmed
         </p>
-        <h1 className="font-serif text-3xl md:text-4xl text-black mb-8 leading-tight">
+        <h1 className="text-3xl md:text-4xl text-black mb-8 leading-tight">
           주문이 접수되었습니다.
         </h1>
         <p className="text-sm text-zinc-600 leading-relaxed mb-10">
@@ -34,7 +34,7 @@ function SuccessBody() {
             <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 mb-2">
               Order Number
             </p>
-            <p className="font-serif text-lg text-black tracking-wide">{orderNumber}</p>
+            <p className="text-lg text-black tracking-wide">{orderNumber}</p>
           </div>
         )}
 

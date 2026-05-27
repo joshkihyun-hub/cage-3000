@@ -144,7 +144,7 @@ export default function AdminOrdersPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
             <div>
-              <h1 className="font-serif text-3xl uppercase">Order Management</h1>
+              <h1 className="text-3xl uppercase">Order Management</h1>
               <p className="text-xs text-zinc-400 mt-2 tracking-wide">
                 주문 검색·상태 변경·운송장 입력
               </p>
@@ -169,7 +169,7 @@ export default function AdminOrdersPage() {
             {summaryCards.map((card) => (
               <div key={card.label} className="border border-zinc-100 p-4">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-2">{card.label}</p>
-                <p className="font-serif text-2xl text-black">{card.value}</p>
+                <p className="text-2xl text-black">{card.value}</p>
               </div>
             ))}
           </div>

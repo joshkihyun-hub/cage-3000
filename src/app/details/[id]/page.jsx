@@ -88,11 +88,11 @@ export default function ProjectDetailPage({ params }) {
 
           <div className="flex justify-start px-4 mt-12 md:mt-16 pb-32">
             <div className="w-full md:max-w-md text-left space-y-4">
-              <h1 className="font-serif text-xl md:text-3xl text-zinc-900 uppercase tracking-wide leading-tight">
+              <h1 className="text-xl md:text-3xl text-zinc-900 uppercase tracking-wide leading-tight">
                 {project.title}
               </h1>
 
-              <p className="text-xs md:text-sm text-zinc-500 tracking-widest font-serif">
+              <p className="text-xs md:text-sm text-zinc-500 tracking-widest">
                 {project.subtitle?.replace('FASHION / ', '')}
               </p>
 
@@ -100,7 +100,7 @@ export default function ProjectDetailPage({ params }) {
               {project.credits && (
                 <div className="pt-8 space-y-1 border-t border-zinc-100 mt-8">
                   {project.credits.map((credit, idx) => (
-                    <p key={idx} className="text-[10px] md:text-xs text-zinc-400 font-serif tracking-wide">
+                    <p key={idx} className="text-[10px] md:text-xs text-zinc-400 tracking-wide">
                       <span className="font-medium text-zinc-600">{credit.role}</span> - {credit.name}
                     </p>
                   ))}
@@ -158,18 +158,18 @@ export default function ProjectDetailPage({ params }) {
           {/* 2. Info Block */}
           <div className="flex justify-start px-4 mt-12 md:mt-16">
             <div className="w-full md:max-w-md text-left space-y-4">
-              <h1 className="font-serif text-xl md:text-3xl text-zinc-900 uppercase tracking-wide leading-tight">
+              <h1 className="text-xl md:text-3xl text-zinc-900 uppercase tracking-wide leading-tight">
                 {project.title}
               </h1>
 
-              <p className="text-xs md:text-sm text-zinc-500 tracking-widest font-serif">
+              <p className="text-xs md:text-sm text-zinc-500 tracking-widest">
                 {project.subtitle?.replace('FASHION / ', '')}
               </p>
 
               {project.credits && (
                 <div className="pt-8 space-y-1 border-t border-zinc-100 mt-8">
                   {project.credits.map((credit, idx) => (
-                    <p key={idx} className="text-[10px] md:text-xs text-zinc-400 font-serif tracking-wide">
+                    <p key={idx} className="text-[10px] md:text-xs text-zinc-400 tracking-wide">
                       <span className="font-medium text-zinc-600">{credit.role}</span> - {credit.name}
                     </p>
                   ))}

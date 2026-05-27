@@ -187,7 +187,7 @@ const CheckoutClientPage = () => {
   return (
     <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
       <div className="container mx-auto px-4 md:px-8 max-w-screen-lg">
-        <h1 className="font-serif text-3xl md:text-4xl text-center mb-6 text-black uppercase">
+        <h1 className="text-3xl md:text-4xl text-center mb-6 text-black uppercase">
           Checkout
         </h1>
 
@@ -215,7 +215,7 @@ const CheckoutClientPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24">
           {/* Order Summary */}
           <div>
-            <h2 className="font-serif text-xl text-black mb-8 border-b border-zinc-200 pb-4">
+            <h2 className="text-xl text-black mb-8 border-b border-zinc-200 pb-4">
               주문 내역
             </h2>
             {cart.length === 0 ? (
@@ -243,7 +243,7 @@ const CheckoutClientPage = () => {
                   <h3 className="text-xs uppercase tracking-widest text-black font-bold">
                     합계
                   </h3>
-                  <p className="font-serif text-xl text-black">{formatKRW(subtotal)}</p>
+                  <p className="text-xl text-black">{formatKRW(subtotal)}</p>
                 </div>
               </>
             )}
@@ -254,7 +254,7 @@ const CheckoutClientPage = () => {
             {/* Guest email — only when not signed in */}
             {isGuest && (
               <div>
-                <h2 className="font-serif text-xl text-black mb-8 border-b border-zinc-200 pb-4">
+                <h2 className="text-xl text-black mb-8 border-b border-zinc-200 pb-4">
                   이메일 (영수증·주문 조회)
                 </h2>
                 <input
@@ -272,7 +272,7 @@ const CheckoutClientPage = () => {
             )}
 
             <div>
-              <h2 className="font-serif text-xl text-black mb-8 border-b border-zinc-200 pb-4">
+              <h2 className="text-xl text-black mb-8 border-b border-zinc-200 pb-4">
                 배송 정보
               </h2>
               <div className="space-y-5">
@@ -330,7 +330,7 @@ const CheckoutClientPage = () => {
             </div>
 
             <div>
-              <h2 className="font-serif text-xl text-black mb-8 border-b border-zinc-200 pb-4">
+              <h2 className="text-xl text-black mb-8 border-b border-zinc-200 pb-4">
                 결제 수단
               </h2>
               <div className="space-y-3">
@@ -402,7 +402,7 @@ const CheckoutClientPage = () => {
               <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-2 text-center">
                 Easy Pay
               </p>
-              <h3 className="font-serif text-xl text-black mb-8 text-center">
+              <h3 className="text-xl text-black mb-8 text-center">
                 간편결제 선택
               </h3>
               <div className="space-y-3">

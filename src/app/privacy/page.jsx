@@ -7,7 +7,7 @@ export default function PrivacyPage() {
   return (
     <div className="bg-white min-h-screen pt-36 pb-24">
       <div className="max-w-2xl mx-auto px-6 md:px-8">
-        <h1 className="font-serif text-3xl text-black mb-2 tracking-widest uppercase">개인정보처리방침</h1>
+        <h1 className="text-3xl text-black mb-2 tracking-widest uppercase">개인정보처리방침</h1>
         <p className="text-[10px] text-zinc-400 mb-12 tracking-wide">최종 업데이트: 2025년 07월 27일</p>
 
         <div className="space-y-10 text-[13px] text-zinc-600 leading-relaxed">

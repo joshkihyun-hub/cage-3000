@@ -143,7 +143,7 @@ export default function SignUp() {
       <div className="container mx-auto px-4 md:px-8 max-w-2xl">
 
         <div className="mb-16">
-          <h1 className="font-serif text-xl md:text-2xl text-black mb-4 uppercase tracking-wide">
+          <h1 className="text-xl md:text-2xl text-black mb-4 uppercase tracking-wide">
             Register Account
           </h1>
           <p className="text-sm text-zinc-500">

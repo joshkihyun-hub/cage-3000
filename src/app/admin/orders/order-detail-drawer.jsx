@@ -107,7 +107,7 @@ export default function OrderDetailDrawer({ orderId, onClose, onUpdated }) {
       <aside className="relative w-full max-w-2xl bg-white h-full overflow-y-auto shadow-2xl">
         <div className="sticky top-0 bg-white border-b border-zinc-100 z-10 flex items-center justify-between px-8 py-5">
           <div>
-            <h2 className="font-serif text-lg uppercase tracking-wide">Order Detail</h2>
+            <h2 className="text-lg uppercase tracking-wide">Order Detail</h2>
             {order && <p className="font-mono text-xs text-zinc-400 mt-1">{order.orderNumber}</p>}
           </div>
           <button onClick={onClose} className="p-2 hover:bg-zinc-100 rounded-full">
@@ -172,7 +172,7 @@ export default function OrderDetailDrawer({ orderId, onClose, onUpdated }) {
                 </div>
                 <div className="flex justify-between text-base pt-2 mt-2 border-t border-zinc-200 font-medium">
                   <span>Total</span>
-                  <span className="font-serif">{formatKRW(order.totalAmount)}</span>
+                  <span className="">{formatKRW(order.totalAmount)}</span>
                 </div>
               </section>
 

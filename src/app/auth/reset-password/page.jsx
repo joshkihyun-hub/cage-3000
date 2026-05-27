@@ -63,7 +63,7 @@ function ResetPasswordInner() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-6">
         <div className="max-w-md w-full text-center">
-          <h1 className="font-serif text-3xl mb-4 text-black">Invalid Link</h1>
+          <h1 className="text-3xl mb-4 text-black">Invalid Link</h1>
           <p className="text-sm text-zinc-500 mb-12">재설정 토큰이 없습니다.</p>
           <Link
             href="/auth/forgot-password"
@@ -81,7 +81,7 @@ function ResetPasswordInner() {
       <div className="min-h-screen bg-white flex items-center justify-center px-6">
         <div className="max-w-md w-full text-center">
           <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-10">CAGE3000</p>
-          <h1 className="font-serif text-3xl mb-4 text-black">Password Updated</h1>
+          <h1 className="text-3xl mb-4 text-black">Password Updated</h1>
           <p className="text-sm text-zinc-600 mb-12">
             새 비밀번호로 로그인해 주세요.
           </p>
@@ -99,7 +99,7 @@ function ResetPasswordInner() {
   return (
     <div className="bg-white text-zinc-900 min-h-screen flex items-center justify-center pt-20">
       <div className="max-w-sm w-full p-8">
-        <h1 className="font-serif text-3xl text-center mb-12 text-black uppercase">
+        <h1 className="text-3xl text-center mb-12 text-black uppercase">
           Reset Password
         </h1>
         <form onSubmit={handleSubmit}>

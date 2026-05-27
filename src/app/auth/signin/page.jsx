@@ -62,7 +62,7 @@ function SignInForm() {
   return (
     <div className="bg-white text-zinc-900 min-h-screen flex items-center justify-center pt-20">
       <div className="max-w-sm w-full p-8">
-        <h1 className="font-serif text-3xl text-center mb-4 text-black uppercase">Login</h1>
+        <h1 className="text-3xl text-center mb-4 text-black uppercase">Login</h1>
 
         {fromCheckout && (
           <p className="text-center mb-10 text-[11px] text-zinc-500 leading-relaxed">

@@ -85,7 +85,7 @@ export default function AdminDashboard() {
 
           <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
             <div>
-              <h1 className="font-serif text-3xl uppercase">Dashboard</h1>
+              <h1 className="text-3xl uppercase">Dashboard</h1>
               <p className="text-xs text-zinc-400 mt-2 tracking-wide">
                 매출·회원·주문 현황
               </p>
@@ -224,7 +224,7 @@ export default function AdminDashboard() {
                   {Object.entries(stats.orderStatuses).map(([k, v]) => (
                     <div key={k} className="border border-zinc-100 p-4">
                       <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-2">{k}</p>
-                      <p className="font-serif text-xl">{v}</p>
+                      <p className="text-xl">{v}</p>
                     </div>
                   ))}
                 </div>
@@ -241,7 +241,7 @@ function KpiCard({ label, value, sub, delta }) {
   return (
     <div className="border border-zinc-100 p-5">
       <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-3">{label}</p>
-      <p className="font-serif text-2xl text-black flex items-baseline">
+      <p className="text-2xl text-black flex items-baseline">
         {value}
         {delta}
       </p>

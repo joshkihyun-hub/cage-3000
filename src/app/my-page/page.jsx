@@ -90,7 +90,7 @@ export default function MyPage() {
   return (
     <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
       <div className="container mx-auto px-4 md:px-8 max-w-3xl">
-        <h1 className="font-serif text-3xl md:text-4xl text-center mb-12 text-black font-normal">
+        <h1 className="text-3xl md:text-4xl text-center mb-12 text-black font-normal">
           My Page
         </h1>
 
@@ -147,7 +147,7 @@ export default function MyPage() {
         {/* Order History */}
         <section className="border-t border-zinc-100 pt-12">
           <div className="flex items-baseline justify-between mb-8">
-            <h2 className="font-serif text-2xl uppercase tracking-wide">Order History</h2>
+            <h2 className="text-2xl uppercase tracking-wide">Order History</h2>
             <p className="text-[10px] uppercase tracking-widest text-zinc-400">
               {orders.length}건
             </p>
@@ -173,7 +173,7 @@ export default function MyPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-serif text-base text-black">
+                      <p className="text-base text-black">
                         {formatKRW(order.totalAmount)}
                       </p>
                       <p className="text-[10px] uppercase tracking-widest text-zinc-500 mt-1">
@@ -205,7 +205,7 @@ function Field({ label, value }) {
   return (
     <div>
       <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-2">{label}</p>
-      <p className="font-serif text-base text-black break-words leading-snug">{value || '-'}</p>
+      <p className="text-base text-black break-words leading-snug">{value || '-'}</p>
     </div>
   );
 }

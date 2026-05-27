@@ -48,14 +48,14 @@ function VerifyEmailInner() {
 
         {state.status === 'loading' && (
           <>
-            <h1 className="font-serif text-2xl mb-4">이메일을 인증하는 중...</h1>
+            <h1 className="text-2xl mb-4">이메일을 인증하는 중...</h1>
             <p className="text-sm text-zinc-500">잠시만 기다려 주세요.</p>
           </>
         )}
 
         {state.status === 'success' && (
           <>
-            <h1 className="font-serif text-3xl mb-4 text-black">Verified</h1>
+            <h1 className="text-3xl mb-4 text-black">Verified</h1>
             <p className="text-sm text-zinc-600 mb-12">{state.message}</p>
             <Link
               href="/auth/signin"
@@ -68,7 +68,7 @@ function VerifyEmailInner() {
 
         {state.status === 'error' && (
           <>
-            <h1 className="font-serif text-3xl mb-4 text-black">Verification Failed</h1>
+            <h1 className="text-3xl mb-4 text-black">Verification Failed</h1>
             <p className="text-sm text-red-500 mb-12">{state.message}</p>
             <Link
               href="/auth/signin"
