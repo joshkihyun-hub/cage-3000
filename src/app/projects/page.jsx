@@ -36,8 +36,13 @@ export default function ProjectsPage() {
                                         onMouseEnter={() => setActiveId(item.id)}
                                         onClick={() => setActiveId(item.id)}
                                         className={[
-                                            'group inline-flex flex-wrap items-center gap-x-3 md:gap-x-5 gap-y-2 text-left',
-                                            'transition-all duration-500 ease-out cursor-pointer',
+                                            // flex (not inline-flex) keeps the button as a single contiguous block —
+                                            // mobile Safari/Chrome render filter:blur on inline-flex with wrapped
+                                            // content as horizontal banding (each wrapped line getting its own
+                                            // partial blur). transform-gpu pins a compositing layer so the blur
+                                            // stays consistent across scroll.
+                                            'group flex flex-wrap items-center gap-x-3 md:gap-x-5 gap-y-2 text-left w-full',
+                                            'transition-all duration-500 ease-out cursor-pointer transform-gpu',
                                             // Drive the blur off the active state only — touch devices don't have a
                                             // reliable :hover, and iOS Safari's sticky-hover behaviour was leaving
                                             // multiple rows looking 'selected' after taps. State-only makes
