@@ -38,7 +38,12 @@ export default function ProjectsPage() {
                                         className={[
                                             'group inline-flex flex-wrap items-center gap-x-3 md:gap-x-5 gap-y-2 text-left',
                                             'transition-all duration-500 ease-out cursor-pointer',
-                                            isActive ? 'blur-none' : 'blur-sm hover:blur-none',
+                                            // Drive the blur off the active state only — touch devices don't have a
+                                            // reliable :hover, and iOS Safari's sticky-hover behaviour was leaving
+                                            // multiple rows looking 'selected' after taps. State-only makes
+                                            // desktop hover / desktop click / mobile tap all converge to the
+                                            // same visual outcome.
+                                            isActive ? 'blur-none' : 'blur-sm',
                                         ].join(' ')}
                                     >
                                         <span className="font-sans text-2xl md:text-3xl lg:text-4xl leading-none tracking-tight text-black">
