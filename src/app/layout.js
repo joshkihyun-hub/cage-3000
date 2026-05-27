@@ -49,10 +49,8 @@ export const metadata = {
   alternates: {
     canonical: '/',
   },
-  icons: {
-    icon: '/favicon-v2.png',
-    apple: '/favicon-v2.png',
-  },
+  // Favicons are auto-discovered from src/app/icon.png + apple-icon.png
+  // (Next.js App Router convention) — no need to declare them here.
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
