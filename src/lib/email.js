@@ -24,21 +24,7 @@ const SITE_URL =
   process.env.NEXTAUTH_URL ||
   'https://cage3000.com';
 
-function maskKey(key) {
-  if (!key) return '(missing)';
-  if (key.length <= 8) return '(too short)';
-  return `${key.slice(0, 4)}...${key.slice(-4)} (len=${key.length})`;
-}
-
 export async function sendEmail({ to, subject, html, text }) {
-  // Diagnostic logging — confirms env vars are actually populated in prod.
-  console.log('[email] sendEmail called', {
-    to,
-    from: FROM,
-    replyTo: REPLY_TO,
-    apiKey: maskKey(process.env.RESEND_API_KEY),
-  });
-
   const client = getClient();
   const payload = {
     from: FROM,
@@ -56,7 +42,6 @@ export async function sendEmail({ to, subject, html, text }) {
     const msg = error.message || JSON.stringify(error);
     throw new Error(`Resend send failed: ${msg}`);
   }
-  console.log('[email] Resend accepted, id:', data?.id);
   return data;
 }
 
