@@ -69,15 +69,7 @@ const RandomHoverLink = ({ href, text, className }) => {
 };
 
 const navItemsLeft = [
-  {
-    name: 'Shop',
-    href: '/shop',
-    subItems: [
-      { name: 'All', href: '/shop' },
-      { name: 'Clothes', href: '/shop?category=clothes' },
-      { name: 'Accessories', href: '/shop?category=accessories' },
-    ]
-  },
+  { name: 'Shop', href: '/shop' },
   { name: 'Lookbook', href: '/lookbook' },
 ];
 
