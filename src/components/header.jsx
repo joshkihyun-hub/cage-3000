@@ -219,7 +219,7 @@ export default function Header() {
                 <RandomHoverLink
                   href={item.href}
                   text={item.name}
-                  className="text-xs uppercase tracking-[0.2em] text-zinc-600 font-medium"
+                  className="font-serif text-xs uppercase tracking-[0.2em] text-zinc-600 font-medium"
                 />
               </motion.div>
             ))}
