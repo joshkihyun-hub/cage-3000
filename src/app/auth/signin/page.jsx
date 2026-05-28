@@ -20,7 +20,6 @@ function SignInForm() {
 
   useEffect(() => {
     if (registered) {
-      // Surface a friendly notice after a successful registration redirect.
       setError('');
     }
   }, [registered]);
@@ -60,89 +59,102 @@ function SignInForm() {
   };
 
   return (
-    <div className="bg-white text-zinc-900 min-h-screen flex items-center justify-center pt-20">
-      <div className="max-w-sm w-full p-8">
-        <h1 className="text-3xl text-center mb-4 text-black uppercase">Login</h1>
+    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+      <div className="container mx-auto px-6 md:px-12 max-w-screen-md">
+
+        <Block>
+          <h1 className="text-base md:text-lg">Sign In</h1>
+        </Block>
 
         {fromCheckout && (
-          <p className="text-center mb-10 text-[11px] text-zinc-500 leading-relaxed">
-            계정 없이 구매하실 수 있어요.{' '}
-            <Link
-              href="/checkout"
-              className="text-black underline hover:text-zinc-600"
-            >
-              비회원으로 주문하기
-            </Link>
-          </p>
+          <Block className="mt-3">
+            <p className="text-sm leading-relaxed">
+              계정 없이 구매하실 수 있어요.{' '}
+              <Link href="/checkout" className="underline hover:text-zinc-600">
+                비회원으로 주문하기
+              </Link>
+            </p>
+          </Block>
         )}
-        {!fromCheckout && <div className="mb-12" />}
 
         {registered && (
-          <p className="text-emerald-700 text-center mb-6 text-xs bg-emerald-50 border border-emerald-100 py-3 leading-relaxed">
-            회원가입이 완료되었습니다.<br />
-            인증 메일을 발송했으니 이메일을 확인해 주세요.
-          </p>
+          <Block className="mt-3">
+            <p className="text-sm leading-relaxed">
+              회원가입이 완료되었습니다. 인증 메일을 발송했으니 이메일을 확인해 주세요.
+            </p>
+          </Block>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="mt-3 space-y-3">
           {error && (
-            <p className="text-red-500 text-center mb-4 text-xs bg-red-50 border border-red-100 py-3">
-              {error}
-            </p>
+            <Block>
+              <p className="text-sm text-red-600">{error}</p>
+            </Block>
           )}
-          <div className="mb-8">
-            <label className="block text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2" htmlFor="email">
-              Email
-            </label>
-            <input
-              className="w-full border-b border-zinc-200 py-2 text-sm focus:outline-none focus:border-black transition-colors bg-transparent rounded-none"
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Block>
+              <label className="block text-sm mb-2" htmlFor="email">
+                Email
+              </label>
+              <input
+                className="w-full border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none"
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Block>
+
+            <Block>
+              <label className="block text-sm mb-2" htmlFor="password">
+                Password
+              </label>
+              <input
+                className="w-full border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none"
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Block>
           </div>
-          <div className="mb-12">
-            <label className="block text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2" htmlFor="password">
-              Password
-            </label>
-            <input
-              className="w-full border-b border-zinc-200 py-2 text-sm focus:outline-none focus:border-black transition-colors bg-transparent rounded-none"
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col items-center space-y-6">
+
+          <Block>
             <button
-              disabled={submitting}
-              className="w-full bg-black text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors disabled:bg-zinc-300"
               type="submit"
+              disabled={submitting}
+              className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed"
             >
-              {submitting ? '로그인 중...' : 'Sign In'}
+              {submitting ? '로그인 중…' : 'Submit →'}
             </button>
-            <div className="flex items-center gap-4 text-[10px] uppercase tracking-widest text-zinc-400">
-              <Link
-                href="/auth/forgot-password"
-                className="hover:text-black transition-colors border-b border-transparent hover:border-black pb-0.5"
-              >
-                Forgot Password?
+          </Block>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Block>
+              <Link href="/auth/forgot-password" className="text-sm hover:underline">
+                Forgot Password
               </Link>
-              <span className="text-zinc-200">·</span>
-              <Link
-                href="/auth/signup"
-                className="hover:text-black transition-colors border-b border-transparent hover:border-black pb-0.5"
-              >
+            </Block>
+            <Block>
+              <Link href="/auth/signup" className="text-sm hover:underline">
                 Register
               </Link>
-            </div>
+            </Block>
           </div>
         </form>
       </div>
     </div>
+  );
+}
+
+function Block({ children, className = '' }) {
+  return (
+    <section className={`border-t border-l border-zinc-900 pt-2 pl-3 pb-4 ${className}`}>
+      {children}
+    </section>
   );
 }
 
