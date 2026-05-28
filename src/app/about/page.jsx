@@ -21,7 +21,7 @@ export default function AboutPage() {
                     initial="initial"
                     animate="animate"
                     transition={{ duration: 1.2, delay: 0.15, ease }}
-                    className="relative w-56 h-72 md:w-64 md:h-80 overflow-hidden border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)]"
+                    className="relative w-28 h-36 md:w-32 md:h-40 overflow-hidden border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)]"
                 >
                     <Image
                         src="/about_profile.png"
