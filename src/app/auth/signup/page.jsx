@@ -140,32 +140,23 @@ export default function SignUp() {
     <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
       <div className="container mx-auto px-6 md:px-12 max-w-screen-lg">
 
-        {/* Editorial Header Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 mb-16 md:mb-20 text-xs md:text-sm text-zinc-900 leading-relaxed">
-          <p>(CAGE3000)</p>
-          <p className="md:text-right">(Register)</p>
-          <p>(Seoul)</p>
-          <p className="md:text-right">(About)</p>
-        </div>
-
         {/* Title */}
-        <h1 className="text-4xl md:text-5xl mb-3 tracking-tight">(Register Account)</h1>
+        <h1 className="text-4xl md:text-5xl mb-3 tracking-tight">Register Account</h1>
         <p className="text-sm md:text-base text-zinc-500 mb-14 md:mb-16">
           이미 회원이신가요?{' '}
           <Link href="/auth/signin" className="text-blue-600 hover:text-black transition-colors">
-            (로그인)
+            로그인
           </Link>
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-0 border-t border-zinc-900/90" noValidate>
           {serverError && (
             <p className="text-red-500 text-xs md:text-sm py-3 border-b border-red-100">
-              ({serverError})
+              {serverError}
             </p>
           )}
 
-          {/* Name */}
-          <FormRow label="(Name)" required>
+          <FormRow label="Name" required>
             <input
               className={shouldShow('name') ? errorInputClass : inputClass}
               id="name"
@@ -178,8 +169,7 @@ export default function SignUp() {
             {shouldShow('name') && <ErrorText>{errors.name}</ErrorText>}
           </FormRow>
 
-          {/* Phone */}
-          <FormRow label="(Phone)" required>
+          <FormRow label="Phone" required>
             <input
               className={shouldShow('phoneNumber') ? errorInputClass : inputClass}
               id="phoneNumber"
@@ -195,8 +185,7 @@ export default function SignUp() {
             {shouldShow('phoneNumber') && <ErrorText>{errors.phoneNumber}</ErrorText>}
           </FormRow>
 
-          {/* Email */}
-          <FormRow label="(Email)" required>
+          <FormRow label="Email" required>
             <input
               className={shouldShow('email') ? errorInputClass : inputClass}
               id="email"
@@ -209,8 +198,7 @@ export default function SignUp() {
             {shouldShow('email') && <ErrorText>{errors.email}</ErrorText>}
           </FormRow>
 
-          {/* Address */}
-          <FormRow label="(Address)" optional>
+          <FormRow label="Address" optional>
             <div className="space-y-4">
               <div className="flex gap-3 items-end">
                 <input
@@ -224,7 +212,7 @@ export default function SignUp() {
                   onClick={() => setIsPostcodeOpen(true)}
                   className="text-sm md:text-base text-blue-600 hover:text-black transition-colors pb-2"
                 >
-                  (검색)
+                  검색
                 </button>
               </div>
               <input
@@ -256,8 +244,7 @@ export default function SignUp() {
             )}
           </FormRow>
 
-          {/* Password */}
-          <FormRow label="(Password)" required>
+          <FormRow label="Password" required>
             <div className="relative">
               <input
                 className={shouldShow('password') ? errorInputClass : inputClass}
@@ -294,7 +281,7 @@ export default function SignUp() {
                   />
                 </div>
                 <p className="text-[11px] text-zinc-500 w-20 text-right">
-                  ({strengthLabels[Math.max(1, strength.score)]})
+                  {strengthLabels[Math.max(1, strength.score)]}
                 </p>
               </div>
             )}
@@ -304,8 +291,7 @@ export default function SignUp() {
             {shouldShow('password') && <ErrorText>{errors.password}</ErrorText>}
           </FormRow>
 
-          {/* Confirm Password */}
-          <FormRow label="(Confirm)" required>
+          <FormRow label="Confirm" required>
             <div className="relative">
               <input
                 className={shouldShow('confirmPassword') ? errorInputClass : inputClass}
@@ -328,8 +314,7 @@ export default function SignUp() {
             {shouldShow('confirmPassword') && <ErrorText>{errors.confirmPassword}</ErrorText>}
           </FormRow>
 
-          {/* Consent */}
-          <FormRow label="(Consent)" required>
+          <FormRow label="Consent" required>
             <div className="space-y-4">
               <label className="flex items-center gap-3 cursor-pointer select-none">
                 <input
@@ -339,7 +324,7 @@ export default function SignUp() {
                   className="w-4 h-4 accent-black"
                 />
                 <span className="text-sm md:text-base text-zinc-900">
-                  (전체 동의)
+                  전체 동의
                 </span>
               </label>
 
@@ -354,7 +339,7 @@ export default function SignUp() {
                   <span className="text-xs md:text-sm text-zinc-600 leading-relaxed">
                     <span className="bg-pink-100 px-1 py-0.5 mr-1 text-zinc-900">필수</span>
                     <Link href="/terms" target="_blank" className="text-blue-600 hover:text-black">
-                      (이용약관)
+                      이용약관
                     </Link>
                     에 동의합니다.
                   </span>
@@ -370,7 +355,7 @@ export default function SignUp() {
                   <span className="text-xs md:text-sm text-zinc-600 leading-relaxed">
                     <span className="bg-pink-100 px-1 py-0.5 mr-1 text-zinc-900">필수</span>
                     <Link href="/privacy" target="_blank" className="text-blue-600 hover:text-black">
-                      (개인정보 수집 및 이용)
+                      개인정보 수집 및 이용
                     </Link>
                     에 동의합니다.
                   </span>
@@ -392,14 +377,13 @@ export default function SignUp() {
             </div>
           </FormRow>
 
-          {/* Submit — editorial link-style */}
           <div className="flex justify-end pt-10">
             <button
               type="submit"
               disabled={submitting || !formValid}
               className="text-lg md:text-xl text-blue-600 hover:text-black transition-colors disabled:text-zinc-300 disabled:cursor-not-allowed"
             >
-              {submitting ? '(처리 중…)' : '(회원가입) →'}
+              {submitting ? '처리 중…' : '회원가입 →'}
             </button>
           </div>
         </form>
@@ -414,7 +398,7 @@ function FormRow({ label, required, optional, children }) {
       <p className="text-sm md:text-base text-zinc-500 pt-2">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
-        {optional && <span className="text-zinc-400 ml-1 text-xs">(선택)</span>}
+        {optional && <span className="text-zinc-400 ml-1 text-xs">선택</span>}
       </p>
       <div>{children}</div>
     </div>
@@ -422,5 +406,5 @@ function FormRow({ label, required, optional, children }) {
 }
 
 function ErrorText({ children }) {
-  return <p className="text-[11px] md:text-xs text-red-500 mt-2">({children})</p>;
+  return <p className="text-[11px] md:text-xs text-red-500 mt-2">{children}</p>;
 }

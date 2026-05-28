@@ -71,7 +71,6 @@ export default function MyPage() {
     };
   }, [status]);
 
-  // Group orders by year for editorial year-marker layout (like ref image)
   const ordersByYear = useMemo(() => {
     const map = new Map();
     for (const o of orders) {
@@ -79,14 +78,13 @@ export default function MyPage() {
       if (!map.has(y)) map.set(y, []);
       map.get(y).push(o);
     }
-    // sort years desc
     return [...map.entries()].sort((a, b) => Number(b[0]) - Number(a[0]));
   }, [orders]);
 
   if (status === 'loading') {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-zinc-500 text-sm tracking-wider">(Loading)</p>
+        <p className="text-zinc-500 text-sm tracking-wider">Loading</p>
       </div>
     );
   }
@@ -111,23 +109,15 @@ export default function MyPage() {
     <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
       <div className="container mx-auto px-6 md:px-12 max-w-screen-lg">
 
-        {/* Editorial Header Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 mb-16 md:mb-20 text-xs md:text-sm text-zinc-900 leading-relaxed">
-          <p>({session.user.name || 'Member'})</p>
-          <p className="md:text-right">(Account)</p>
-          <p>(Seoul)</p>
-          <p className="md:text-right">(CAGE3000)</p>
-        </div>
-
         {/* Title */}
-        <h1 className="text-4xl md:text-5xl mb-14 md:mb-16 tracking-tight">(My Page)</h1>
+        <h1 className="text-4xl md:text-5xl mb-14 md:mb-16 tracking-tight">My Page</h1>
 
-        {/* Profile Fields — editorial row grid */}
+        {/* Profile Fields */}
         <section className="border-t border-zinc-900/90 mb-14">
-          <FieldRow label="(Name)" value={session.user.name} />
-          <FieldRow label="(Email)" value={session.user.email} />
-          <FieldRow label="(Phone)" value={formatPhoneDisplay(session.user.phoneNumber)} />
-          <FieldRow label="(Address)" value={fullAddress} />
+          <FieldRow label="Name" value={session.user.name} />
+          <FieldRow label="Email" value={session.user.email} />
+          <FieldRow label="Phone" value={formatPhoneDisplay(session.user.phoneNumber)} />
+          <FieldRow label="Address" value={fullAddress} />
         </section>
 
         {/* Inline Action Row */}
@@ -136,7 +126,7 @@ export default function MyPage() {
             href="/my-page/edit"
             className="text-blue-600 hover:text-black transition-colors"
           >
-            (Edit Profile)
+            Edit Profile
           </Link>
 
           {session.user.role === 'admin' && (
@@ -144,7 +134,7 @@ export default function MyPage() {
               href="/admin"
               className="text-zinc-900 hover:text-blue-600 transition-colors"
             >
-              (Admin Mode)
+              Admin Mode
             </Link>
           )}
 
@@ -170,21 +160,21 @@ export default function MyPage() {
             }}
             className="text-zinc-400 hover:text-red-500 transition-colors"
           >
-            (Withdrawal)
+            Withdrawal
           </button>
         </div>
 
-        {/* Order History — editorial with year markers */}
+        {/* Order History */}
         <section>
           <div className="flex items-baseline justify-between mb-10 border-t border-zinc-900/90 pt-5">
-            <h2 className="text-xl md:text-2xl">(Order History)</h2>
-            <p className="text-xs md:text-sm text-zinc-500">({orders.length}건)</p>
+            <h2 className="text-xl md:text-2xl">Order History</h2>
+            <p className="text-xs md:text-sm text-zinc-500">{orders.length}건</p>
           </div>
 
           {ordersLoading ? (
-            <p className="text-sm text-zinc-400 py-16 text-center">(Loading)</p>
+            <p className="text-sm text-zinc-400 py-16 text-center">Loading</p>
           ) : orders.length === 0 ? (
-            <p className="text-sm text-zinc-400 py-16 text-center">(No orders yet)</p>
+            <p className="text-sm text-zinc-400 py-16 text-center">No orders yet</p>
           ) : (
             <ul className="space-y-1">
               {ordersByYear.map(([year, list]) =>
@@ -204,15 +194,12 @@ export default function MyPage() {
                       )}
                     </p>
 
-                    {/* Order details */}
                     <div>
                       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
                         <p className="text-sm md:text-base text-zinc-900">
-                          (
                           <span className="font-mono text-xs md:text-sm text-zinc-700">
                             {order.orderNumber}
                           </span>
-                          )
                           <span className="text-zinc-400 mx-2">·</span>
                           <span className="text-zinc-500 text-xs md:text-sm">
                             {formatDate(order.createdAt)}
@@ -222,7 +209,7 @@ export default function MyPage() {
                           {formatKRW(order.totalAmount)}
                           <span className="text-zinc-400 mx-2">·</span>
                           <span className="text-zinc-500 text-xs md:text-sm">
-                            ({ORDER_STATUS_LABELS[order.status] || order.status})
+                            {ORDER_STATUS_LABELS[order.status] || order.status}
                           </span>
                         </p>
                       </div>
