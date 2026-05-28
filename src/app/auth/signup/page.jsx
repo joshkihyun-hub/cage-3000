@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import DaumPostcode from 'react-daum-postcode';
-import { Eye, EyeOff, Check } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import {
   isValidEmail,
   isValidKrPhone,
@@ -14,12 +14,10 @@ import {
 } from '@/lib/validation';
 
 const inputClass =
-  'w-full border-b border-zinc-200 py-2 text-base focus:outline-none focus:border-black transition-colors bg-transparent rounded-none';
+  'w-full border-b border-zinc-300 py-2 text-sm md:text-base focus:outline-none focus:border-black transition-colors bg-transparent rounded-none';
 
 const errorInputClass =
-  'w-full border-b border-red-400 py-2 text-base focus:outline-none focus:border-red-600 transition-colors bg-transparent rounded-none';
-
-const labelClass = 'block text-xs uppercase tracking-[0.2em] text-zinc-800 mb-2';
+  'w-full border-b border-red-400 py-2 text-sm md:text-base focus:outline-none focus:border-red-600 transition-colors bg-transparent rounded-none';
 
 const strengthLabels = ['', '매우 약함', '약함', '보통', '강함', '매우 강함'];
 
@@ -139,73 +137,66 @@ export default function SignUp() {
   };
 
   return (
-    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
-      <div className="container mx-auto px-4 md:px-8 max-w-2xl">
+    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+      <div className="container mx-auto px-6 md:px-12 max-w-screen-lg">
 
-        <div className="mb-16">
-          <h1 className="text-xl md:text-2xl text-black mb-4 uppercase tracking-wide">
-            Register Account
-          </h1>
-          <p className="text-sm text-zinc-500">
-            이미 회원이신가요?{' '}
-            <Link href="/auth/signin" className="text-black underline hover:text-zinc-600 transition-colors">
-              로그인
-            </Link>
-          </p>
+        {/* Editorial Header Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 mb-16 md:mb-20 text-xs md:text-sm text-zinc-900 leading-relaxed">
+          <p>(CAGE3000)</p>
+          <p className="md:text-right">(Register)</p>
+          <p>(Seoul)</p>
+          <p className="md:text-right">(About)</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-12" noValidate>
+        {/* Title */}
+        <h1 className="text-4xl md:text-5xl mb-3 tracking-tight">(Register Account)</h1>
+        <p className="text-sm md:text-base text-zinc-500 mb-14 md:mb-16">
+          이미 회원이신가요?{' '}
+          <Link href="/auth/signin" className="text-blue-600 hover:text-black transition-colors">
+            (로그인)
+          </Link>
+        </p>
+
+        <form onSubmit={handleSubmit} className="space-y-0 border-t border-zinc-900/90" noValidate>
           {serverError && (
-            <p className="text-red-500 text-xs text-center bg-red-50 border border-red-100 py-3">
-              {serverError}
+            <p className="text-red-500 text-xs md:text-sm py-3 border-b border-red-100">
+              ({serverError})
             </p>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-            <div>
-              <label className={labelClass} htmlFor="name">
-                이름 <span className="text-red-500">*</span>
-              </label>
-              <input
-                className={shouldShow('name') ? errorInputClass : inputClass}
-                id="name"
-                type="text"
-                autoComplete="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onBlur={() => blur('name')}
-              />
-              {shouldShow('name') && (
-                <p className="text-[11px] text-red-500 mt-2">{errors.name}</p>
-              )}
-            </div>
+          {/* Name */}
+          <FormRow label="(Name)" required>
+            <input
+              className={shouldShow('name') ? errorInputClass : inputClass}
+              id="name"
+              type="text"
+              autoComplete="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={() => blur('name')}
+            />
+            {shouldShow('name') && <ErrorText>{errors.name}</ErrorText>}
+          </FormRow>
 
-            <div>
-              <label className={labelClass} htmlFor="phoneNumber">
-                휴대폰 번호 <span className="text-red-500">*</span>
-              </label>
-              <input
-                className={shouldShow('phoneNumber') ? errorInputClass : inputClass}
-                id="phoneNumber"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel"
-                placeholder="010-1234-5678"
-                value={phoneNumber}
-                onChange={(e) => handlePhoneChange(e.target.value)}
-                onBlur={() => blur('phoneNumber')}
-                maxLength={13}
-              />
-              {shouldShow('phoneNumber') && (
-                <p className="text-[11px] text-red-500 mt-2">{errors.phoneNumber}</p>
-              )}
-            </div>
-          </div>
+          {/* Phone */}
+          <FormRow label="(Phone)" required>
+            <input
+              className={shouldShow('phoneNumber') ? errorInputClass : inputClass}
+              id="phoneNumber"
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel"
+              placeholder="010-1234-5678"
+              value={phoneNumber}
+              onChange={(e) => handlePhoneChange(e.target.value)}
+              onBlur={() => blur('phoneNumber')}
+              maxLength={13}
+            />
+            {shouldShow('phoneNumber') && <ErrorText>{errors.phoneNumber}</ErrorText>}
+          </FormRow>
 
-          <div>
-            <label className={labelClass} htmlFor="email">
-              이메일 <span className="text-red-500">*</span>
-            </label>
+          {/* Email */}
+          <FormRow label="(Email)" required>
             <input
               className={shouldShow('email') ? errorInputClass : inputClass}
               id="email"
@@ -215,17 +206,15 @@ export default function SignUp() {
               onChange={(e) => setEmail(e.target.value)}
               onBlur={() => blur('email')}
             />
-            {shouldShow('email') && (
-              <p className="text-[11px] text-red-500 mt-2">{errors.email}</p>
-            )}
-          </div>
+            {shouldShow('email') && <ErrorText>{errors.email}</ErrorText>}
+          </FormRow>
 
-          <div>
-            <label className={labelClass}>주소 (선택)</label>
+          {/* Address */}
+          <FormRow label="(Address)" optional>
             <div className="space-y-4">
-              <div className="flex gap-4">
+              <div className="flex gap-3 items-end">
                 <input
-                  className="w-32 border-b border-zinc-200 py-2 text-base focus:outline-none focus:border-black transition-colors bg-transparent rounded-none"
+                  className="w-32 border-b border-zinc-300 py-2 text-sm md:text-base focus:outline-none focus:border-black transition-colors bg-transparent rounded-none"
                   placeholder="우편번호"
                   value={zipCode}
                   readOnly
@@ -233,9 +222,9 @@ export default function SignUp() {
                 <button
                   type="button"
                   onClick={() => setIsPostcodeOpen(true)}
-                  className="bg-black text-white py-2 px-6 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors"
+                  className="text-sm md:text-base text-blue-600 hover:text-black transition-colors pb-2"
                 >
-                  검색
+                  (검색)
                 </button>
               </div>
               <input
@@ -265,12 +254,10 @@ export default function SignUp() {
                 </div>
               </div>
             )}
-          </div>
+          </FormRow>
 
-          <div>
-            <label className={labelClass} htmlFor="password">
-              비밀번호 <span className="text-red-500">*</span>
-            </label>
+          {/* Password */}
+          <FormRow label="(Password)" required>
             <div className="relative">
               <input
                 className={shouldShow('password') ? errorInputClass : inputClass}
@@ -307,22 +294,18 @@ export default function SignUp() {
                   />
                 </div>
                 <p className="text-[11px] text-zinc-500 w-20 text-right">
-                  {strengthLabels[Math.max(1, strength.score)]}
+                  ({strengthLabels[Math.max(1, strength.score)]})
                 </p>
               </div>
             )}
-            <p className="text-[11px] text-zinc-400 mt-2">
+            <p className="text-[11px] md:text-xs text-zinc-400 mt-2">
               최소 {PASSWORD_MIN_LENGTH}자 이상, 영문과 숫자를 포함해 주세요.
             </p>
-            {shouldShow('password') && (
-              <p className="text-[11px] text-red-500 mt-2">{errors.password}</p>
-            )}
-          </div>
+            {shouldShow('password') && <ErrorText>{errors.password}</ErrorText>}
+          </FormRow>
 
-          <div>
-            <label className={labelClass} htmlFor="confirmPassword">
-              비밀번호 확인 <span className="text-red-500">*</span>
-            </label>
+          {/* Confirm Password */}
+          <FormRow label="(Confirm)" required>
             <div className="relative">
               <input
                 className={shouldShow('confirmPassword') ? errorInputClass : inputClass}
@@ -342,85 +325,102 @@ export default function SignUp() {
                 {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
-            {shouldShow('confirmPassword') && (
-              <p className="text-[11px] text-red-500 mt-2">{errors.confirmPassword}</p>
-            )}
-          </div>
+            {shouldShow('confirmPassword') && <ErrorText>{errors.confirmPassword}</ErrorText>}
+          </FormRow>
 
-          {/* 약관 동의 */}
-          <div className="border-t border-zinc-100 pt-8 space-y-4">
-            <label className="flex items-center gap-3 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={allAgreed}
-                onChange={toggleAll}
-                className="w-4 h-4 accent-black"
-              />
-              <span className="text-xs uppercase tracking-[0.2em] text-black font-medium">
-                전체 동의
-              </span>
-            </label>
-
-            <div className="pl-7 space-y-3 border-l border-zinc-100">
-              <label className="flex items-start gap-3 cursor-pointer select-none">
+          {/* Consent */}
+          <FormRow label="(Consent)" required>
+            <div className="space-y-4">
+              <label className="flex items-center gap-3 cursor-pointer select-none">
                 <input
                   type="checkbox"
-                  checked={termsAgreed}
-                  onChange={(e) => setTermsAgreed(e.target.checked)}
-                  className="mt-1 w-4 h-4 accent-black"
+                  checked={allAgreed}
+                  onChange={toggleAll}
+                  className="w-4 h-4 accent-black"
                 />
-                <span className="text-xs text-zinc-700 leading-relaxed">
-                  <span className="text-red-500 mr-1">[필수]</span>
-                  <Link href="/terms" target="_blank" className="underline hover:text-black">
-                    이용약관
-                  </Link>
-                  에 동의합니다.
+                <span className="text-sm md:text-base text-zinc-900">
+                  (전체 동의)
                 </span>
               </label>
 
-              <label className="flex items-start gap-3 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={privacyAgreed}
-                  onChange={(e) => setPrivacyAgreed(e.target.checked)}
-                  className="mt-1 w-4 h-4 accent-black"
-                />
-                <span className="text-xs text-zinc-700 leading-relaxed">
-                  <span className="text-red-500 mr-1">[필수]</span>
-                  <Link href="/privacy" target="_blank" className="underline hover:text-black">
-                    개인정보 수집 및 이용
-                  </Link>
-                  에 동의합니다.
-                </span>
-              </label>
+              <div className="pl-7 space-y-3">
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={termsAgreed}
+                    onChange={(e) => setTermsAgreed(e.target.checked)}
+                    className="mt-1 w-4 h-4 accent-black"
+                  />
+                  <span className="text-xs md:text-sm text-zinc-600 leading-relaxed">
+                    <span className="bg-pink-100 px-1 py-0.5 mr-1 text-zinc-900">필수</span>
+                    <Link href="/terms" target="_blank" className="text-blue-600 hover:text-black">
+                      (이용약관)
+                    </Link>
+                    에 동의합니다.
+                  </span>
+                </label>
 
-              <label className="flex items-start gap-3 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={marketingConsent}
-                  onChange={(e) => setMarketingConsent(e.target.checked)}
-                  className="mt-1 w-4 h-4 accent-black"
-                />
-                <span className="text-xs text-zinc-500 leading-relaxed">
-                  <span className="text-zinc-400 mr-1">[선택]</span>
-                  마케팅 정보 수신(이메일·SMS)에 동의합니다.
-                </span>
-              </label>
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={privacyAgreed}
+                    onChange={(e) => setPrivacyAgreed(e.target.checked)}
+                    className="mt-1 w-4 h-4 accent-black"
+                  />
+                  <span className="text-xs md:text-sm text-zinc-600 leading-relaxed">
+                    <span className="bg-pink-100 px-1 py-0.5 mr-1 text-zinc-900">필수</span>
+                    <Link href="/privacy" target="_blank" className="text-blue-600 hover:text-black">
+                      (개인정보 수집 및 이용)
+                    </Link>
+                    에 동의합니다.
+                  </span>
+                </label>
+
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={marketingConsent}
+                    onChange={(e) => setMarketingConsent(e.target.checked)}
+                    className="mt-1 w-4 h-4 accent-black"
+                  />
+                  <span className="text-xs md:text-sm text-zinc-500 leading-relaxed">
+                    <span className="bg-zinc-100 px-1 py-0.5 mr-1 text-zinc-500">선택</span>
+                    마케팅 정보 수신(이메일·SMS)에 동의합니다.
+                  </span>
+                </label>
+              </div>
             </div>
-          </div>
+          </FormRow>
 
-          <div className="flex justify-end pt-4">
+          {/* Submit — editorial link-style */}
+          <div className="flex justify-end pt-10">
             <button
               type="submit"
               disabled={submitting || !formValid}
-              className="bg-black text-white py-4 px-16 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors disabled:bg-zinc-300 disabled:cursor-not-allowed inline-flex items-center gap-2"
+              className="text-lg md:text-xl text-blue-600 hover:text-black transition-colors disabled:text-zinc-300 disabled:cursor-not-allowed"
             >
-              {submitting ? '처리 중...' : '회원가입'}
-              {formValid && !submitting && <Check size={14} />}
+              {submitting ? '(처리 중…)' : '(회원가입) →'}
             </button>
           </div>
         </form>
       </div>
     </div>
   );
+}
+
+function FormRow({ label, required, optional, children }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-3 md:gap-10 py-6 border-b border-zinc-100 items-start">
+      <p className="text-sm md:text-base text-zinc-500 pt-2">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+        {optional && <span className="text-zinc-400 ml-1 text-xs">(선택)</span>}
+      </p>
+      <div>{children}</div>
+    </div>
+  );
+}
+
+function ErrorText({ children }) {
+  return <p className="text-[11px] md:text-xs text-red-500 mt-2">({children})</p>;
 }

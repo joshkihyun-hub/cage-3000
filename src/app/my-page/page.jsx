@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -27,6 +27,15 @@ function formatDate(value) {
     return new Date(value).toLocaleDateString('ko-KR');
   } catch {
     return '-';
+  }
+}
+
+function getYear(value) {
+  if (!value) return '----';
+  try {
+    return String(new Date(value).getFullYear());
+  } catch {
+    return '----';
   }
 }
 
@@ -62,10 +71,22 @@ export default function MyPage() {
     };
   }, [status]);
 
+  // Group orders by year for editorial year-marker layout (like ref image)
+  const ordersByYear = useMemo(() => {
+    const map = new Map();
+    for (const o of orders) {
+      const y = getYear(o.createdAt);
+      if (!map.has(y)) map.set(y, []);
+      map.get(y).push(o);
+    }
+    // sort years desc
+    return [...map.entries()].sort((a, b) => Number(b[0]) - Number(a[0]));
+  }, [orders]);
+
   if (status === 'loading') {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-zinc-500 text-sm uppercase tracking-widest">Loading...</p>
+        <p className="text-zinc-500 text-sm tracking-wider">(Loading)</p>
       </div>
     );
   }
@@ -78,7 +99,6 @@ export default function MyPage() {
     ? `${zipPart}${session.user.address}${detailPart}`.trim()
     : '-';
 
-  // 010-1234-5678 형태로 보여주기 위한 가벼운 포매터. 11자리 숫자만 처리.
   const formatPhoneDisplay = (raw) => {
     if (!raw) return '-';
     const digits = String(raw).replace(/\D/g, '');
@@ -88,33 +108,43 @@ export default function MyPage() {
   };
 
   return (
-    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
-      <div className="container mx-auto px-4 md:px-8 max-w-3xl">
-        <h1 className="text-3xl md:text-4xl text-center mb-12 text-black font-normal">
-          My Page
-        </h1>
+    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+      <div className="container mx-auto px-6 md:px-12 max-w-screen-lg">
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12 mb-12">
-          <Field label="Name" value={session.user.name} />
-          <Field label="Phone" value={formatPhoneDisplay(session.user.phoneNumber)} />
-          <Field label="Email" value={session.user.email} />
-          <Field label="Address" value={fullAddress} />
+        {/* Editorial Header Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 mb-16 md:mb-20 text-xs md:text-sm text-zinc-900 leading-relaxed">
+          <p>({session.user.name || 'Member'})</p>
+          <p className="md:text-right">(Account)</p>
+          <p>(Seoul)</p>
+          <p className="md:text-right">(CAGE3000)</p>
+        </div>
+
+        {/* Title */}
+        <h1 className="text-4xl md:text-5xl mb-14 md:mb-16 tracking-tight">(My Page)</h1>
+
+        {/* Profile Fields — editorial row grid */}
+        <section className="border-t border-zinc-900/90 mb-14">
+          <FieldRow label="(Name)" value={session.user.name} />
+          <FieldRow label="(Email)" value={session.user.email} />
+          <FieldRow label="(Phone)" value={formatPhoneDisplay(session.user.phoneNumber)} />
+          <FieldRow label="(Address)" value={fullAddress} />
         </section>
 
-        <div className="space-y-3 mb-16">
+        {/* Inline Action Row */}
+        <div className="flex flex-wrap gap-x-8 gap-y-3 mb-24 md:mb-28 text-sm md:text-base">
           <Link
             href="/my-page/edit"
-            className="block w-full bg-black text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors text-center"
+            className="text-blue-600 hover:text-black transition-colors"
           >
-            Edit Profile
+            (Edit Profile)
           </Link>
 
           {session.user.role === 'admin' && (
             <Link
               href="/admin"
-              className="block w-full border border-black text-black py-4 text-xs uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors text-center"
+              className="text-zinc-900 hover:text-blue-600 transition-colors"
             >
-              Admin Mode
+              (Admin Mode)
             </Link>
           )}
 
@@ -138,61 +168,79 @@ export default function MyPage() {
                 }
               }
             }}
-            className="block w-full border border-zinc-200 text-zinc-400 py-4 text-xs uppercase tracking-[0.2em] hover:text-red-500 hover:border-red-500 transition-colors text-center"
+            className="text-zinc-400 hover:text-red-500 transition-colors"
           >
-            Withdrawal
+            (Withdrawal)
           </button>
         </div>
 
-        {/* Order History */}
-        <section className="border-t border-zinc-100 pt-12">
-          <div className="flex items-baseline justify-between mb-8">
-            <h2 className="text-2xl uppercase tracking-wide">Order History</h2>
-            <p className="text-[10px] uppercase tracking-widest text-zinc-400">
-              {orders.length}건
-            </p>
+        {/* Order History — editorial with year markers */}
+        <section>
+          <div className="flex items-baseline justify-between mb-10 border-t border-zinc-900/90 pt-5">
+            <h2 className="text-xl md:text-2xl">(Order History)</h2>
+            <p className="text-xs md:text-sm text-zinc-500">({orders.length}건)</p>
           </div>
 
           {ordersLoading ? (
-            <p className="text-xs uppercase tracking-widest text-zinc-400 py-10 text-center">
-              Loading...
-            </p>
+            <p className="text-sm text-zinc-400 py-16 text-center">(Loading)</p>
           ) : orders.length === 0 ? (
-            <p className="text-sm text-zinc-400 py-10 text-center">
-              아직 주문 내역이 없습니다.
-            </p>
+            <p className="text-sm text-zinc-400 py-16 text-center">(No orders yet)</p>
           ) : (
-            <ul className="space-y-5">
-              {orders.map((order) => (
-                <li key={order.id} className="border border-zinc-100 px-5 py-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <p className="font-mono text-xs text-zinc-500">{order.orderNumber}</p>
-                      <p className="text-[10px] uppercase tracking-widest text-zinc-400 mt-1">
-                        {formatDate(order.createdAt)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-base text-black">
-                        {formatKRW(order.totalAmount)}
-                      </p>
-                      <p className="text-[10px] uppercase tracking-widest text-zinc-500 mt-1">
-                        {ORDER_STATUS_LABELS[order.status] || order.status}
-                      </p>
-                    </div>
-                  </div>
-                  <ul className="text-xs text-zinc-600 space-y-1">
-                    {order.items.map((item) => (
-                      <li key={item.id} className="flex justify-between">
-                        <span>
-                          {item.productName} × {item.quantity}
+            <ul className="space-y-1">
+              {ordersByYear.map(([year, list]) =>
+                list.map((order, idx) => (
+                  <li
+                    key={order.id}
+                    className="grid grid-cols-[64px_1fr] md:grid-cols-[88px_1fr] gap-4 md:gap-8 py-5 border-b border-zinc-100 items-start"
+                  >
+                    {/* Year marker (pink only on first of group) */}
+                    <p className="text-sm md:text-base pt-0.5">
+                      {idx === 0 ? (
+                        <span className="bg-pink-100 px-1.5 py-0.5 text-zinc-900">
+                          {year}
                         </span>
-                        <span>{formatKRW(item.subtotal)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
+                      ) : (
+                        <span className="text-transparent select-none">{year}</span>
+                      )}
+                    </p>
+
+                    {/* Order details */}
+                    <div>
+                      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+                        <p className="text-sm md:text-base text-zinc-900">
+                          (
+                          <span className="font-mono text-xs md:text-sm text-zinc-700">
+                            {order.orderNumber}
+                          </span>
+                          )
+                          <span className="text-zinc-400 mx-2">·</span>
+                          <span className="text-zinc-500 text-xs md:text-sm">
+                            {formatDate(order.createdAt)}
+                          </span>
+                        </p>
+                        <p className="text-sm md:text-base text-zinc-900">
+                          {formatKRW(order.totalAmount)}
+                          <span className="text-zinc-400 mx-2">·</span>
+                          <span className="text-zinc-500 text-xs md:text-sm">
+                            ({ORDER_STATUS_LABELS[order.status] || order.status})
+                          </span>
+                        </p>
+                      </div>
+
+                      <ul className="mt-3 space-y-0.5 text-xs md:text-sm text-zinc-500">
+                        {order.items.map((item) => (
+                          <li key={item.id} className="flex justify-between">
+                            <span>
+                              {item.productName} × {item.quantity}
+                            </span>
+                            <span>{formatKRW(item.subtotal)}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </li>
+                ))
+              )}
             </ul>
           )}
         </section>
@@ -201,11 +249,13 @@ export default function MyPage() {
   );
 }
 
-function Field({ label, value }) {
+function FieldRow({ label, value }) {
   return (
-    <div>
-      <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-2">{label}</p>
-      <p className="text-base text-black break-words leading-snug">{value || '-'}</p>
+    <div className="grid grid-cols-[120px_1fr] md:grid-cols-[200px_1fr] gap-6 md:gap-10 py-5 border-b border-zinc-100 items-baseline">
+      <p className="text-sm md:text-base text-zinc-500">{label}</p>
+      <p className="text-sm md:text-base text-zinc-900 break-words leading-snug">
+        {value || '-'}
+      </p>
     </div>
   );
 }

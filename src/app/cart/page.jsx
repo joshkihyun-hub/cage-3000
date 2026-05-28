@@ -24,56 +24,99 @@ export default function CartPage() {
 
   return (
     <PageContainer>
-      <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
-        <div className="container mx-auto px-4 md:px-8 max-w-screen-lg">
-          <h1 className="text-3xl md:text-4xl text-center mb-12 text-black uppercase">Your Cart</h1>
+      <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+        <div className="container mx-auto px-6 md:px-12 max-w-screen-lg">
+
+          {/* Editorial Header Row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 mb-16 md:mb-20 text-xs md:text-sm text-zinc-900 leading-relaxed">
+            <p>(CAGE3000)</p>
+            <p className="md:text-right">(Cart)</p>
+            <p>(Seoul)</p>
+            <p className="md:text-right">(About)</p>
+          </div>
+
+          {/* Title */}
+          <h1 className="text-4xl md:text-5xl mb-14 md:mb-16 tracking-tight">
+            (Your Cart)
+          </h1>
+
           {cart.length === 0 ? (
-            <p className="text-center text-zinc-500 text-sm tracking-widest uppercase">Your cart is empty.</p>
+            <div className="border-t border-zinc-900/90 pt-20">
+              <p className="text-center text-sm text-zinc-400">(Empty)</p>
+            </div>
           ) : (
-            <div className="max-w-3xl mx-auto">
-              <ul className="space-y-10">
-                {cart.map((item) => (
-                  <li key={item.id} className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] gap-6 md:gap-10 items-start border-b border-zinc-100 pb-10 last:border-0">
+            <>
+              <ul className="border-t border-zinc-900/90">
+                {cart.map((item, idx) => (
+                  <li
+                    key={item.id}
+                    className="grid grid-cols-[44px_96px_1fr_auto] md:grid-cols-[64px_140px_1fr_auto] gap-4 md:gap-8 py-6 border-b border-zinc-100 items-start"
+                  >
+                    {/* Index marker (pink) */}
+                    <p className="text-sm md:text-base pt-1">
+                      <span className="bg-pink-100 px-1.5 py-0.5 text-zinc-900">
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
+                    </p>
+
+                    {/* Product image */}
                     <div className="relative aspect-[3/4] bg-white">
                       <Image
                         src={item.imageUrl}
                         alt={item.name}
                         fill
-                        sizes="(max-width: 768px) 120px, 160px"
+                        sizes="(max-width: 768px) 96px, 140px"
                         className="object-cover"
                       />
                     </div>
+
+                    {/* Details */}
                     <div className="flex flex-col">
-                      <h2 className="text-lg md:text-xl text-black">{item.name}</h2>
-                      <p className="text-xs tracking-widest text-zinc-500 mt-2">
-                        {item.name === '03' || item.name === '07' ? item.price : 'ORDER MADE'}
+                      <p className="text-sm md:text-base text-zinc-900">
+                        ({item.name})
                       </p>
-                      <p className="text-[11px] tracking-widest text-zinc-400 uppercase mt-1">
-                        Quantity {item.quantity}
+                      <p className="text-xs md:text-sm text-zinc-500 mt-2">
+                        {item.name === '03' || item.name === '07'
+                          ? item.price
+                          : '(Order Made)'}
+                      </p>
+                      <p className="text-xs md:text-sm text-zinc-400 mt-1">
+                        (Quantity {item.quantity})
                       </p>
                       <button
                         onClick={() => removeFromCart(item.id)}
-                        className="mt-6 text-[10px] uppercase tracking-widest text-zinc-400 hover:text-black transition-colors self-start border-b border-transparent hover:border-black pb-0.5"
+                        className="mt-5 text-xs md:text-sm text-zinc-400 hover:text-red-500 transition-colors self-start"
                       >
-                        Remove
+                        (Remove)
                       </button>
                     </div>
+
+                    {/* Price (right) */}
+                    <p className="text-sm md:text-base text-zinc-900 text-right">
+                      {item.name === '03' || item.name === '07' ? item.price : ''}
+                    </p>
                   </li>
                 ))}
               </ul>
-              <div className="mt-12 border-t border-zinc-200 pt-8">
-                <div className="flex justify-between items-baseline mb-6">
-                  <span className="text-[11px] uppercase tracking-widest text-zinc-500">Total</span>
-                  <span className="text-2xl text-black">₩{getTotalPrice()}</span>
-                </div>
+
+              {/* Total Row */}
+              <div className="grid grid-cols-[1fr_auto] gap-6 py-6 border-b border-zinc-900/90 items-baseline">
+                <p className="text-sm md:text-base text-zinc-500">(Total)</p>
+                <p className="text-2xl md:text-3xl text-zinc-900">
+                  ₩{getTotalPrice()}
+                </p>
+              </div>
+
+              {/* Checkout — editorial link-style */}
+              <div className="flex justify-end mt-10">
                 <button
                   onClick={handleCheckout}
-                  className="w-full bg-black text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors"
+                  className="text-lg md:text-xl text-blue-600 hover:text-black transition-colors"
                 >
-                  Checkout
+                  (Checkout) →
                 </button>
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>
