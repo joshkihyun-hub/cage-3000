@@ -27,6 +27,17 @@ export const ProductInfo = ({ item }) => {
                 </p>
             </div>
 
+            {/* Made-to-order lead time — surfaced above the fold so buyers
+                see the production window before opening the description. */}
+            <div className="border-t border-zinc-200 py-4">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-medium mb-1.5">
+                    Made to Order
+                </p>
+                <p className="text-xs text-zinc-700 leading-relaxed">
+                    결제 후 영업일 기준 4–6일 내에 제작이 완료되며 순차 배송됩니다.
+                </p>
+            </div>
+
             {/* Accordion */}
             <div className="border-t border-zinc-200">
                 <button
