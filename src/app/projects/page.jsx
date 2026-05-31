@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { PROJECT1_ITEMS } from '../../shared/constants/project1-images';
 
 // "FASHION / 2025" 형태의 subtitle에서 연도만 뽑아낸다.
@@ -10,42 +10,11 @@ function extractYear(subtitle) {
     return m ? m[0] : '';
 }
 
-// 카드 폭(컨테이너 비율) — 78%면 양옆에 11%씩 다음/이전 이미지 peek가 보임.
-const CARD_WIDTH_PCT = 78;
-const GAP_PX = 16;
-
-// 가로 스냅 캐러셀 카드 — 컨테이너 가로 스크롤 진행도(0→1)에 따라 blur를 연속적으로
-// 변화시킨다. 중앙(progress 0.45~0.55)에서만 선명, 양 끝으로 갈수록 16px까지 흐려짐.
-// (룩북 세로 갤러리의 패턴을 X축으로 회전한 형태.)
-function CarouselCard({ src, idx, containerRef }) {
-    const ref = useRef(null);
-    const { scrollXProgress } = useScroll({
-        container: containerRef,
-        target: ref,
-        offset: ['start end', 'end start'],
-    });
-    const blurValue = useTransform(scrollXProgress, [0, 0.45, 0.55, 1], [16, 0, 0, 16]);
-    const filter = useTransform(blurValue, (b) => `blur(${b}px)`);
-
-    return (
-        <div
-            ref={ref}
-            className="snap-center shrink-0 flex items-center justify-center"
-            style={{ width: `${CARD_WIDTH_PCT}%` }}
-        >
-            {/* motion.img: framer-motion이 MotionValue로 style을 직접 갱신해서
-                매 스크롤 프레임마다 React 재랜더 없이 부드럽게 흐림이 변한다. */}
-            <motion.img
-                src={src}
-                alt={`detail ${idx + 1}`}
-                style={{ filter, willChange: 'filter' }}
-                className="max-h-[65vh] w-auto object-contain transform-gpu"
-            />
-        </div>
-    );
-}
-
-// 가로 캐러셀 컨테이너 — 좌우 padding으로 첫·마지막 카드도 중앙 정렬, snap으로 한 카드씩 정착.
+// 가로 스냅 캐러셀.
+// • 컨테이너에서 가로로 스크롤(또는 스와이프)하면 자식 이미지가 한 폭씩 스냅.
+// • 스냅된(현재 활성) 이미지만 blur-none, 나머지는 blur-md.
+// • 데스크탑은 hover 시 좌우 화살표가 떠서 클릭으로도 이동 가능.
+// • 도트는 항상 클릭 가능, 카운터 "01 / 06"로 총 장수 명시.
 function ImageCarousel({ images }) {
     const containerRef = useRef(null);
     const [activeIdx, setActiveIdx] = useState(0);
@@ -54,18 +23,14 @@ function ImageCarousel({ images }) {
     const handleScroll = useCallback(() => {
         const el = containerRef.current;
         if (!el) return;
-        const cardW = (el.offsetWidth * CARD_WIDTH_PCT) / 100;
-        const stride = cardW + GAP_PX;
-        const idx = Math.round(el.scrollLeft / stride);
+        const idx = Math.round(el.scrollLeft / el.offsetWidth);
         setActiveIdx((prev) => (prev === idx ? prev : idx));
     }, []);
 
     const scrollToIdx = (idx) => {
         const el = containerRef.current;
         if (!el) return;
-        const cardW = (el.offsetWidth * CARD_WIDTH_PCT) / 100;
-        const stride = cardW + GAP_PX;
-        el.scrollTo({ left: idx * stride, behavior: 'smooth' });
+        el.scrollTo({ left: idx * el.offsetWidth, behavior: 'smooth' });
     };
 
     const hasPrev = activeIdx > 0;
@@ -77,19 +42,23 @@ function ImageCarousel({ images }) {
                 ref={containerRef}
                 onScroll={handleScroll}
                 className="flex overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                style={{
-                    paddingLeft: `${(100 - CARD_WIDTH_PCT) / 2}%`,
-                    paddingRight: `${(100 - CARD_WIDTH_PCT) / 2}%`,
-                    gap: `${GAP_PX}px`,
-                }}
             >
                 {images.map((src, idx) => (
-                    <CarouselCard
+                    <div
                         key={`${src}-${idx}`}
-                        src={src}
-                        idx={idx}
-                        containerRef={containerRef}
-                    />
+                        className="snap-center shrink-0 w-full flex items-center justify-center"
+                    >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src={src}
+                            alt={`detail ${idx + 1}`}
+                            className={[
+                                'max-h-[70vh] w-auto object-contain transform-gpu',
+                                'transition-all duration-500 ease-out',
+                                activeIdx === idx ? 'blur-none' : 'blur-md',
+                            ].join(' ')}
+                        />
+                    </div>
                 ))}
             </div>
 
@@ -101,7 +70,7 @@ function ImageCarousel({ images }) {
                         onClick={() => scrollToIdx(activeIdx - 1)}
                         disabled={!hasPrev}
                         aria-label="Previous image"
-                        className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/85 backdrop-blur-sm text-zinc-900 text-lg opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity disabled:cursor-default rounded-full shadow-sm z-10"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/85 backdrop-blur-sm text-zinc-900 text-lg opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity disabled:cursor-default rounded-full shadow-sm"
                     >
                         ‹
                     </button>
@@ -110,7 +79,7 @@ function ImageCarousel({ images }) {
                         onClick={() => scrollToIdx(activeIdx + 1)}
                         disabled={!hasNext}
                         aria-label="Next image"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/85 backdrop-blur-sm text-zinc-900 text-lg opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity disabled:cursor-default rounded-full shadow-sm z-10"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/85 backdrop-blur-sm text-zinc-900 text-lg opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity disabled:cursor-default rounded-full shadow-sm"
                     >
                         ›
                     </button>
