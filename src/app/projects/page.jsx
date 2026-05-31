@@ -13,10 +13,12 @@ function extractYear(subtitle) {
 // 가로 스냅 캐러셀.
 // • 컨테이너에서 가로로 스크롤(또는 스와이프)하면 자식 이미지가 한 폭씩 스냅.
 // • 스냅된(현재 활성) 이미지만 blur-none, 나머지는 blur-md.
-// • 컨테이너 너비를 기준으로 activeIdx 계산 → CSS 클래스 토글로 부드럽게 전환.
+// • 데스크탑은 hover 시 좌우 화살표가 떠서 클릭으로도 이동 가능.
+// • 도트는 항상 클릭 가능, 카운터 "01 / 06"로 총 장수 명시.
 function ImageCarousel({ images }) {
     const containerRef = useRef(null);
     const [activeIdx, setActiveIdx] = useState(0);
+    const total = images.length;
 
     const handleScroll = useCallback(() => {
         const el = containerRef.current;
@@ -25,8 +27,17 @@ function ImageCarousel({ images }) {
         setActiveIdx((prev) => (prev === idx ? prev : idx));
     }, []);
 
+    const scrollToIdx = (idx) => {
+        const el = containerRef.current;
+        if (!el) return;
+        el.scrollTo({ left: idx * el.offsetWidth, behavior: 'smooth' });
+    };
+
+    const hasPrev = activeIdx > 0;
+    const hasNext = activeIdx < total - 1;
+
     return (
-        <div>
+        <div className="relative group">
             <div
                 ref={containerRef}
                 onScroll={handleScroll}
@@ -51,18 +62,50 @@ function ImageCarousel({ images }) {
                 ))}
             </div>
 
-            {/* 페이지네이션 도트 — 활성은 가로로 늘어난 pill. */}
-            {images.length > 1 && (
-                <div className="flex justify-center gap-1.5 mt-4">
-                    {images.map((_, idx) => (
-                        <span
-                            key={idx}
-                            className={[
-                                'h-1 rounded-full transition-all duration-300',
-                                activeIdx === idx ? 'w-6 bg-zinc-900' : 'w-1.5 bg-zinc-300',
-                            ].join(' ')}
-                        />
-                    ))}
+            {/* Prev/Next 화살표 — desktop hover에서 등장 (모바일은 스와이프). */}
+            {total > 1 && (
+                <>
+                    <button
+                        type="button"
+                        onClick={() => scrollToIdx(activeIdx - 1)}
+                        disabled={!hasPrev}
+                        aria-label="Previous image"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/85 backdrop-blur-sm text-zinc-900 text-lg opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity disabled:cursor-default rounded-full shadow-sm"
+                    >
+                        ‹
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => scrollToIdx(activeIdx + 1)}
+                        disabled={!hasNext}
+                        aria-label="Next image"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/85 backdrop-blur-sm text-zinc-900 text-lg opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity disabled:cursor-default rounded-full shadow-sm"
+                    >
+                        ›
+                    </button>
+                </>
+            )}
+
+            {/* 카운터 + 클릭 가능한 도트. 다중 이미지일 때만 표시. */}
+            {total > 1 && (
+                <div className="flex flex-col items-center gap-3 mt-5">
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 tabular-nums">
+                        {String(activeIdx + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+                    </p>
+                    <div className="flex justify-center gap-1.5">
+                        {images.map((_, idx) => (
+                            <button
+                                type="button"
+                                key={idx}
+                                onClick={() => scrollToIdx(idx)}
+                                aria-label={`Go to image ${idx + 1}`}
+                                className={[
+                                    'h-1 rounded-full transition-all duration-300 cursor-pointer',
+                                    activeIdx === idx ? 'w-6 bg-zinc-900' : 'w-2 bg-zinc-300 hover:bg-zinc-500',
+                                ].join(' ')}
+                            />
+                        ))}
+                    </div>
                 </div>
             )}
         </div>
