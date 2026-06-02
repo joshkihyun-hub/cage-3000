@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PROJECT1_ITEMS } from '../../shared/constants/project1-images';
 
@@ -10,27 +10,77 @@ function extractYear(subtitle) {
     return m ? m[0] : '';
 }
 
+// 카드 폭(컨테이너 비율). 82%면 양옆으로 9%씩 이전/다음 이미지가 흐릿하게 peek 된다.
+const CARD_WIDTH_PCT = 82;
+const GAP_PX = 20;
+const MAX_BLUR = 12;   // 중앙에서 한 칸 벗어났을 때의 흐림(px)
+const DEADZONE = 0.12; // 중앙 ±12% 안에서는 완전히 선명 — 정착 시 흔들림 방지
+
 // 가로 스냅 캐러셀.
-// • 컨테이너에서 가로로 스크롤(또는 스와이프)하면 자식 이미지가 한 폭씩 스냅.
-// • 스냅된(현재 활성) 이미지만 blur-none, 나머지는 blur-md.
-// • 데스크탑은 hover 시 좌우 화살표가 떠서 클릭으로도 이동 가능.
-// • 도트는 항상 클릭 가능, 카운터 "01 / 06"로 총 장수 명시.
+// • 스와이프(모바일)·트랙패드·화살표(데스크탑 hover)로 한 장씩 스냅 이동.
+// • 양옆에 다음/이전 이미지가 흐릿하게 보였다가, 중앙으로 오면 선명해진다.
+// • 흐림/스케일/투명도는 스크롤 위치(중앙으로부터의 거리)로 직접 계산해 매 프레임 갱신하므로
+//   React 재랜더 없이 부드럽게 흐르고, 정지 시 항상 중앙 한 장만 또렷하다.
+// • 페이지 도트/카운터는 없다 — 흐림 자체가 "더 있다"는 예고.
 function ImageCarousel({ images }) {
     const containerRef = useRef(null);
+    const cardRefs = useRef([]);
+    const rafRef = useRef(0);
     const [activeIdx, setActiveIdx] = useState(0);
     const total = images.length;
 
-    const handleScroll = useCallback(() => {
+    // 각 카드 중심이 뷰포트 중앙에서 얼마나 떨어졌는지로 blur/scale/opacity를 직접 칠한다.
+    const paint = useCallback(() => {
         const el = containerRef.current;
         if (!el) return;
-        const idx = Math.round(el.scrollLeft / el.offsetWidth);
-        setActiveIdx((prev) => (prev === idx ? prev : idx));
+        const contRect = el.getBoundingClientRect();
+        const contCenter = contRect.left + contRect.width / 2;
+        let nearest = 0;
+        let nearestDist = Infinity;
+
+        cardRefs.current.forEach((card, idx) => {
+            if (!card) return;
+            const r = card.getBoundingClientRect();
+            const cardCenter = r.left + r.width / 2;
+            const dist = Math.abs(cardCenter - contCenter) / (r.width + GAP_PX);
+            const t = Math.min(Math.max((dist - DEADZONE) / (1 - DEADZONE), 0), 1);
+            const img = card.firstElementChild;
+            if (img) {
+                img.style.filter = `blur(${(t * MAX_BLUR).toFixed(2)}px)`;
+                img.style.transform = `scale(${(1 - t * 0.1).toFixed(3)})`;
+                img.style.opacity = (1 - t * 0.5).toFixed(3);
+            }
+            if (dist < nearestDist) {
+                nearestDist = dist;
+                nearest = idx;
+            }
+        });
+        setActiveIdx((prev) => (prev === nearest ? prev : nearest));
     }, []);
 
+    // 스크롤은 rAF로 한 프레임당 한 번만 칠하도록 묶는다.
+    const handleScroll = useCallback(() => {
+        if (rafRef.current) return;
+        rafRef.current = requestAnimationFrame(() => {
+            rafRef.current = 0;
+            paint();
+        });
+    }, [paint]);
+
+    // 마운트(이미지 교체 포함)·리사이즈 시 초기 포커스 1회 계산.
+    useEffect(() => {
+        paint();
+        const onResize = () => paint();
+        window.addEventListener('resize', onResize);
+        return () => {
+            window.removeEventListener('resize', onResize);
+            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        };
+    }, [paint, total]);
+
     const scrollToIdx = (idx) => {
-        const el = containerRef.current;
-        if (!el) return;
-        el.scrollTo({ left: idx * el.offsetWidth, behavior: 'smooth' });
+        const card = cardRefs.current[idx];
+        if (card) card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     };
 
     const hasPrev = activeIdx > 0;
@@ -42,27 +92,33 @@ function ImageCarousel({ images }) {
                 ref={containerRef}
                 onScroll={handleScroll}
                 className="flex overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                style={{
+                    paddingLeft: `${(100 - CARD_WIDTH_PCT) / 2}%`,
+                    paddingRight: `${(100 - CARD_WIDTH_PCT) / 2}%`,
+                    gap: `${GAP_PX}px`,
+                }}
             >
                 {images.map((src, idx) => (
                     <div
                         key={`${src}-${idx}`}
-                        className="snap-center shrink-0 w-full flex items-center justify-center"
+                        ref={(node) => { cardRefs.current[idx] = node; }}
+                        className="snap-center shrink-0 flex items-center justify-center"
+                        style={{ width: `${CARD_WIDTH_PCT}%` }}
                     >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={src}
                             alt={`detail ${idx + 1}`}
-                            className={[
-                                'max-h-[70vh] w-auto object-contain transform-gpu',
-                                'transition-all duration-500 ease-out',
-                                activeIdx === idx ? 'blur-none' : 'blur-md',
-                            ].join(' ')}
+                            draggable={false}
+                            onLoad={paint}
+                            style={{ willChange: 'filter, transform' }}
+                            className="max-h-[70vh] w-auto object-contain transform-gpu select-none"
                         />
                     </div>
                 ))}
             </div>
 
-            {/* Prev/Next 화살표 — desktop hover에서 등장 (모바일은 스와이프). */}
+            {/* Prev/Next 화살표 — desktop hover에서만 옅게 등장 (모바일은 스와이프). */}
             {total > 1 && (
                 <>
                     <button
@@ -70,7 +126,7 @@ function ImageCarousel({ images }) {
                         onClick={() => scrollToIdx(activeIdx - 1)}
                         disabled={!hasPrev}
                         aria-label="Previous image"
-                        className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/85 backdrop-blur-sm text-zinc-900 text-lg opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity disabled:cursor-default rounded-full shadow-sm"
+                        className="hidden lg:flex absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 items-center justify-center bg-white/70 backdrop-blur-sm text-zinc-900 text-lg opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity duration-300 disabled:cursor-default rounded-full z-10"
                     >
                         ‹
                     </button>
@@ -79,34 +135,11 @@ function ImageCarousel({ images }) {
                         onClick={() => scrollToIdx(activeIdx + 1)}
                         disabled={!hasNext}
                         aria-label="Next image"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/85 backdrop-blur-sm text-zinc-900 text-lg opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity disabled:cursor-default rounded-full shadow-sm"
+                        className="hidden lg:flex absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 items-center justify-center bg-white/70 backdrop-blur-sm text-zinc-900 text-lg opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity duration-300 disabled:cursor-default rounded-full z-10"
                     >
                         ›
                     </button>
                 </>
-            )}
-
-            {/* 카운터 + 클릭 가능한 도트. 다중 이미지일 때만 표시. */}
-            {total > 1 && (
-                <div className="flex flex-col items-center gap-3 mt-5">
-                    <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 tabular-nums">
-                        {String(activeIdx + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
-                    </p>
-                    <div className="flex justify-center gap-1.5">
-                        {images.map((_, idx) => (
-                            <button
-                                type="button"
-                                key={idx}
-                                onClick={() => scrollToIdx(idx)}
-                                aria-label={`Go to image ${idx + 1}`}
-                                className={[
-                                    'h-1 rounded-full transition-all duration-300 cursor-pointer',
-                                    activeIdx === idx ? 'w-6 bg-zinc-900' : 'w-2 bg-zinc-300 hover:bg-zinc-500',
-                                ].join(' ')}
-                            />
-                        ))}
-                    </div>
-                </div>
             )}
         </div>
     );
@@ -144,17 +177,17 @@ export default function ProjectsPage() {
                                             isActive ? 'blur-none' : 'blur-sm',
                                         ].join(' ')}
                                     >
-                                        <span className="font-sans text-[13px] md:text-3xl lg:text-4xl leading-none tracking-tight text-black truncate min-w-0">
+                                        <span className="font-sans text-[15px] md:text-3xl lg:text-4xl leading-none tracking-tight text-black truncate min-w-0">
                                             {item.title}
                                         </span>
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
                                             src={item.image}
                                             alt={item.title}
-                                            className="h-5 md:h-10 lg:h-12 w-auto shrink-0 object-contain transition-transform duration-700 group-hover:scale-105"
+                                            className="h-6 md:h-10 lg:h-12 w-auto shrink-0 object-contain transition-transform duration-700 group-hover:scale-105"
                                         />
                                         {year && (
-                                            <span className="font-sans text-[10px] md:text-xl lg:text-2xl text-zinc-400 leading-none shrink-0">
+                                            <span className="font-sans text-[12px] md:text-xl lg:text-2xl text-zinc-400 leading-none shrink-0">
                                                 {year}
                                             </span>
                                         )}
