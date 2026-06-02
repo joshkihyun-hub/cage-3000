@@ -56,11 +56,11 @@ export const PROJECT1_ITEMS = [
     id: 2,
     title: '" I gr whrrr I plrrsr "',
     subtitle: 'FASHION / 2025', // 부제목 추가
-    image: '/asset/bike.png',
-    image_hover: '/asset/bike2.png',
+    image: '/asset/details/bike/bike.png',
+    image_hover: '/asset/details/bike/bike2.png',
     subImages: [
       // 이 프로젝트의 상세 이미지 경로도 추가해주세요.
-      '/asset/details/bike1.jpg', '/asset/details/bike2.jpg', '/asset/details/bike3.jpg', '/asset/details/bike4.jpg', '/asset/details/bike5.jpg', '/asset/details/bike6.jpg', '/asset/details/bike7.jpg', '/asset/details/bike8.jpg'
+      '/asset/details/bike/bike1.jpg', '/asset/details/bike/bike2.jpg', '/asset/details/bike/bike3.jpg', '/asset/details/bike/bike4.jpg', '/asset/details/bike/bike5.jpg', '/asset/details/bike/bike6.jpg', '/asset/details/bike/bike7.jpg', '/asset/details/bike/bike8.jpg'
     ],
     credits: [
       { role: 'Design', name: '@choppycocky @youngikyoun' },
