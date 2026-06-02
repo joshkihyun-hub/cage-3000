@@ -159,6 +159,26 @@ export default function ProjectsPage() {
                                             </span>
                                         )}
                                     </button>
+
+                                    {/* Mobile-only: carousel appears directly under the tapped title */}
+                                    {isActive && (
+                                        <div className="lg:hidden mt-6 mb-8">
+                                            <AnimatePresence mode="wait">
+                                                <motion.div
+                                                    key={item.id}
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: -10 }}
+                                                    transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                                                >
+                                                    <ImageCarousel images={carouselImages} />
+                                                    <p className="mt-6 text-[10px] uppercase tracking-[0.25em] text-zinc-400 text-center">
+                                                        {item.subtitle}
+                                                    </p>
+                                                </motion.div>
+                                            </AnimatePresence>
+                                        </div>
+                                    )}
                                 </li>
                             );
                         })}
@@ -184,25 +204,6 @@ export default function ProjectsPage() {
                         </AnimatePresence>
                     </div>
 
-                    {/* === Below-lg fallback: carousel inline under the list === */}
-                    {activeItem && (
-                        <div className="lg:hidden">
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={activeItem.id}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                                >
-                                    <ImageCarousel images={carouselImages} />
-                                    <p className="mt-6 text-[10px] uppercase tracking-[0.25em] text-zinc-400 text-center">
-                                        {activeItem.subtitle}
-                                    </p>
-                                </motion.div>
-                            </AnimatePresence>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
