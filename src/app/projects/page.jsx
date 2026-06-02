@@ -205,9 +205,6 @@ export default function ProjectsPage() {
                                                     transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                                                 >
                                                     <ImageCarousel images={carouselImages} />
-                                                    <p className="mt-6 text-[10px] uppercase tracking-[0.25em] text-zinc-400 text-center">
-                                                        {item.subtitle}
-                                                    </p>
                                                 </motion.div>
                                             </AnimatePresence>
                                         </div>
@@ -229,9 +226,6 @@ export default function ProjectsPage() {
                                     transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                                 >
                                     <ImageCarousel images={carouselImages} />
-                                    <p className="mt-6 text-[10px] uppercase tracking-[0.25em] text-zinc-400 text-center">
-                                        {activeItem.subtitle}
-                                    </p>
                                 </motion.div>
                             )}
                         </AnimatePresence>
