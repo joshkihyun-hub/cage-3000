@@ -139,22 +139,22 @@ export default function ProjectsPage() {
                                         onMouseEnter={() => setActiveId(item.id)}
                                         onClick={() => setActiveId(item.id)}
                                         className={[
-                                            'group flex flex-wrap items-center gap-x-3 md:gap-x-5 gap-y-2 text-left w-full',
+                                            'group flex flex-nowrap md:flex-wrap items-center gap-x-2 md:gap-x-5 gap-y-2 text-left w-full',
                                             'transition-all duration-500 ease-out cursor-pointer transform-gpu',
                                             isActive ? 'blur-none' : 'blur-sm',
                                         ].join(' ')}
                                     >
-                                        <span className="font-sans text-2xl md:text-3xl lg:text-4xl leading-none tracking-tight text-black">
+                                        <span className="font-sans text-[13px] md:text-3xl lg:text-4xl leading-none tracking-tight text-black truncate min-w-0">
                                             {item.title}
                                         </span>
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
                                             src={item.image}
                                             alt={item.title}
-                                            className="h-8 md:h-10 lg:h-12 w-auto object-contain transition-transform duration-700 group-hover:scale-105"
+                                            className="h-5 md:h-10 lg:h-12 w-auto shrink-0 object-contain transition-transform duration-700 group-hover:scale-105"
                                         />
                                         {year && (
-                                            <span className="font-sans text-base md:text-xl lg:text-2xl text-zinc-400 leading-none">
+                                            <span className="font-sans text-[10px] md:text-xl lg:text-2xl text-zinc-400 leading-none shrink-0">
                                                 {year}
                                             </span>
                                         )}
