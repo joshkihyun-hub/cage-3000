@@ -1,5 +1,42 @@
 export const PROJECT1_ITEMS = [
   {
+    id: 0,
+    title: 'ESQUIRE KOREA JUNE ISSUE',
+    subtitle: 'EDITORIAL / 2026',
+    image: '/asset/details/esquire/esquire1.jpg',
+    image_hover: '/asset/details/esquire/esquire2.jpg',
+    subImages: [
+      '/asset/details/esquire/esquire1.jpg',
+      '/asset/details/esquire/esquire2.jpg',
+    ],
+  },
+  {
+    id: 4,
+    title: 'NMIXX HEAVY SERENADE',
+    subtitle: 'MUSIC VIDEO / 2026',
+    image: '/asset/details/heavy-serenade/heavy-serenade1.jpg',
+    image_hover: '/asset/details/heavy-serenade/heavy-serenade2.jpg',
+    subImages: [
+      '/asset/details/heavy-serenade/heavy-serenade1.jpg',
+      '/asset/details/heavy-serenade/heavy-serenade2.jpg',
+      '/asset/details/heavy-serenade/heavy-serenade3.jpg',
+      '/asset/details/heavy-serenade/heavy-serenade4.jpg',
+      '/asset/details/heavy-serenade/heavy-serenade5.jpg',
+      '/asset/details/heavy-serenade/heavy-serenade6.jpg',
+    ],
+  },
+  {
+    id: 5,
+    title: "HARPER'S BAZAAR APRIL ISSUE SIK-K",
+    subtitle: 'EDITORIAL / 2026',
+    image: '/asset/details/bazaar-sikk/bazaar-sikk1.jpg',
+    image_hover: '/asset/details/bazaar-sikk/bazaar-sikk2.jpg',
+    subImages: [
+      '/asset/details/bazaar-sikk/bazaar-sikk1.jpg',
+      '/asset/details/bazaar-sikk/bazaar-sikk2.jpg',
+    ],
+  },
+  {
     id: 1,
     title: 'DAZED 2025 JUNE BAT APT',
     subtitle: 'FASHION / 2025', // 부제목 추가
