@@ -96,6 +96,12 @@ function ImageCarousel({ images }) {
                     paddingLeft: `${(100 - CARD_WIDTH_PCT) / 2}%`,
                     paddingRight: `${(100 - CARD_WIDTH_PCT) / 2}%`,
                     gap: `${GAP_PX}px`,
+                    // 양 끝에서 peek 이미지가 딱 잘려 보이지 않도록 가장자리를 투명으로 페이드.
+                    // 중앙 카드(9~91%)는 opaque 영역(8~92%) 안이라 그대로 선명하게 유지된다.
+                    WebkitMaskImage:
+                        'linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)',
+                    maskImage:
+                        'linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)',
                 }}
             >
                 {images.map((src, idx) => (
