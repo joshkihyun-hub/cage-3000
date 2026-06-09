@@ -14,11 +14,11 @@ export const PROJECT1_ITEMS = [
     id: 4,
     title: 'NMIXX HEAVY SERENADE',
     subtitle: 'MUSIC VIDEO / 2026',
-    image: '/asset/details/heavy-serenade/heavy-serenade1.jpg',
-    image_hover: '/asset/details/heavy-serenade/heavy-serenade2.jpg',
+    image: '/asset/details/heavy-serenade/heavy-serenade2.jpg',
+    image_hover: '/asset/details/heavy-serenade/heavy-serenade1.jpg',
     subImages: [
-      '/asset/details/heavy-serenade/heavy-serenade1.jpg',
       '/asset/details/heavy-serenade/heavy-serenade2.jpg',
+      '/asset/details/heavy-serenade/heavy-serenade1.jpg',
       '/asset/details/heavy-serenade/heavy-serenade3.jpg',
       '/asset/details/heavy-serenade/heavy-serenade4.jpg',
       '/asset/details/heavy-serenade/heavy-serenade5.jpg',
@@ -59,8 +59,10 @@ export const PROJECT1_ITEMS = [
     image: '/asset/details/bike/bike.png',
     image_hover: '/asset/details/bike/bike2.png',
     subImages: [
-      // 이 프로젝트의 상세 이미지 경로도 추가해주세요.
-      '/asset/details/bike/bike1.jpg', '/asset/details/bike/bike2.jpg', '/asset/details/bike/bike3.jpg', '/asset/details/bike/bike4.jpg', '/asset/details/bike/bike5.jpg', '/asset/details/bike/bike6.jpg', '/asset/details/bike/bike7.jpg', '/asset/details/bike/bike8.jpg'
+      '/asset/details/bike/bike.png',
+      '/asset/details/bike/bike2.png',
+      '/asset/details/bike/bike8.jpg',
+      '/asset/details/bike/KakaoTalk_Photo_2025-04-05-23-52-57.jpeg',
     ],
     credits: [
       { role: 'Design', name: '@choppycocky @youngikyoun' },
