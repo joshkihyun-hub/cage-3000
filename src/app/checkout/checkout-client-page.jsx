@@ -33,6 +33,8 @@ const CheckoutClientPage = () => {
   const [isEasyPayOpen, setIsEasyPayOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  // 전자상거래법: 주문제작 상품의 청약철회 제한은 "사전 고지 + 동의"가 있어야 유효.
+  const [agreedMadeToOrder, setAgreedMadeToOrder] = useState(false);
 
   // Prefill from session profile once it loads.
   useEffect(() => {
@@ -89,6 +91,10 @@ const CheckoutClientPage = () => {
           ? '이메일과 배송 정보를 모두 입력해 주세요.'
           : '배송 정보를 모두 입력해 주세요.'
       );
+      return;
+    }
+    if (!agreedMadeToOrder) {
+      setError('주문 제작 상품의 환불 제한 안내에 동의해 주세요.');
       return;
     }
     if (!STORE_ID || !CHANNEL_KCP) {
@@ -333,16 +339,31 @@ const CheckoutClientPage = () => {
               <h2 className="text-xl text-black mb-8 border-b border-zinc-200 pb-4">
                 결제 수단
               </h2>
+              <label className="flex items-start gap-3 mb-6 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreedMadeToOrder}
+                  onChange={(e) => setAgreedMadeToOrder(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-black"
+                />
+                <span className="text-[11px] text-zinc-600 leading-relaxed">
+                  <span className="text-black font-medium">[필수]</span> 본 상품은 주문 제작(Made-to-Order)
+                  상품으로, 결제 후 제작이 시작되면 단순 변심에 의한 청약철회·환불이 제한됨을 확인했습니다.{' '}
+                  <a href="/refund" className="underline hover:text-black transition-colors">
+                    환불 및 취소 정책
+                  </a>
+                </span>
+              </label>
               <div className="space-y-3">
                 <button
-                  disabled={submitting || !shippingValid || cart.length === 0}
+                  disabled={submitting || !shippingValid || cart.length === 0 || !agreedMadeToOrder}
                   onClick={() => handlePayment('CARD')}
                   className="w-full bg-black text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors disabled:bg-zinc-300 disabled:cursor-not-allowed"
                 >
                   신용카드
                 </button>
                 <button
-                  disabled={submitting || !shippingValid || cart.length === 0}
+                  disabled={submitting || !shippingValid || cart.length === 0 || !agreedMadeToOrder}
                   onClick={() => setIsEasyPayOpen(true)}
                   className="w-full border border-black text-black py-4 text-xs uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >

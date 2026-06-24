@@ -2,17 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-
-const STATUS_LABEL = {
-  pending: '결제 대기',
-  paid: '결제 완료',
-  preparing: '제작 중',
-  shipped: '배송 중',
-  delivered: '배송 완료',
-  cancelled: '취소',
-  refunded: '환불',
-  failed: '실패',
-};
+import { ORDER_STATUS_LABEL } from '@/lib/order-status';
 
 const CARRIERS = ['CJ대한통운', '우체국', '한진택배', '롯데택배', '로젠택배', 'EMS', 'DHL'];
 
@@ -214,10 +204,17 @@ export default function OrderDetailDrawer({ orderId, onClose, onUpdated }) {
                     onChange={(e) => setStatusDraft(e.target.value)}
                     className="w-full border-b border-zinc-200 py-2 text-sm bg-transparent focus:outline-none focus:border-black"
                   >
-                    {Object.entries(STATUS_LABEL).map(([v, label]) => (
+                    {Object.entries(ORDER_STATUS_LABEL).map(([v, label]) => (
                       <option key={v} value={v}>{label}</option>
                     ))}
                   </select>
+                  {(statusDraft === 'refunded' || statusDraft === 'cancelled') &&
+                    order.status !== statusDraft && (
+                      <p className="mt-2 text-[11px] text-rose-600 leading-relaxed bg-rose-50 border border-rose-100 px-3 py-2">
+                        ⚠ 상태만 변경됩니다. <strong>실제 환불은 처리되지 않습니다</strong> —
+                        PortOne 콘솔에서 직접 결제를 취소해 주세요. (콘솔에서 취소하면 웹훅으로 상태가 자동 반영됩니다.)
+                      </p>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

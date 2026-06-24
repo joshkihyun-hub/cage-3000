@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { requireActiveUser } from '@/lib/auth-guards';
 import { getProductById, getProductUnitPrice, generateOrderNumber } from '@/lib/catalog';
 import { isValidEmail, isValidKrPhone } from '@/lib/validation';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 // Cookie that proves a logged-out client owns a freshly created order.
 // Read by /api/payment/confirm to authorize the payment transition.
@@ -17,6 +18,15 @@ const GUEST_COOKIE_MAX_AGE = 60 * 60; // 1 hour — long enough for any payment 
 // guests must provide an email so we can send the receipt and look the order
 // up later. Pricing is computed server-side; client cart prices are ignored.
 export async function POST(req) {
+  // Soft per-IP guard against draft-order spam (best-effort; see lib/rate-limit).
+  const limited = rateLimit(`orders:${getClientIp(req)}`, { limit: 10, windowMs: 60_000 });
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.' },
+      { status: 429, headers: { 'Retry-After': String(limited.retryAfter) } }
+    );
+  }
+
   const session = await getServerSession(authOptions);
   const isGuest = !session?.user?.id;
 

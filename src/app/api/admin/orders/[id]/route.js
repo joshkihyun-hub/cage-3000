@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-guards';
-
-const VALID_STATUSES = ['pending', 'paid', 'preparing', 'shipped', 'delivered', 'cancelled', 'refunded', 'failed'];
+import { isValidOrderStatus } from '@/lib/order-status';
 
 export async function GET(_req, { params }) {
   const { error } = await requireAdmin();
@@ -57,7 +56,7 @@ export async function PATCH(req, { params }) {
   const data = {};
 
   if (body.status !== undefined) {
-    if (!VALID_STATUSES.includes(body.status)) {
+    if (!isValidOrderStatus(body.status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
     data.status = body.status;

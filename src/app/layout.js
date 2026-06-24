@@ -145,6 +145,7 @@ export default function RootLayout({ children }) {
 
                   {/* Policy Links */}
                   <div className="flex flex-col gap-2 text-[10px] text-zinc-400">
+                    <a href="/order-lookup" className="hover:text-black transition-colors tracking-wide">주문조회</a>
                     <a href="/terms" className="hover:text-black transition-colors tracking-wide">이용약관</a>
                     <a href="/privacy" className="hover:text-black transition-colors tracking-wide">개인정보처리방침</a>
                     <a href="/refund" className="hover:text-black transition-colors tracking-wide">환불 및 취소 정책</a>
@@ -154,7 +155,7 @@ export default function RootLayout({ children }) {
                 {/* Divider + Copyright */}
                 <div className="mt-8 pt-6 border-t border-zinc-100 flex flex-col md:flex-row md:justify-between items-center gap-2 text-[10px] text-zinc-300">
                   <p>&copy; {new Date().getFullYear()} CAGE3000 / 케이에이치엔(KHN). All rights reserved.</p>
-                  <p>통신판매업 신고 예정</p>
+                  <p>통신판매업 신고번호 제2026-서울서대문-0621호</p>
                 </div>
               </div>
             </footer>

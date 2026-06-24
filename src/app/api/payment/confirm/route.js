@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
-import { PortOneClient } from '@portone/server-sdk';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
-import { sendOrderConfirmationEmail, sendOrderNotificationToSeller } from '@/lib/email';
+import { settleOrderPayment } from '@/lib/order-payment';
 
 const GUEST_COOKIE = 'cage_guest_order';
 
@@ -17,6 +16,11 @@ function parseGuestCookie(req) {
   return { orderId: raw.slice(0, idx), token: raw.slice(idx + 1) };
 }
 
+// POST /api/payment/confirm — client-driven settlement.
+// Authorizes the caller (session or guest cookie), then defers the actual
+// verify-and-transition to the shared, idempotent settleOrderPayment so this
+// path and the webhook can never disagree. The webhook is the safety net for
+// when this call never runs (redirect flows, browser closed mid-payment).
 export async function POST(request) {
   const session = await getServerSession(authOptions);
   const sessionUserId = session?.user?.id || null;
@@ -28,33 +32,23 @@ export async function POST(request) {
     return NextResponse.json({ message: '잘못된 요청 형식입니다.' }, { status: 400 });
   }
 
-  const { paymentId, orderId } = body || {};
-  if (!paymentId || !orderId) {
-    return NextResponse.json(
-      { message: 'paymentId 또는 orderId가 누락되었습니다.' },
-      { status: 400 }
-    );
-  }
-
-  const apiSecret = process.env.PORTONE_API_SECRET;
-  if (!apiSecret) {
-    console.error('PORTONE_API_SECRET is not configured');
-    return NextResponse.json({ message: '결제 설정 오류' }, { status: 500 });
+  const { paymentId } = body || {};
+  // orderId is optional: the inline flow sends it, but the redirect flow only
+  // has the PortOne paymentId — which equals our orderNumber, so we can resolve
+  // the order either way.
+  const orderId = body?.orderId || null;
+  if (!paymentId) {
+    return NextResponse.json({ message: 'paymentId가 누락되었습니다.' }, { status: 400 });
   }
 
   const order = await prisma.order.findUnique({
-    where: { id: orderId },
+    where: orderId ? { id: orderId } : { orderNumber: paymentId },
     select: {
       id: true,
       userId: true,
       guestToken: true,
-      guestEmail: true,
       status: true,
       totalAmount: true,
-      currency: true,
-      paymentId: true,
-      orderNumber: true,
-      recipientName: true,
     },
   });
 
@@ -69,157 +63,45 @@ export async function POST(request) {
       return NextResponse.json({ message: '권한이 없습니다.' }, { status: 403 });
     }
   } else {
-    // Guest order — verify cookie.
     const guest = parseGuestCookie(request);
     if (!guest || guest.orderId !== order.id || guest.token !== order.guestToken) {
       return NextResponse.json({ message: '권한이 없습니다.' }, { status: 403 });
     }
   }
 
-  if (order.status === 'paid') {
-    return NextResponse.json({ status: 'success', message: '이미 결제 완료된 주문입니다.' });
-  }
-  if (order.status !== 'pending') {
-    return NextResponse.json(
-      { message: `결제할 수 없는 주문 상태입니다. (${order.status})` },
-      { status: 400 }
-    );
-  }
+  const result = await settleOrderPayment({ order, paymentId });
 
-  try {
-    const portoneClient = new PortOneClient({ apiSecret });
-    const payment = await portoneClient.payments.get(paymentId);
-
-    if (!payment) {
-      return NextResponse.json({ message: '결제 정보를 찾을 수 없습니다.' }, { status: 404 });
-    }
-
-    if (payment.status !== 'PAID') {
-      await prisma.order.update({
-        where: { id: order.id },
-        data: { status: 'failed' },
-      });
-      return NextResponse.json(
-        { status: 'failed', message: `결제 상태: ${payment.status}` },
-        { status: 400 }
-      );
-    }
-
-    const paidAmount = payment.amount?.total ?? payment.totalAmount;
-    if (Number(paidAmount) !== Number(order.totalAmount)) {
-      console.error('Payment amount mismatch', {
-        orderId: order.id,
-        expected: order.totalAmount,
-        got: paidAmount,
-      });
-      return NextResponse.json(
-        { message: '결제 금액이 일치하지 않습니다. 관리자에게 문의해 주세요.' },
-        { status: 400 }
-      );
-    }
-
-    const updated = await prisma.order.update({
-      where: { id: order.id },
-      data: {
-        status: 'paid',
-        paidAt: new Date(),
-        paymentId,
-        paymentMethod: payment.method?.type || payment.channel?.type || null,
-      },
-      select: {
-        id: true,
-        orderNumber: true,
-        totalAmount: true,
-        paidAt: true,
-        paymentMethod: true,
-        guestEmail: true,
-        userId: true,
-        recipientName: true,
-        recipientPhone: true,
-        shippingZipCode: true,
-        shippingAddress: true,
-        shippingDetail: true,
-        customerNote: true,
-        items: { select: { productName: true, quantity: true, subtotal: true } },
-      },
-    });
-
-    // Fire-and-forget order emails. Both the buyer receipt and the seller
-    // notification are best-effort — payment success must never block on
-    // email delivery problems.
-    try {
-      let buyerEmail = updated.guestEmail;
-      let buyerName = updated.recipientName;
-      if (!buyerEmail && updated.userId) {
-        const u = await prisma.user.findUnique({
-          where: { id: updated.userId },
-          select: { email: true, name: true },
-        });
-        buyerEmail = u?.email || null;
-        buyerName = u?.name || buyerName;
-      }
-
-      const shippingForEmail = {
-        recipientName: updated.recipientName,
-        recipientPhone: updated.recipientPhone,
-        zipCode: updated.shippingZipCode,
-        address: updated.shippingAddress,
-        detail: updated.shippingDetail,
-        customerNote: updated.customerNote,
-      };
-
-      // Buyer receipt
-      if (buyerEmail) {
-        await sendOrderConfirmationEmail({
-          to: buyerEmail,
-          name: buyerName,
-          orderNumber: updated.orderNumber,
-          totalAmount: updated.totalAmount,
-          items: updated.items,
-          shipping: shippingForEmail,
-        });
-      }
-
-      // Seller notification
-      await sendOrderNotificationToSeller({
-        orderNumber: updated.orderNumber,
-        totalAmount: updated.totalAmount,
-        paymentMethod: updated.paymentMethod,
-        paidAt: updated.paidAt,
-        isGuest: !updated.userId,
-        buyer: {
-          name: buyerName,
-          email: buyerEmail,
-          phone: updated.recipientPhone,
-        },
-        shipping: shippingForEmail,
-        items: updated.items,
-      });
-    } catch (mailErr) {
-      // Never block payment success on email problems — just log.
-      console.error('[payment/confirm] order email failed', {
-        message: mailErr?.message,
-        orderNumber: updated.orderNumber,
-      });
-    }
-
-    // Clear the guest cookie now that the order has settled.
+  if (result.ok) {
     const res = NextResponse.json({
       status: 'success',
-      message: '결제가 완료되었습니다.',
-      order: {
-        id: updated.id,
-        orderNumber: updated.orderNumber,
-        totalAmount: updated.totalAmount,
-        paidAt: updated.paidAt,
-      },
+      message: result.alreadyPaid ? '이미 결제 완료된 주문입니다.' : '결제가 완료되었습니다.',
     });
-    if (!order.userId) {
-      res.cookies.delete(GUEST_COOKIE);
-    }
+    // Clear the guest cookie now that the order has settled.
+    if (!order.userId) res.cookies.delete(GUEST_COOKIE);
     return res;
-  } catch (err) {
-    console.error('PortOne verification error:', err);
-    return NextResponse.json({ message: '결제 검증 중 오류가 발생했습니다.' }, { status: 500 });
+  }
+
+  // Map settlement failures to client responses.
+  switch (result.status) {
+    case 'failed':
+      return NextResponse.json(
+        { status: 'failed', message: `결제가 완료되지 않았습니다. (${result.code})` },
+        { status: 400 }
+      );
+    case 'mismatch':
+      return NextResponse.json(
+        { message: '결제 금액이 일치하지 않아 자동 취소되었습니다. 다시 시도해 주세요.' },
+        { status: 400 }
+      );
+    case 'conflict':
+      return NextResponse.json(
+        { message: `결제할 수 없는 주문 상태입니다. (${result.code})` },
+        { status: 400 }
+      );
+    default:
+      return NextResponse.json(
+        { message: result.code === 'config' ? '결제 설정 오류' : '결제 검증 중 오류가 발생했습니다.' },
+        { status: 500 }
+      );
   }
 }

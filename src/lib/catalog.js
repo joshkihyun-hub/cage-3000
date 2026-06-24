@@ -5,15 +5,8 @@ export function getProductById(id) {
   return items.find((item) => String(item.id) === String(id)) || null;
 }
 
-// Reflects the in-stock vs made-to-order display rule used on the storefront.
-function isPriced(item) {
-  return item.name === '03' || item.name === '07';
-}
-
 export function getProductUnitPrice(item) {
-  if (!item) return 0;
-  if (isPriced(item)) return Number(item.priceNum) || 0;
-  return Number(item.priceNum) || 0;
+  return Number(item?.priceNum) || 0;
 }
 
 export function generateOrderNumber() {

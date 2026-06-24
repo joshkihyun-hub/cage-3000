@@ -5,40 +5,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/page-container';
 import OrderDetailDrawer from './order-detail-drawer';
+import { ORDER_STATUSES, ORDER_STATUS_LABEL, ORDER_STATUS_BADGE } from '@/lib/order-status';
 
 const STATUS_OPTIONS = [
   { value: '', label: 'All' },
-  { value: 'pending', label: '결제 대기' },
-  { value: 'paid', label: '결제 완료' },
-  { value: 'preparing', label: '제작 중' },
-  { value: 'shipped', label: '배송 중' },
-  { value: 'delivered', label: '배송 완료' },
-  { value: 'cancelled', label: '취소' },
-  { value: 'refunded', label: '환불' },
-  { value: 'failed', label: '실패' },
+  ...ORDER_STATUSES.map((value) => ({ value, label: ORDER_STATUS_LABEL[value] })),
 ];
-
-const STATUS_BADGE = {
-  pending: 'bg-zinc-50 text-zinc-600 border-zinc-200',
-  paid: 'bg-blue-50 text-blue-700 border-blue-100',
-  preparing: 'bg-amber-50 text-amber-700 border-amber-100',
-  shipped: 'bg-indigo-50 text-indigo-700 border-indigo-100',
-  delivered: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-  cancelled: 'bg-zinc-100 text-zinc-500 border-zinc-200',
-  refunded: 'bg-rose-50 text-rose-600 border-rose-100',
-  failed: 'bg-red-50 text-red-600 border-red-100',
-};
-
-const STATUS_LABEL = {
-  pending: '결제 대기',
-  paid: '결제 완료',
-  preparing: '제작 중',
-  shipped: '배송 중',
-  delivered: '배송 완료',
-  cancelled: '취소',
-  refunded: '환불',
-  failed: '실패',
-};
 
 function formatDate(value) {
   if (!value) return '-';
@@ -68,6 +40,7 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedId, setSelectedId] = useState(null);
+  const [cleaning, setCleaning] = useState(false);
 
   useEffect(() => {
     if (authStatus === 'loading') return;
@@ -130,6 +103,27 @@ export default function AdminOrdersPage() {
     setQ(searchInput.trim());
   };
 
+  const handleCleanup = async () => {
+    if (!window.confirm('24시간이 지난 미결제(결제 대기) 주문을 모두 실패 처리할까요?')) return;
+    setCleaning(true);
+    setError('');
+    try {
+      const res = await fetch('/api/admin/orders/cleanup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ olderThanHours: 24 }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || '정리에 실패했습니다.');
+      window.alert(`오래된 미결제 주문 ${json.updated}건을 정리했습니다.`);
+      fetchOrders();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setCleaning(false);
+    }
+  };
+
   if (authStatus === 'loading' || (authStatus === 'authenticated' && session?.user?.role !== 'admin')) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -150,6 +144,15 @@ export default function AdminOrdersPage() {
               </p>
             </div>
             <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleCleanup}
+                disabled={cleaning}
+                title="24시간이 지난 미결제 주문을 실패 처리합니다"
+                className="text-[11px] uppercase tracking-[0.2em] px-5 py-3 border border-zinc-200 text-zinc-500 hover:border-black hover:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {cleaning ? 'Cleaning…' : '미결제 정리'}
+              </button>
               <a
                 href="/admin/users"
                 className="text-[11px] uppercase tracking-[0.2em] px-5 py-3 border border-zinc-200 hover:border-black hover:bg-black hover:text-white transition-colors"
@@ -259,8 +262,8 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="py-4 px-3 font-medium">{formatKRW(order.totalAmount)}</td>
                     <td className="py-4 px-3">
-                      <span className={`inline-block px-2 py-0.5 text-[10px] uppercase tracking-widest border ${STATUS_BADGE[order.status] || ''}`}>
-                        {STATUS_LABEL[order.status] || order.status}
+                      <span className={`inline-block px-2 py-0.5 text-[10px] uppercase tracking-widest border ${ORDER_STATUS_BADGE[order.status] || ''}`}>
+                        {ORDER_STATUS_LABEL[order.status] || order.status}
                       </span>
                     </td>
                     <td className="py-4 px-3 text-xs text-zinc-500 hidden md:table-cell">

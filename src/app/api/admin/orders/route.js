@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-guards';
-
-const VALID_STATUSES = ['pending', 'paid', 'preparing', 'shipped', 'delivered', 'cancelled', 'refunded', 'failed'];
+import { isValidOrderStatus, REVENUE_STATUSES } from '@/lib/order-status';
 
 export async function GET(req) {
   const { error } = await requireAdmin();
@@ -29,7 +28,7 @@ export async function GET(req) {
       { guestEmail: { contains: q, mode: 'insensitive' } },
     ];
   }
-  if (status && VALID_STATUSES.includes(status)) where.status = status;
+  if (status && isValidOrderStatus(status)) where.status = status;
 
   const [orders, total, statusGroups, revenueAgg] = await Promise.all([
     prisma.order.findMany({
@@ -60,7 +59,7 @@ export async function GET(req) {
     prisma.order.count({ where }),
     prisma.order.groupBy({ by: ['status'], _count: { _all: true } }),
     prisma.order.aggregate({
-      where: { status: { in: ['paid', 'preparing', 'shipped', 'delivered'] } },
+      where: { status: { in: REVENUE_STATUSES } },
       _sum: { totalAmount: true },
     }),
   ]);

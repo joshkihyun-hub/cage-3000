@@ -39,7 +39,7 @@ export default function TermsPage() {
             <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제4조 (서비스의 제공)</h2>
             <p className="mb-2">회사는 다음과 같은 서비스를 제공합니다.</p>
             <ul className="list-disc list-inside space-y-1.5">
-              <li>예술 작품 및 무대의상 등 상품의 판매</li>
+              <li>모자(밀리너리) 및 패션 액세서리 등 상품의 판매</li>
               <li>상품 주문 및 결제 서비스</li>
               <li>기타 회사가 정하는 서비스</li>
             </ul>

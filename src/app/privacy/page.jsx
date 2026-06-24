@@ -101,7 +101,41 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제6조 (정보주체의 권리·의무)</h2>
+            <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제6조 (개인정보의 국외 이전)</h2>
+            <p className="mb-3">회사는 원활한 서비스 제공을 위해 아래와 같이 개인정보를 국외로 이전(처리위탁·보관)하고 있습니다.</p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-[12px] border-collapse">
+                <thead>
+                  <tr className="border-b border-zinc-200">
+                    <th className="text-left py-2 pr-4 text-black font-medium">이전받는 자 (국가)</th>
+                    <th className="text-left py-2 pr-4 text-black font-medium">이전 항목</th>
+                    <th className="text-left py-2 pr-4 text-black font-medium">이전 목적</th>
+                    <th className="text-left py-2 text-black font-medium">보유·이용기간</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100">
+                  <tr>
+                    <td className="py-2 pr-4 align-top">Resend, Inc. (미국)</td>
+                    <td className="py-2 pr-4 align-top">이메일 주소, 이름, 주문 정보</td>
+                    <td className="py-2 pr-4 align-top">주문확인·인증 메일 발송</td>
+                    <td className="py-2 align-top">위탁계약 종료 또는 회원 탈퇴 시까지</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 pr-4 align-top">Vercel Inc. (미국)</td>
+                    <td className="py-2 pr-4 align-top">서비스 이용 시 입력·생성되는 개인정보</td>
+                    <td className="py-2 pr-4 align-top">웹사이트 호스팅·운영</td>
+                    <td className="py-2 align-top">위탁계약 종료 시까지</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-3 text-[12px] text-zinc-400">
+              * 이전 일시 및 방법: 서비스 이용·주문 시점에 정보통신망을 통해 전송. 이용자는 국외 이전을 거부할 수 있으며, 거부 시 회원가입·주문 등 일부 서비스 이용이 제한될 수 있습니다.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제7조 (정보주체의 권리·의무)</h2>
             <p className="mb-2">이용자는 개인정보 주체로서 다음과 같은 권리를 행사할 수 있습니다.</p>
             <ul className="list-disc list-inside space-y-1.5">
               <li>개인정보 열람 요구</li>
@@ -113,14 +147,14 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제7조 (쿠키의 사용)</h2>
+            <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제8조 (쿠키의 사용)</h2>
             <p>
               회사는 서비스 제공을 위해 쿠키를 사용할 수 있습니다. 이용자는 브라우저 설정을 통해 쿠키 저장을 거부할 수 있으나, 이 경우 일부 서비스 이용이 제한될 수 있습니다.
             </p>
           </section>
 
           <section>
-            <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제8조 (개인정보 보호책임자)</h2>
+            <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제9조 (개인정보 보호책임자)</h2>
             <div className="bg-zinc-50 rounded p-4 text-[12px] space-y-1">
               <p><span className="text-zinc-800 font-medium">성명</span> &nbsp;김기현</p>
               <p><span className="text-zinc-800 font-medium">직위</span> &nbsp;대표</p>
