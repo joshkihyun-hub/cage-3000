@@ -24,7 +24,7 @@ export default function HomePage() {
               sizes="100vw"
               className="object-cover object-center"
               priority
-              quality={100}
+              quality={85}
             />
           </div>
 
@@ -37,7 +37,7 @@ export default function HomePage() {
               sizes="100vw"
               className="object-cover object-center"
               priority
-              quality={100}
+              quality={85}
             />
           </div>
         </Link>
