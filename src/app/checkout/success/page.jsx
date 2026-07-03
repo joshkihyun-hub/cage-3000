@@ -24,10 +24,13 @@ function SuccessBody() {
   const orderParam = params.get('order'); // inline flow
   const paymentId = params.get('paymentId'); // redirect flow
   const code = params.get('code'); // redirect failure
+  const soft = params.get('soft'); // inline flow, PG still finalizing (webhook settles)
 
   // 'confirming' (verifying redirect payment) | 'done' (confirmed) |
   // 'received' (confirm didn't confirm, webhook will settle — soft success)
-  const [phase, setPhase] = useState(code ? 'redirecting' : paymentId ? 'confirming' : 'done');
+  const [phase, setPhase] = useState(
+    code ? 'redirecting' : paymentId ? 'confirming' : soft ? 'received' : 'done'
+  );
   const orderNumber = orderParam || paymentId || '';
   const ranRef = useRef(false);
 

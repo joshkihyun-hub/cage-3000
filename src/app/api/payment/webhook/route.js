@@ -57,8 +57,10 @@ export async function POST(req) {
 
     if (type === 'Transaction.Paid') {
       const result = await settleOrderPayment({ order, paymentId });
-      // Transient errors → 500 so PortOne retries; terminal outcomes ack.
-      if (!result.ok && result.status === 'error') {
+      // Transient states → 500 so PortOne retries; terminal outcomes ack.
+      // 'processing' means the PG hadn't finalized when we looked it up —
+      // retrying is what eventually settles the order.
+      if (!result.ok && (result.status === 'error' || result.status === 'processing')) {
         return NextResponse.json({ message: 'retry' }, { status: 500 });
       }
     } else if (type === 'Transaction.Cancelled') {

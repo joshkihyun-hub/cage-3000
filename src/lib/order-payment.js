@@ -28,19 +28,32 @@ function describePaymentMethod(payment) {
   return payment?.channel?.type || null;
 }
 
+// Order statuses that a Transaction.Paid may legitimately transition to `paid`.
+// `failed` is included as a recovery path: if we ever marked an order failed
+// while the PG was still processing (or a webhook raced us), a later PAID
+// verification must still settle it — the customer's money was captured.
+const SETTLEABLE_STATUSES = ['pending', 'failed'];
+
+// PortOne payment statuses that mean "not paid and never will be".
+// Everything else non-PAID (READY, PENDING, VIRTUAL_ACCOUNT_ISSUED, ...)
+// is still in flight and must NOT flip the order to failed.
+const TERMINAL_FAILURE_STATUSES = ['FAILED', 'CANCELLED', 'PARTIAL_CANCELLED'];
+
 /**
  * Verifies a PortOne payment and atomically settles the order to `paid`.
  * Idempotent — concurrent callers (client + webhook, double-clicks) are safe.
  *
  * @param {{ order: { id: string, status: string, totalAmount: number }, paymentId: string }} args
- * @returns {Promise<{ ok: boolean, status: 'success'|'failed'|'mismatch'|'conflict'|'error', code?: string, alreadyPaid?: boolean }>}
+ * @returns {Promise<{ ok: boolean, status: 'success'|'failed'|'mismatch'|'conflict'|'processing'|'error', code?: string, alreadyPaid?: boolean }>}
  */
 export async function settleOrderPayment({ order, paymentId }) {
   if (!order || !paymentId) return { ok: false, status: 'error', code: 'bad_input' };
 
   // Fast idempotency: already settled, or no longer settleable.
   if (order.status === 'paid') return { ok: true, status: 'success', alreadyPaid: true };
-  if (order.status !== 'pending') return { ok: false, status: 'conflict', code: order.status };
+  if (!SETTLEABLE_STATUSES.includes(order.status)) {
+    return { ok: false, status: 'conflict', code: order.status };
+  }
 
   const client = getPortOneClient();
   if (!client) {
@@ -57,8 +70,14 @@ export async function settleOrderPayment({ order, paymentId }) {
   }
   if (!payment) return { ok: false, status: 'error', code: 'not_found' };
 
-  // Not actually paid — record the terminal state so the order doesn't linger.
   if (payment.status !== 'PAID') {
+    // Still in flight at the PG (READY / PENDING / ...): leave the order as-is
+    // and report `processing` — the webhook (or a confirm retry) settles later.
+    // Flipping to failed here would strand a payment that succeeds moments after.
+    if (!TERMINAL_FAILURE_STATUSES.includes(payment.status)) {
+      return { ok: false, status: 'processing', code: payment.status };
+    }
+    // Terminally not paid — record it so the order doesn't linger as pending.
     await prisma.order.updateMany({
       where: { id: order.id, status: 'pending' },
       data: { status: 'failed' },
@@ -82,17 +101,17 @@ export async function settleOrderPayment({ order, paymentId }) {
       console.error('[settle] auto-cancel failed', { paymentId, message: cancelErr?.message });
     }
     await prisma.order.updateMany({
-      where: { id: order.id, status: 'pending' },
+      where: { id: order.id, status: { in: SETTLEABLE_STATUSES } },
       data: { status: 'failed' },
     });
     return { ok: false, status: 'mismatch' };
   }
 
-  // Atomic pending -> paid. The conditional `where` means only the first
+  // Atomic pending/failed -> paid. The conditional `where` means only the first
   // concurrent caller flips it (count === 1); any other sees count === 0 and
   // skips the email, so confirmations never double-send.
   const result = await prisma.order.updateMany({
-    where: { id: order.id, status: 'pending' },
+    where: { id: order.id, status: { in: SETTLEABLE_STATUSES } },
     data: {
       status: 'paid',
       paidAt: new Date(),

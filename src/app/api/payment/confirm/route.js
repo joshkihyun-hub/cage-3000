@@ -83,6 +83,13 @@ export async function POST(request) {
 
   // Map settlement failures to client responses.
   switch (result.status) {
+    case 'processing':
+      // PG still finalizing (e.g. easy-pay approval lag). Not an error: the
+      // webhook settles it server-side; the client shows a soft "접수됨" state.
+      return NextResponse.json(
+        { status: 'processing', message: '결제 확인이 진행 중입니다. 확인이 완료되면 메일로 안내드립니다.' },
+        { status: 202 }
+      );
     case 'failed':
       return NextResponse.json(
         { status: 'failed', message: `결제가 완료되지 않았습니다. (${result.code})` },

@@ -171,6 +171,11 @@ const CheckoutClientPage = () => {
       if (verifyRes.ok && verifyData.status === 'success') {
         clearCart();
         window.location.href = `/checkout/success?order=${encodeURIComponent(orderNumber)}`;
+      } else if (verifyData.status === 'processing') {
+        // PG가 아직 승인을 마무리 중 — 웹훅이 서버에서 정산하므로 실패가 아니다.
+        // 소프트 접수 화면으로 보낸다.
+        clearCart();
+        window.location.href = `/checkout/success?order=${encodeURIComponent(orderNumber)}&soft=1`;
       } else {
         setError(verifyData.message || '결제 검증에 실패했습니다.');
       }
