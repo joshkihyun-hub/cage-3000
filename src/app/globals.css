@@ -145,14 +145,14 @@
 }
 
 /* ————————————————————————————————————————————————————————————
-   Custom cursor — 브랜드 톤에 맞춘 절제된 점/링.
-   기본: 작은 검정 점(흰 테두리로 어두운 배경에서도 보임).
+   Custom cursor — 브랜드 톤에 맞춘 가는 십자(+)/링.
+   기본: 가는 십자선(흰 언더레이로 어두운 배경에서도 보임).
    링크·버튼 위: 가는 링 + 중심점. 터치 기기·트랙패드 없는 환경은 제외.
    SVG data-URI라 네트워크 요청·JS 비용이 전혀 없다.
    ———————————————————————————————————————————————————————————— */
 @media (hover: hover) and (pointer: fine) {
   body {
-    cursor: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22%3E%3Ccircle cx=%226%22 cy=%226%22 r=%224%22 fill=%22%23000%22 stroke=%22%23fff%22 stroke-width=%221.25%22/%3E%3C/svg%3E') 6 6, auto;
+    cursor: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2222%22 height=%2222%22%3E%3Cpath d=%22M11 2v18M2 11h18%22 stroke=%22%23fff%22 stroke-width=%223%22/%3E%3Cpath d=%22M11 2v18M2 11h18%22 stroke=%22%23000%22 stroke-width=%221.2%22/%3E%3C/svg%3E') 11 11, auto;
   }
 
   a,
