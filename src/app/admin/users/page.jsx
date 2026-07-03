@@ -175,6 +175,8 @@ export default function AdminUsersPage() {
               <a href="/admin/orders" className="text-[11px] uppercase tracking-[0.2em] px-5 py-3 border border-zinc-200 hover:border-black hover:bg-black hover:text-white transition-colors">
                 Orders
               </a>
+              {/* API 파일 다운로드는 <Link>가 아닌 일반 앵커가 맞다. */}
+              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
               <a
                 href="/api/admin/users/export"
                 className="text-[11px] uppercase tracking-[0.2em] px-5 py-3 border border-zinc-200 hover:border-black hover:bg-black hover:text-white transition-colors"

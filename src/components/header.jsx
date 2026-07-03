@@ -20,6 +20,11 @@ import { motion } from 'framer-motion';
 const DURATION = 0.25;
 const STAGGER = 0.025;
 
+// 글자별 "불규칙한" 추가 지연 — Math.random()은 렌더 순수성을 깨고
+// (react-hooks/purity) 위·아래 레이어의 지연이 어긋나므로, 인덱스에서
+// 유도한 결정적 지터를 쓴다. 보기엔 랜덤이고 두 레이어는 정확히 동기화된다.
+const jitter = (i) => (((i + 1) * 9301 + 49297) % 233280) / 233280 * 0.1;
+
 const RandomHoverLink = ({ href, text, className }) => {
   return (
     <Link
@@ -37,7 +42,7 @@ const RandomHoverLink = ({ href, text, className }) => {
             transition={{
               duration: DURATION,
               ease: "easeInOut",
-              delay: STAGGER * i + Math.random() * 0.1, // Randomized delay for "unpredictable" feel
+              delay: STAGGER * i + jitter(i),
             }}
             className="inline-block"
           >
@@ -56,7 +61,7 @@ const RandomHoverLink = ({ href, text, className }) => {
             transition={{
               duration: DURATION,
               ease: "easeInOut",
-              delay: STAGGER * i + Math.random() * 0.1, // Same random delay seed if possible, or just random enough
+              delay: STAGGER * i + jitter(i),
             }}
             className="inline-block"
           >

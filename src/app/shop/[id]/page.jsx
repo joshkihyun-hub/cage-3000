@@ -73,6 +73,7 @@ function DesktopCarousel({ item }) {
         <>
           <button
             onClick={() => paginate(-1)}
+            aria-label="이전 이미지"
             className="absolute left-8 top-1/2 -translate-y-1/2 group/nav focus:outline-none z-10"
           >
             <div className="p-4 rounded-full bg-black/5 hover:bg-black/10 backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100 flex items-center justify-center">
@@ -81,6 +82,7 @@ function DesktopCarousel({ item }) {
           </button>
           <button
             onClick={() => paginate(1)}
+            aria-label="다음 이미지"
             className="absolute right-8 top-1/2 -translate-y-1/2 group/nav focus:outline-none z-10"
           >
             <div className="p-4 rounded-full bg-black/5 hover:bg-black/10 backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100 flex items-center justify-center">
@@ -93,6 +95,8 @@ function DesktopCarousel({ item }) {
             {images.map((_, idx) => (
               <button
                 key={idx}
+                aria-label={`이미지 ${idx + 1} 보기`}
+                aria-current={idx === currentIndex}
                 onClick={() => {
                   setDirection(idx > currentIndex ? 1 : -1);
                   setCurrentIndex(idx);

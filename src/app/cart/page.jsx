@@ -7,12 +7,16 @@ import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/page-container';
 
 export default function CartPage() {
-  const { cart, removeFromCart } = useCart();
+  const { cart, removeFromCart, updateQuantity } = useCart();
   const router = useRouter();
 
   const getTotalPrice = () => {
     const total = cart.reduce((acc, item) => {
-      const price = item.priceNum || parseFloat(item.price.replace(/[^0-9.]/g, '')) || 0;
+      // 오래된 localStorage 카트에 price 필드가 없어도 크래시하지 않게 방어.
+      const price =
+        item.priceNum ||
+        (item.price ? parseFloat(String(item.price).replace(/[^0-9.]/g, '')) : 0) ||
+        0;
       return acc + item.quantity * price;
     }, 0);
     return new Intl.NumberFormat('ko-KR').format(total);
@@ -58,9 +62,23 @@ export default function CartPage() {
                               ? item.price
                               : 'Order Made'}
                           </p>
-                          <p className="text-sm text-zinc-500 mt-1">
-                            Quantity {item.quantity}
-                          </p>
+                          <div className="mt-2 flex items-center gap-4 text-sm text-zinc-700">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              aria-label="수량 줄이기"
+                              className="w-6 text-center hover:underline"
+                            >
+                              −
+                            </button>
+                            <span aria-live="polite">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, Math.min(99, item.quantity + 1))}
+                              aria-label="수량 늘리기"
+                              className="w-6 text-center hover:underline"
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                         <button
                           onClick={() => removeFromCart(item.id)}
