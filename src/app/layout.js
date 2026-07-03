@@ -5,6 +5,7 @@ import { Bodoni_Moda } from 'next/font/google';
 import AuthProvider from './auth-provider';
 import Header from '../components/header';
 import UISound from '../components/ui-sound';
+import UICursor from '../components/ui-cursor';
 import { CartProvider } from '../shared/context/cart-context';
 
 // 본문용 폰트 설정
@@ -121,6 +122,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${bodoni.variable} font-sans bg-background text-foreground min-h-screen flex flex-col antialiased selection:bg-primary/10 selection:text-primary`}>
         <UISound />
+        <UICursor />
         <AuthProvider>
           <CartProvider>
             <Header />

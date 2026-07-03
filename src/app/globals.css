@@ -145,41 +145,100 @@
 }
 
 /* ————————————————————————————————————————————————————————————
-   Custom cursor — 브랜드 톤에 맞춘 가는 십자(+)/링.
-   기본: 가는 십자선(흰 언더레이로 어두운 배경에서도 보임).
-   링크·버튼 위: 가는 링 + 중심점. 터치 기기·트랙패드 없는 환경은 제외.
-   SVG data-URI라 네트워크 요청·JS 비용이 전혀 없다.
+   Custom cursor — 가는 십자(+)가 링크·버튼 위에서 45° 회전해 ×로.
+   DOM 커서(components/ui-cursor.jsx)가 마운트되면 <html>에
+   .has-custom-cursor가 붙고 그때만 네이티브 커서를 숨긴다 —
+   JS 실패 시 클래스가 없으므로 기본 커서가 그대로 남는다.
    ———————————————————————————————————————————————————————————— */
 @media (hover: hover) and (pointer: fine) {
-  body {
-    cursor: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2222%22 height=%2222%22%3E%3Cpath d=%22M11 2v18M2 11h18%22 stroke=%22%23fff%22 stroke-width=%223%22/%3E%3Cpath d=%22M11 2v18M2 11h18%22 stroke=%22%23000%22 stroke-width=%221.2%22/%3E%3C/svg%3E') 11 11, auto;
+  .has-custom-cursor body,
+  .has-custom-cursor a,
+  .has-custom-cursor button,
+  .has-custom-cursor [role='button'],
+  .has-custom-cursor summary,
+  .has-custom-cursor label,
+  .has-custom-cursor select,
+  .has-custom-cursor input[type='checkbox'],
+  .has-custom-cursor input[type='radio'] {
+    cursor: none;
   }
 
-  a,
-  button,
-  [role='button'],
-  summary,
-  label {
-    cursor: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2228%22 height=%2228%22%3E%3Ccircle cx=%2214%22 cy=%2214%22 r=%2210%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%223.5%22/%3E%3Ccircle cx=%2214%22 cy=%2214%22 r=%2210%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.5%22/%3E%3Ccircle cx=%2214%22 cy=%2214%22 r=%222.25%22 fill=%22%23000%22/%3E%3C/svg%3E') 14 14, pointer;
-  }
-
-  /* 텍스트 입력은 표준 I-beam을 유지해야 입력 위치가 읽힌다. */
-  input,
-  textarea {
+  /* 텍스트 입력은 표준 I-beam 유지 — 십자 쪽이 스스로 숨는다. */
+  .has-custom-cursor input:not([type='checkbox']):not([type='radio']),
+  .has-custom-cursor textarea {
     cursor: text;
   }
+}
 
-  /* 체크박스·셀렉트는 클릭 대상이므로 링으로. */
-  input[type='checkbox'],
-  input[type='radio'],
-  select {
-    cursor: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2228%22 height=%2228%22%3E%3Ccircle cx=%2214%22 cy=%2214%22 r=%2210%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%223.5%22/%3E%3Ccircle cx=%2214%22 cy=%2214%22 r=%2210%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.5%22/%3E%3Ccircle cx=%2214%22 cy=%2214%22 r=%222.25%22 fill=%22%23000%22/%3E%3C/svg%3E') 14 14, pointer;
-  }
+#ui-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
 
-  button:disabled,
-  [aria-disabled='true'] {
-    cursor: not-allowed;
-  }
+#ui-cursor.cursor-visible {
+  opacity: 1;
+}
+
+#ui-cursor.cursor-hidden {
+  opacity: 0;
+}
+
+#ui-cursor .cross {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  translate: -50% -50%;
+  rotate: 0deg;
+  scale: 1;
+  /* 헤더 등과 같은 사이트 공용 이징 — 십자 → × 변형이 여기서 일어난다. */
+  transition:
+    rotate 0.3s cubic-bezier(0.32, 0.725, 0.25, 1),
+    scale 0.3s cubic-bezier(0.32, 0.725, 0.25, 1);
+  /* 흰 배경 위에선 검정, 검은 버튼·어두운 사진 위에선 흰색으로 자동 반전. */
+  mix-blend-mode: difference;
+}
+
+#ui-cursor .cross::before,
+#ui-cursor .cross::after {
+  content: '';
+  position: absolute;
+  background: #fff;
+}
+
+#ui-cursor .cross::before {
+  left: 50%;
+  top: 0;
+  width: 1.2px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+#ui-cursor .cross::after {
+  top: 50%;
+  left: 0;
+  height: 1.2px;
+  width: 100%;
+  transform: translateY(-50%);
+}
+
+/* 링크·버튼 위: + 가 ×로 회전하며 살짝 커진다. */
+#ui-cursor.cursor-link .cross {
+  rotate: 45deg;
+  scale: 1.35;
+}
+
+/* 누르는 동안: 살짝 수축 — 물리적인 눌림 감. */
+#ui-cursor.cursor-down .cross {
+  scale: 0.8;
+}
+
+#ui-cursor.cursor-link.cursor-down .cross {
+  scale: 1.1;
 }
 
 /* ————— 마감 폴리시 ————— */
