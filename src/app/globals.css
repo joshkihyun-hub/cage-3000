@@ -144,67 +144,61 @@
   }
 }
 
-.btn-bevel {
-  border-style: solid;
-  border-width: 2px;
-  border-color: #f0f0f0 #808080 #808080 #f0f0f0;
-  background-color: #d1d1d1;
-}
-
-.btn-bevel:active {
-  border-color: #808080 #f0f0f0 #f0f0f0 #808080;
-}
-
-/* 네비게이션 메뉴의 '터지는 듯한' 호버 효과를 위한 Keyframe 애니메이션 */
-@keyframes burst {
-  0% {
-    text-shadow: none;
+/* ————————————————————————————————————————————————————————————
+   Custom cursor — 브랜드 톤에 맞춘 절제된 점/링.
+   기본: 작은 검정 점(흰 테두리로 어두운 배경에서도 보임).
+   링크·버튼 위: 가는 링 + 중심점. 터치 기기·트랙패드 없는 환경은 제외.
+   SVG data-URI라 네트워크 요청·JS 비용이 전혀 없다.
+   ———————————————————————————————————————————————————————————— */
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22%3E%3Ccircle cx=%226%22 cy=%226%22 r=%224%22 fill=%22%23000%22 stroke=%22%23fff%22 stroke-width=%221.25%22/%3E%3C/svg%3E') 6 6, auto;
   }
 
-  50% {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 25px rgba(59, 130, 246, 0.8);
+  a,
+  button,
+  [role='button'],
+  summary,
+  label {
+    cursor: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2228%22 height=%2228%22%3E%3Ccircle cx=%2214%22 cy=%2214%22 r=%2210%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%223.5%22/%3E%3Ccircle cx=%2214%22 cy=%2214%22 r=%2210%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.5%22/%3E%3Ccircle cx=%2214%22 cy=%2214%22 r=%222.25%22 fill=%22%23000%22/%3E%3C/svg%3E') 14 14, pointer;
   }
 
-  100% {
-    text-shadow: none;
-  }
-}
-
-/* 호버 시 burst 애니메이션을 적용하는 커스텀 클래스 */
-.nav-link-hover:hover {
-  animation: burst 0.4s ease-out;
-}
-
-/* 숫자에서 CAGE로 바뀔 때의 플립 애니메이션 */
-@keyframes flip {
-  from {
-    transform: rotateX(0deg);
+  /* 텍스트 입력은 표준 I-beam을 유지해야 입력 위치가 읽힌다. */
+  input,
+  textarea {
+    cursor: text;
   }
 
-  to {
-    transform: rotateX(360deg);
+  /* 체크박스·셀렉트는 클릭 대상이므로 링으로. */
+  input[type='checkbox'],
+  input[type='radio'],
+  select {
+    cursor: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2228%22 height=%2228%22%3E%3Ccircle cx=%2214%22 cy=%2214%22 r=%2210%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%223.5%22/%3E%3Ccircle cx=%2214%22 cy=%2214%22 r=%2210%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.5%22/%3E%3Ccircle cx=%2214%22 cy=%2214%22 r=%222.25%22 fill=%22%23000%22/%3E%3C/svg%3E') 14 14, pointer;
+  }
+
+  button:disabled,
+  [aria-disabled='true'] {
+    cursor: not-allowed;
   }
 }
 
-.flipping {
-  /* 애니메이션 적용 */
-  animation: flip 0.6s cubic-bezier(0.45, 0, 0.55, 1);
-  /* 3D 효과를 위한 설정 */
-  transform-style: preserve-3d;
+/* ————— 마감 폴리시 ————— */
+
+/* 모바일 탭 시 회색 하이라이트 플래시 제거 — 사운드/트랜지션과 어긋난다. */
+html {
+  -webkit-tap-highlight-color: transparent;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 40px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+/* 키보드 사용자용 포커스 링 — 마우스 클릭에는 나타나지 않는다. */
+a:focus-visible,
+button:focus-visible,
+[role='button']:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 4px;
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+/* 제품·룩북 이미지를 드래그했을 때 반투명 고스트가 끌려다니지 않게. */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
 }
