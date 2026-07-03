@@ -199,15 +199,17 @@
   transition:
     rotate 0.3s cubic-bezier(0.32, 0.725, 0.25, 1),
     scale 0.3s cubic-bezier(0.32, 0.725, 0.25, 1);
-  /* 흰 배경 위에선 검정, 검은 버튼·어두운 사진 위에선 흰색으로 자동 반전. */
-  mix-blend-mode: difference;
 }
 
+/* 검정 선 + 얇은 흰 테두리 — 흰 배경과 검은 버튼 어디서든 보인다.
+   (mix-blend-mode 반전은 고정 래퍼의 스태킹 컨텍스트에 갇혀 페이지와
+   블렌딩되지 않는 문제가 있어 쓰지 않는다.) */
 #ui-cursor .cross::before,
 #ui-cursor .cross::after {
   content: '';
   position: absolute;
-  background: #fff;
+  background: #000;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9);
 }
 
 #ui-cursor .cross::before {
