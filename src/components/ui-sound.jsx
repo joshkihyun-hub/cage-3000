@@ -172,12 +172,38 @@ function pickPreset(el) {
 
 export default function UISound() {
   useEffect(() => {
-    // Hover sounds only make sense with a real pointer — skip touch devices,
-    // where mouseover fires on tap and would double up with the tap itself.
-    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    // 데스크톱(정밀 포인터): 호버에서 재생.
+    // 터치 기기(아이폰 등): 호버가 없으므로 탭(click) 순간에 재생.
+    const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
     let lastEl = null;
     let lastPlayed = 0;
+
+    // 터치 경로 — iOS는 touchstart/pointerdown이 아니라 탭 완료(click)
+    // 시점만 오디오 잠금 해제 제스처로 인정하므로, click 안에서
+    // 생성·재개·재생을 한 번에 처리한다. (iOS 무음 스위치가 켜져 있으면
+    // 시스템이 웹 오디오를 음소거한다 — 이는 OS 동작으로 우회하지 않는다.)
+    const onTap = (e) => {
+      const el = e.target instanceof Element ? e.target.closest(INTERACTIVE_SELECTOR) : null;
+      if (!el || el.disabled || el.getAttribute('aria-disabled') === 'true') return;
+      const preset = pickPreset(el);
+      if (!preset) return;
+      const now = performance.now();
+      if (now - lastPlayed < MIN_INTERVAL_MS) return;
+      lastPlayed = now;
+      const ac = getContext();
+      if (!ac) return;
+      if (ac.state === 'suspended') {
+        ac.resume().then(() => PRESETS[preset](ac)).catch(() => {});
+      } else {
+        PRESETS[preset](ac);
+      }
+    };
+
+    if (!isFinePointer) {
+      document.addEventListener('click', onTap, { passive: true });
+      return () => document.removeEventListener('click', onTap);
+    }
 
     // 브라우저 자동재생 정책: 오디오는 세션의 첫 클릭/키 입력이 있어야
     // 풀린다(호버는 제스처로 인정 안 됨). 잠금을 푸는 바로 그 클릭이
