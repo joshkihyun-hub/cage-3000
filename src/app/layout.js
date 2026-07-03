@@ -1,8 +1,10 @@
 import './globals.css';
+import Link from 'next/link';
 import { Analytics } from "@vercel/analytics/next"
 import { Bodoni_Moda } from 'next/font/google';
 import AuthProvider from './auth-provider';
 import Header from '../components/header';
+import UISound from '../components/ui-sound';
 import { CartProvider } from '../shared/context/cart-context';
 
 // 본문용 폰트 설정
@@ -110,7 +112,7 @@ const organizationJsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ko">
+    <html lang="ko" data-scroll-behavior="smooth">
       <head>
         <script
           type="application/ld+json"
@@ -118,6 +120,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className={`${bodoni.variable} font-sans bg-background text-foreground min-h-screen flex flex-col antialiased selection:bg-primary/10 selection:text-primary`}>
+        <UISound />
         <AuthProvider>
           <CartProvider>
             <Header />
@@ -132,6 +135,14 @@ export default function RootLayout({ children }) {
                   <div className="flex flex-col gap-2">
                     <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-800 font-medium">CAGE3000</p>
                     <p className="text-[10px] text-zinc-400 tracking-wide">케이에이치엔(KHN)</p>
+                    <a
+                      href="https://instagram.com/cage3k"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 text-[10px] uppercase tracking-[0.2em] text-zinc-400 hover:text-black transition-colors"
+                    >
+                      Instagram ↗
+                    </a>
                   </div>
 
                   {/* Business Details */}
@@ -145,10 +156,10 @@ export default function RootLayout({ children }) {
 
                   {/* Policy Links */}
                   <div className="flex flex-col gap-2 text-[10px] text-zinc-400">
-                    <a href="/order-lookup" className="hover:text-black transition-colors tracking-wide">주문조회</a>
-                    <a href="/terms" className="hover:text-black transition-colors tracking-wide">이용약관</a>
-                    <a href="/privacy" className="hover:text-black transition-colors tracking-wide">개인정보처리방침</a>
-                    <a href="/refund" className="hover:text-black transition-colors tracking-wide">환불 및 취소 정책</a>
+                    <Link href="/order-lookup" className="hover:text-black transition-colors tracking-wide">주문조회</Link>
+                    <Link href="/terms" className="hover:text-black transition-colors tracking-wide">이용약관</Link>
+                    <Link href="/privacy" className="hover:text-black transition-colors tracking-wide">개인정보처리방침</Link>
+                    <Link href="/refund" className="hover:text-black transition-colors tracking-wide">환불 및 취소 정책</Link>
                   </div>
                 </div>
 

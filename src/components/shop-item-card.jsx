@@ -4,7 +4,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useRef } from 'react';
 
-export const ShopItemCard = ({ item }) => {
+// `priority` should only be true for above-the-fold cards (e.g. the first grid
+// row on /shop). Marking every card priority forces the browser to preload all
+// nine primary images at once, starving the actual LCP image.
+export const ShopItemCard = ({ item, priority = false }) => {
     // Default to displaying the first image (index 0)
     const [currentIndex, setCurrentIndex] = useState(0);
     const containerRef = useRef(null);
@@ -63,9 +66,9 @@ export const ShopItemCard = ({ item }) => {
                         src={imagesToRender[0]}
                         alt={`${item.name} - view 1`}
                         fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        sizes="(max-width: 768px) 50vw, 33vw"
                         className="object-cover object-center"
-                        priority={true}
+                        priority={priority}
                     />
                 </div>
 
@@ -80,7 +83,7 @@ export const ShopItemCard = ({ item }) => {
                             src={imgSrc}
                             alt={`${item.name} - view ${idx + 2}`}
                             fill
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            sizes="(max-width: 768px) 50vw, 33vw"
                             className="object-cover object-center"
                             priority={false}
                         />

@@ -12,9 +12,15 @@ const nextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
+    // Next 16 only serves qualities that are explicitly allowed; the hero and
+    // product shots request 85, everything else defaults to 75.
+    qualities: [75, 85],
   },
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    // 결제·웹훅 오류 로그(console.error/warn)는 프로덕션에서도 남겨야
+    // 장애를 추적할 수 있다 — log/debug만 제거한다.
+    removeConsole:
+      process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
   poweredByHeader: false,
 };

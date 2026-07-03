@@ -145,6 +145,8 @@ export default function Header() {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-zinc-900 p-2 hover:bg-zinc-100 rounded-full transition-colors"
+              aria-label={isMobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
+              aria-expanded={isMobileMenuOpen}
             >
               {isMobileMenuOpen ? <IconClose className="w-6 h-6" /> : <IconMenu className="w-6 h-6" />}
             </button>
@@ -193,6 +195,7 @@ export default function Header() {
                 src="/logo_new.png"
                 alt="CAGE3000"
                 fill
+                sizes="96px"
                 className="object-contain"
                 priority
               />

@@ -59,3 +59,6 @@ next-env.d.ts
 # Next.js auto-discovers favicon from src/app/icon.png — never commit
 # a separate favicon.ico (the legacy Vercel default kept regenerating).
 src/app/favicon.ico
+
+# Claude Code local settings
+.claude/settings.local.json

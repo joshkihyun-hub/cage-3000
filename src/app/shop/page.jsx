@@ -51,8 +51,9 @@ function ShopContent() {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-16">
-      {items.map((item) => (
-        <ShopItemCard key={item.id} item={item} />
+      {items.map((item, index) => (
+        // Only the first grid row is above the fold — preload just those.
+        <ShopItemCard key={item.id} item={item} priority={index < 3} />
       ))}
     </div>
   );

@@ -68,9 +68,9 @@ export default function LookbookPage() {
     const [lightboxImage, setLightboxImage] = useState(null);
 
     return (
-        <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-40">
+        <div className="relative bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-40">
             {/* Image stack — full vertical scroll-driven gallery. */}
-            <div className="px-4 md:px-8 space-y-24 md:space-y-32">
+            <div className="relative px-4 md:px-8 space-y-24 md:space-y-32">
                 {galleryImages.map((img, idx) => (
                     <GalleryCard
                         key={idx}

@@ -1,13 +1,31 @@
 "use client";
 
-import Image from 'next/image';
+import { getImageProps } from 'next/image';
 import Link from 'next/link';
 import { items } from '@/shared/constants/shop-items';
 
 import { ShopItemCard } from '@/components/shop-item-card';
 
-
-// ... imports remain same ...
+// Hero art direction: one <picture> with a desktop <source> instead of two
+// CSS-hidden priority <Image>s — the old approach preloaded BOTH hero images
+// on every device, so mobile paid for the desktop shot too.
+const heroCommon = { alt: '', sizes: '100vw', quality: 85, priority: true };
+const {
+  props: { srcSet: heroDesktopSrcSet },
+} = getImageProps({
+  ...heroCommon,
+  width: 2400,
+  height: 1600,
+  src: '/asset/details/lookbook/9hat/A3.jpeg',
+});
+const {
+  props: { srcSet: heroMobileSrcSet, ...heroImgProps },
+} = getImageProps({
+  ...heroCommon,
+  width: 1600,
+  height: 2400,
+  src: '/asset/details/shop/9hat/hat6/shop_hat6_lookbook1.jpg',
+});
 
 export default function HomePage() {
   return (
@@ -15,31 +33,16 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative h-[100dvh] w-full overflow-hidden">
         <Link href="/lookbook" className="block w-full h-full">
-          {/* Desktop Image */}
-          <div className="hidden md:block absolute inset-0">
-            <Image
-              src="/asset/details/lookbook/9hat/A3.jpeg"
-              alt="CAGE3000 Hero Desktop"
-              fill
-              sizes="100vw"
-              className="object-cover object-center"
-              priority
-              quality={85}
+          <picture>
+            <source media="(min-width: 768px)" srcSet={heroDesktopSrcSet} />
+            <img
+              {...heroImgProps}
+              srcSet={heroMobileSrcSet}
+              alt="CAGE3000 — sculpted headwear"
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover object-center"
             />
-          </div>
-
-          {/* Mobile Image */}
-          <div className="md:hidden absolute inset-0">
-            <Image
-              src="/asset/details/shop/9hat/hat6/shop_hat6_lookbook1.jpg"
-              alt="CAGE3000 Hero Mobile"
-              fill
-              sizes="100vw"
-              className="object-cover object-center"
-              priority
-              quality={85}
-            />
-          </div>
+          </picture>
         </Link>
       </section>
 
