@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getProviders, signIn } from 'next-auth/react';
 import Link from 'next/link';
 import DaumPostcode from 'react-daum-postcode';
 import { Eye, EyeOff } from 'lucide-react';
@@ -43,6 +44,12 @@ export default function SignUp() {
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
   const [serverError, setServerError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [hasGoogle, setHasGoogle] = useState(false);
+
+  // Google 버튼은 서버에 프로바이더가 실제로 설정된 경우에만 노출.
+  useEffect(() => {
+    getProviders().then((p) => setHasGoogle(Boolean(p?.google))).catch(() => {});
+  }, []);
 
   const allAgreed = termsAgreed && privacyAgreed && marketingConsent;
 
@@ -152,6 +159,29 @@ export default function SignUp() {
             </Link>
           </p>
         </Block>
+
+        {hasGoogle && (
+          <Block className="mt-3">
+            <button
+              type="button"
+              onClick={() => signIn('google', { callbackUrl: '/' })}
+              className="text-sm md:text-base hover:underline"
+            >
+              Continue with Google →
+            </button>
+            <p className="mt-2 text-xs text-zinc-500 leading-relaxed">
+              구글로 가입 시{' '}
+              <Link href="/terms" target="_blank" className="underline hover:text-black">
+                이용약관
+              </Link>
+              {' '}및{' '}
+              <Link href="/privacy" target="_blank" className="underline hover:text-black">
+                개인정보처리방침
+              </Link>
+              에 동의한 것으로 간주됩니다.
+            </p>
+          </Block>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-3 space-y-3" noValidate>
           {serverError && (

@@ -1,28 +1,49 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { signIn, useSession } from 'next-auth/react';
+import { getProviders, signIn, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+
+// NextAuth가 ?error=로 돌려보내는 코드 → 사용자 메시지.
+const URL_ERROR_MESSAGES = {
+  SUSPENDED: '정지된 계정입니다. 관리자에게 문의해 주세요.',
+  WITHDRAWN: '탈퇴 처리된 계정입니다.',
+  OAuthAccountNotLinked:
+    '이미 다른 방법으로 가입된 이메일입니다. 이메일·비밀번호로 로그인해 주세요.',
+  AccessDenied: '로그인이 거부되었습니다.',
+  Default: '로그인 중 오류가 발생했습니다. 다시 시도해 주세요.',
+};
 
 function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
   const registered = searchParams.get('registered') === '1';
+  const urlError = searchParams.get('error');
   const fromCheckout = callbackUrl === '/checkout';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [hasGoogle, setHasGoogle] = useState(false);
   const { update } = useSession();
+
+  // Google 버튼은 서버에 프로바이더가 실제로 설정된 경우에만 노출.
+  useEffect(() => {
+    getProviders().then((p) => setHasGoogle(Boolean(p?.google))).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (registered) {
       setError('');
+      return;
     }
-  }, [registered]);
+    if (urlError) {
+      setError(URL_ERROR_MESSAGES[urlError] || URL_ERROR_MESSAGES.Default);
+    }
+  }, [registered, urlError]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -131,6 +152,18 @@ function SignInForm() {
               {submitting ? '로그인 중…' : 'Submit →'}
             </button>
           </Block>
+
+          {hasGoogle && (
+            <Block>
+              <button
+                type="button"
+                onClick={() => signIn('google', { callbackUrl })}
+                className="text-sm md:text-base hover:underline"
+              >
+                Continue with Google →
+              </button>
+            </Block>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Block>
