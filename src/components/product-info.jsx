@@ -2,13 +2,35 @@
 
 import { useCart } from '@/shared/context/cart-context';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+
+// 상품 정보 패널 — 로그인/회원가입 페이지와 같은 Block 디자인 언어
+// (border-t + border-l 검정 라인, 텍스트 버튼 "… →")로 통일.
+function Block({ children, className = '' }) {
+    return (
+        <section className={`border-t border-l border-zinc-900 pt-2 pl-3 pb-4 ${className}`}>
+            {children}
+        </section>
+    );
+}
 
 export const ProductInfo = ({ item }) => {
     const { addToCart, clearCart } = useCart();
     const router = useRouter();
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+    const [added, setAdded] = useState(false);
+    const addedTimer = useRef(null);
+
+    useEffect(() => () => clearTimeout(addedTimer.current), []);
+
+    const handleAddToBag = () => {
+        addToCart(item);
+        // 담김 피드백 — 버튼 라벨이 잠시 "Added ✓"로 바뀐다.
+        setAdded(true);
+        clearTimeout(addedTimer.current);
+        addedTimer.current = setTimeout(() => setAdded(false), 1600);
+    };
 
     const handleBuyNow = () => {
         clearCart();
@@ -16,78 +38,74 @@ export const ProductInfo = ({ item }) => {
         router.push('/checkout');
     };
 
+    const priceText = item.name === '03' || item.name === '07' ? item.price : 'Order Made';
+
     return (
-        <div className="w-full md:max-w-md bg-transparent text-zinc-900 p-6 md:p-0">
-            <div className="flex flex-col mb-6">
-                <h1 className="text-2xl md:text-3xl tracking-normal text-black font-light leading-tight">
-                    {item.name}
-                </h1>
-                <p className="text-sm font-light tracking-widest text-zinc-500 mt-2">
-                    {item.name === '03' || item.name === '07' ? item.price : 'ORDER MADE'}
-                </p>
-            </div>
+        <div className="w-full md:max-w-md text-zinc-900 p-6 md:p-0">
+            <div className="space-y-3">
+                <Block>
+                    <h1 className="text-lg md:text-xl">{item.name}</h1>
+                    <p className="text-sm text-zinc-500 mt-1">{priceText}</p>
+                </Block>
 
-            {/* Made-to-order lead time — surfaced above the fold so buyers
-                see the production window before opening the description. */}
-            <div className="border-t border-zinc-200 py-4">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-medium mb-1.5">
-                    Made to Order
-                </p>
-                <p className="text-xs text-zinc-700 leading-relaxed">
-                    결제 후 영업일 기준 4–6일 내에 제작이 완료되며 순차 배송됩니다.
-                </p>
-            </div>
+                {/* Made-to-order lead time — 설명을 열기 전에 제작 기간부터 보이게. */}
+                <Block>
+                    <p className="text-sm mb-2">Made to Order</p>
+                    <p className="text-sm text-zinc-700 leading-relaxed">
+                        결제 후 영업일 기준 4–6일 내에 제작이 완료되며 순차 배송됩니다.
+                    </p>
+                </Block>
 
-            {/* Accordion */}
-            <div className="border-t border-zinc-200">
-                <button
-                    onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
-                    className="w-full py-4 flex justify-between items-center text-[10px] uppercase tracking-[0.2em] text-zinc-500 hover:text-black transition-colors font-medium"
-                >
-                    <span>Description</span>
-                    {isDescriptionOpen ? <ChevronUp size={12} className="text-zinc-400" /> : <ChevronDown size={12} className="text-zinc-400" />}
-                </button>
-
-                <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isDescriptionOpen ? 'max-h-96 opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
-                    <div className="text-xs font-light text-zinc-600 leading-relaxed space-y-3 pb-4">
-                        {item.material && (
-                            <p className="whitespace-pre-line">
+                {item.material && (
+                    <Block>
+                        <button
+                            type="button"
+                            onClick={() => setIsDescriptionOpen((o) => !o)}
+                            className="w-full flex justify-between items-center text-sm hover:underline"
+                            aria-expanded={isDescriptionOpen}
+                        >
+                            <span>Description</span>
+                            <ChevronDown
+                                size={14}
+                                className={`text-zinc-400 transition-transform duration-300 ${isDescriptionOpen ? 'rotate-180' : ''}`}
+                            />
+                        </button>
+                        <div
+                            className={`overflow-hidden transition-all duration-500 ease-in-out ${isDescriptionOpen ? 'max-h-96 opacity-100 mt-3' : 'max-h-0 opacity-0'}`}
+                        >
+                            <p className="text-sm text-zinc-700 leading-relaxed whitespace-pre-line">
                                 {item.material}
                             </p>
-                        )}
-                    </div>
-                </div>
-            </div>
+                        </div>
+                    </Block>
+                )}
 
-            {/* Size Selector */}
-            <div className="mt-4 border-t border-zinc-200 pt-6">
-                <div className="flex justify-between items-center mb-3">
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">Size</span>
-                </div>
-                <div className="flex gap-2">
+                <Block>
+                    <p className="text-sm mb-2">Size</p>
+                    <p className="text-sm text-zinc-700">One Size</p>
+                </Block>
+
+                <Block>
                     <button
-                        className="w-full py-3.5 border border-zinc-200 bg-white text-zinc-800 text-[10px] font-medium uppercase tracking-[0.2em] transition-colors"
-                        disabled
+                        type="button"
+                        data-sound="firm"
+                        onClick={handleAddToBag}
+                        className="text-sm md:text-base hover:underline"
                     >
-                        One Size
+                        {added ? 'Added to Bag ✓' : 'Add to Bag →'}
                     </button>
-                </div>
-            </div>
+                </Block>
 
-            {/* Actions */}
-            <div className="mt-8 space-y-3">
-                <button
-                    onClick={() => addToCart(item)}
-                    className="w-full bg-black text-white py-3.5 text-[10px] font-medium uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors duration-300 shadow-sm"
-                >
-                    Add to Bag
-                </button>
-                <button
-                    onClick={handleBuyNow}
-                    className="w-full border border-black text-black py-3.5 text-[10px] font-medium uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-300"
-                >
-                    Buy Now
-                </button>
+                <Block>
+                    <button
+                        type="button"
+                        data-sound="firm"
+                        onClick={handleBuyNow}
+                        className="text-sm md:text-base hover:underline"
+                    >
+                        Buy Now →
+                    </button>
+                </Block>
             </div>
         </div>
     );
