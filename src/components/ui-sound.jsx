@@ -179,9 +179,29 @@ export default function UISound() {
     let lastEl = null;
     let lastPlayed = 0;
 
-    const unlock = () => {
+    // 브라우저 자동재생 정책: 오디오는 세션의 첫 클릭/키 입력이 있어야
+    // 풀린다(호버는 제스처로 인정 안 됨). 잠금을 푸는 바로 그 클릭이
+    // 무음이면 "소리 없는 사이트"처럼 느껴지므로, 클릭된 요소의 사운드를
+    // 그 자리에서 재생해 첫 상호작용부터 소리가 살아있게 한다.
+    const unlock = (e) => {
+      const alreadyRunning = !!ctx && ctx.state === 'running';
       const ac = getContext();
-      if (ac && ac.state === 'suspended') ac.resume();
+      if (!ac || alreadyRunning) return;
+      const catchUp = () => {
+        if (ac.state !== 'running') return;
+        const el = e.target instanceof Element ? e.target.closest(INTERACTIVE_SELECTOR) : null;
+        if (!el || el.disabled) return;
+        const preset = pickPreset(el);
+        if (preset) {
+          lastPlayed = performance.now();
+          PRESETS[preset](ac);
+        }
+      };
+      if (ac.state === 'suspended') {
+        ac.resume().then(catchUp).catch(() => {});
+      } else {
+        catchUp();
+      }
     };
 
     const onMouseOver = (e) => {
@@ -191,11 +211,17 @@ export default function UISound() {
       if (el.disabled || el.getAttribute('aria-disabled') === 'true') return;
       const preset = pickPreset(el);
       if (!preset) return;
+      const ac = getContext();
+      if (!ac) return;
+      // 이전 제스처로 활성화된 적이 있으면(예: 뒤로가기 복원) 재개를 시도.
+      if (ac.state === 'suspended') {
+        ac.resume().catch(() => {});
+        return;
+      }
       const now = performance.now();
       if (now - lastPlayed < MIN_INTERVAL_MS) return;
       lastPlayed = now;
-      const ac = getContext();
-      if (ac && ac.state === 'running') PRESETS[preset](ac);
+      if (ac.state === 'running') PRESETS[preset](ac);
     };
 
     const onMouseOut = (e) => {
