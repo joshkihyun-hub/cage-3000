@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { Block } from '@/components/block';
 
 // Route-segment error boundary. Catches render/runtime errors in pages so the
 // user sees a branded recovery screen instead of a white screen.
@@ -11,33 +12,38 @@ export default function Error({ error, reset }) {
   }, [error]);
 
   return (
-    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
-      <div className="container mx-auto px-4 md:px-8 max-w-screen-sm text-center">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-6">Error</p>
-        <h1 className="text-3xl md:text-4xl text-black mb-8 leading-tight">
-          문제가 발생했습니다.
-        </h1>
-        <p className="text-sm text-zinc-600 leading-relaxed mb-10">
-          일시적인 오류일 수 있습니다. 다시 시도해 주세요.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <button
-            type="button"
-            onClick={() => reset()}
-            className="bg-black text-white py-3 px-8 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors"
-          >
-            다시 시도
-          </button>
-          <Link
-            href="/"
-            className="border border-black text-black py-3 px-8 text-[11px] uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors"
-          >
-            홈으로
-          </Link>
+    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+      <div className="container mx-auto px-6 md:px-12 max-w-screen-md">
+
+        <Block>
+          <h1 className="text-base md:text-lg">문제가 발생했습니다</h1>
+          <p className="text-sm text-zinc-700 mt-2">
+            일시적인 오류일 수 있습니다. 다시 시도해 주세요.
+          </p>
+        </Block>
+
+        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Block>
+            <button
+              type="button"
+              onClick={() => reset()}
+              className="text-sm md:text-base hover:underline"
+            >
+              다시 시도 →
+            </button>
+          </Block>
+          <Block>
+            <Link href="/" className="text-sm md:text-base hover:underline">
+              홈으로 →
+            </Link>
+          </Block>
         </div>
-        <p className="mt-12 text-[10px] text-zinc-400 leading-relaxed">
-          문제가 계속되면 contact@cage3000.com 으로 문의해 주세요.
-        </p>
+
+        <Block className="mt-3">
+          <p className="text-xs text-zinc-500">
+            문제가 계속되면 contact@cage3000.com 으로 문의해 주세요.
+          </p>
+        </Block>
       </div>
     </div>
   );

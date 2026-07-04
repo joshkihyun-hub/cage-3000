@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { isValidEmail } from '@/lib/validation';
+import { Block } from '@/components/block';
+
+const inputClass =
+  'w-full border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -33,66 +37,68 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="bg-white text-zinc-900 min-h-screen flex items-center justify-center pt-20">
-      <div className="max-w-sm w-full p-8">
-        <h1 className="text-3xl text-center mb-4 text-black uppercase">
-          Forgot Password
-        </h1>
-        <p className="text-xs text-zinc-500 text-center mb-12 leading-relaxed">
-          가입하신 이메일을 입력하시면<br />재설정 링크를 보내드립니다.
-        </p>
+    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+      <div className="container mx-auto px-6 md:px-12 max-w-screen-md">
+
+        <Block>
+          <h1 className="text-base md:text-lg">Forgot Password</h1>
+          <p className="text-sm text-zinc-500 mt-1">
+            가입하신 이메일을 입력하시면 재설정 링크를 보내드립니다.
+          </p>
+        </Block>
 
         {submitted ? (
-          <div className="text-center">
-            <p className="text-sm text-zinc-700 mb-3">
-              메일을 발송했습니다.
-            </p>
-            <p className="text-xs text-zinc-400 leading-relaxed mb-10">
-              입력하신 주소로 가입된 계정이 있다면, 1시간 안에 사용 가능한 재설정 링크가 도착합니다.
-              메일이 보이지 않으면 스팸함도 확인해 주세요.
-            </p>
-            <Link
-              href="/auth/signin"
-              className="inline-block text-[10px] uppercase tracking-widest text-zinc-400 hover:text-black border-b border-transparent hover:border-black pb-0.5"
-            >
-              로그인 페이지로
-            </Link>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            {error && (
-              <p className="text-red-500 text-center mb-4 text-xs bg-red-50 border border-red-100 py-3">
-                {error}
+          <>
+            <Block className="mt-3">
+              <p className="text-sm text-zinc-700">메일을 발송했습니다.</p>
+              <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
+                입력하신 주소로 가입된 계정이 있다면, 1시간 안에 사용 가능한 재설정 링크가 도착합니다.
+                메일이 보이지 않으면 스팸함도 확인해 주세요.
               </p>
+            </Block>
+            <Block className="mt-3">
+              <Link href="/auth/signin" className="text-sm md:text-base hover:underline">
+                로그인 페이지로 →
+              </Link>
+            </Block>
+          </>
+        ) : (
+          <form onSubmit={handleSubmit} className="mt-3 space-y-3">
+            {error && (
+              <Block>
+                <p className="text-sm text-red-600">{error}</p>
+              </Block>
             )}
-            <div className="mb-12">
-              <label className="block text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2" htmlFor="email">
+
+            <Block>
+              <label className="block text-sm mb-2" htmlFor="email">
                 Email
               </label>
               <input
-                className="w-full border-b border-zinc-200 py-2 text-sm focus:outline-none focus:border-black transition-colors bg-transparent rounded-none"
+                className={inputClass}
                 id="email"
                 type="email"
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-            </div>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full bg-black text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors disabled:bg-zinc-300"
-            >
-              {submitting ? '발송 중...' : 'Send Reset Link'}
-            </button>
-            <div className="mt-8 text-center">
-              <Link
-                href="/auth/signin"
-                className="text-[10px] uppercase tracking-widest text-zinc-400 hover:text-black border-b border-transparent hover:border-black pb-0.5"
+            </Block>
+
+            <Block>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed"
               >
+                {submitting ? '발송 중…' : '재설정 링크 발송 →'}
+              </button>
+            </Block>
+
+            <Block>
+              <Link href="/auth/signin" className="text-sm hover:underline">
                 로그인으로 돌아가기
               </Link>
-            </div>
+            </Block>
           </form>
         )}
       </div>

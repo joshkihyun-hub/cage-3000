@@ -8,11 +8,15 @@ import * as PortOne from '@portone/browser-sdk/v2';
 import DaumPostcode from 'react-daum-postcode';
 import { useCart } from '../../shared/context/cart-context';
 import { formatKrPhone, isValidEmail, isValidKrPhone } from '@/lib/validation';
+import { Block } from '@/components/block';
 
 const STORE_ID = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || '';
 // 단일 KCP V2 채널로 카드 + 간편결제(KakaoPay/NaverPay/TossPay/...) 모두 처리.
 // 환경에 따라 테스트연동/실연동 채널 키를 환경변수로 주입한다.
 const CHANNEL_KCP = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KCP || '';
+
+const inputClass =
+  'w-full border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none';
 
 const CheckoutClientPage = () => {
   const router = useRouter();
@@ -195,107 +199,98 @@ const CheckoutClientPage = () => {
     );
   }
 
-  return (
-    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
-      <div className="container mx-auto px-4 md:px-8 max-w-screen-lg">
-        <h1 className="text-3xl md:text-4xl text-center mb-6 text-black uppercase">
-          Checkout
-        </h1>
+  const payDisabled = submitting || !shippingValid || cart.length === 0 || !agreedMadeToOrder;
 
-        {/* Guest banner — login is optional; users can complete checkout with an email only. */}
-        {isGuest && (
-          <p className="text-center text-[11px] text-zinc-500 mb-12">
-            이미 회원이신가요?{' '}
-            <Link
-              href="/auth/signin?callbackUrl=/checkout"
-              className="text-black underline hover:text-zinc-600"
-            >
-              로그인
-            </Link>{' '}
-            · 또는 비회원으로 계속 진행하세요.
-          </p>
-        )}
-        {isAuthed && <div className="mb-12" />}
+  return (
+    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+      <div className="container mx-auto px-6 md:px-12 max-w-screen-lg">
+
+        <Block>
+          <h1 className="text-base md:text-lg">Checkout</h1>
+          {/* Guest banner — login is optional; users can complete checkout with an email only. */}
+          {isGuest && (
+            <p className="text-sm text-zinc-700 mt-1">
+              이미 회원이신가요?{' '}
+              <Link
+                href="/auth/signin?callbackUrl=/checkout"
+                className="underline hover:text-zinc-500"
+              >
+                로그인
+              </Link>{' '}
+              · 또는 비회원으로 계속 진행하세요.
+            </p>
+          )}
+        </Block>
 
         {error && (
-          <p className="text-red-500 text-xs text-center bg-red-50 border border-red-100 py-3 mb-8">
-            {error}
-          </p>
+          <Block className="mt-3">
+            <p className="text-sm text-red-600">{error}</p>
+          </Block>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24">
+        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-x-10 items-start">
           {/* Order Summary */}
-          <div>
-            <h2 className="text-xl text-black mb-8 border-b border-zinc-200 pb-4">
-              주문 내역
-            </h2>
-            {cart.length === 0 ? (
-              <p className="text-sm text-zinc-400">장바구니가 비어 있습니다.</p>
-            ) : (
-              <>
-                <ul className="space-y-6">
-                  {cart.map((item) => (
-                    <li key={item.id} className="flex justify-between items-start">
-                      <div className="space-y-1">
-                        <p className="text-xs uppercase tracking-widest text-black font-medium">
-                          {item.name}
-                        </p>
-                        <p className="text-[10px] uppercase tracking-widest text-zinc-500">
-                          수량: {item.quantity}
-                        </p>
-                      </div>
-                      <span className="text-xs tracking-widest text-zinc-600">
-                        {formatKRW(getItemPrice(item) * item.quantity)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-8 border-t border-zinc-200 pt-6 flex justify-between items-center">
-                  <h3 className="text-xs uppercase tracking-widest text-black font-bold">
-                    합계
-                  </h3>
-                  <p className="text-xl text-black">{formatKRW(subtotal)}</p>
-                </div>
-              </>
-            )}
+          <div className="space-y-3">
+            <Block>
+              <p className="text-sm mb-3">주문 내역</p>
+              {cart.length === 0 ? (
+                <p className="text-sm text-zinc-500">장바구니가 비어 있습니다.</p>
+              ) : (
+                <>
+                  <ul className="space-y-2">
+                    {cart.map((item) => (
+                      <li key={item.id} className="flex justify-between text-sm text-zinc-700">
+                        <span>
+                          {item.name} <span className="text-zinc-400">× {item.quantity}</span>
+                        </span>
+                        <span>{formatKRW(getItemPrice(item) * item.quantity)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex justify-between text-sm md:text-base mt-4 pt-3 border-t border-zinc-200">
+                    <span>합계</span>
+                    <span>{formatKRW(subtotal)}</span>
+                  </div>
+                </>
+              )}
+            </Block>
           </div>
 
           {/* Shipping + Payment */}
-          <div className="space-y-12">
+          <div className="space-y-3">
             {/* Guest email — only when not signed in */}
             {isGuest && (
-              <div>
-                <h2 className="text-xl text-black mb-8 border-b border-zinc-200 pb-4">
-                  이메일 (영수증·주문 조회)
-                </h2>
+              <Block>
+                <label htmlFor="guest-email" className="block text-sm mb-2">
+                  Email
+                </label>
                 <input
+                  id="guest-email"
                   type="email"
                   autoComplete="email"
-                  className="w-full border-b border-zinc-200 py-2 text-sm focus:outline-none focus:border-black bg-transparent"
+                  className={inputClass}
                   placeholder="you@example.com"
                   value={guestEmail}
                   onChange={(e) => setGuestEmail(e.target.value)}
                 />
-                <p className="mt-3 text-[10px] text-zinc-400 leading-relaxed">
+                <p className="mt-2 text-xs text-zinc-500 leading-relaxed">
                   주문 확인 메일이 이 주소로 발송됩니다. 비회원 주문 조회 시에도 필요합니다.
                 </p>
-              </div>
+              </Block>
             )}
 
-            <div>
-              <h2 className="text-xl text-black mb-8 border-b border-zinc-200 pb-4">
-                배송 정보
-              </h2>
-              <div className="space-y-5">
-                <div className="grid grid-cols-2 gap-4">
+            <Block>
+              <p className="text-sm mb-3">배송 정보</p>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
                   <input
-                    className="border-b border-zinc-200 py-2 text-sm focus:outline-none focus:border-black"
+                    className={inputClass}
                     placeholder="수령인"
                     value={recipientName}
                     onChange={(e) => setRecipientName(e.target.value)}
                   />
                   <input
-                    className="border-b border-zinc-200 py-2 text-sm focus:outline-none focus:border-black"
+                    className={inputClass}
                     placeholder="휴대폰 (010-1234-5678)"
                     value={recipientPhone}
                     onChange={(e) => setRecipientPhone(formatKrPhone(e.target.value))}
@@ -303,9 +298,9 @@ const CheckoutClientPage = () => {
                     maxLength={13}
                   />
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-3 items-center">
                   <input
-                    className="w-28 border-b border-zinc-200 py-2 text-sm"
+                    className="w-28 border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none"
                     placeholder="우편번호"
                     value={zipCode}
                     readOnly
@@ -313,45 +308,43 @@ const CheckoutClientPage = () => {
                   <button
                     type="button"
                     onClick={() => setIsPostcodeOpen(true)}
-                    className="bg-black text-white px-5 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-800"
+                    className="text-sm hover:underline"
                   >
                     검색
                   </button>
                 </div>
                 <input
-                  className="w-full border-b border-zinc-200 py-2 text-sm"
+                  className={inputClass}
                   placeholder="주소"
                   value={address}
                   readOnly
                 />
                 <input
-                  className="w-full border-b border-zinc-200 py-2 text-sm focus:outline-none focus:border-black"
+                  className={inputClass}
                   placeholder="상세 주소"
                   value={detailAddress}
                   onChange={(e) => setDetailAddress(e.target.value)}
                 />
                 <textarea
-                  className="w-full border-b border-zinc-200 py-2 text-sm focus:outline-none focus:border-black resize-none"
+                  className={`${inputClass} resize-none`}
                   placeholder="배송 메모 (선택)"
                   rows={2}
                   value={customerNote}
                   onChange={(e) => setCustomerNote(e.target.value)}
                 />
               </div>
-            </div>
+            </Block>
 
-            <div>
-              <h2 className="text-xl text-black mb-8 border-b border-zinc-200 pb-4">
-                결제 수단
-              </h2>
-              <label className="flex items-start gap-3 mb-6 cursor-pointer">
+            <Block>
+              <p className="text-sm mb-3">결제 수단</p>
+              <label className="flex items-start gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={agreedMadeToOrder}
                   onChange={(e) => setAgreedMadeToOrder(e.target.checked)}
                   className="mt-0.5 h-4 w-4 shrink-0 accent-black"
                 />
-                <span className="text-[11px] text-zinc-600 leading-relaxed">
+                <span className="text-xs text-zinc-600 leading-relaxed">
                   <span className="text-black font-medium">[필수]</span> 본 상품은 주문 제작(Made-to-Order)
                   상품으로, 결제 후 제작이 시작되면 단순 변심에 의한 청약철회·환불이 제한됨을 확인했습니다.{' '}
                   <a href="/refund" className="underline hover:text-black transition-colors">
@@ -359,44 +352,51 @@ const CheckoutClientPage = () => {
                   </a>
                 </span>
               </label>
-              <div className="space-y-3">
-                <button
-                  disabled={submitting || !shippingValid || cart.length === 0 || !agreedMadeToOrder}
-                  onClick={() => handlePayment('CARD')}
-                  className="w-full bg-black text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors disabled:bg-zinc-300 disabled:cursor-not-allowed"
-                >
-                  신용카드
-                </button>
-                <button
-                  disabled={submitting || !shippingValid || cart.length === 0 || !agreedMadeToOrder}
-                  onClick={() => setIsEasyPayOpen(true)}
-                  className="w-full border border-black text-black py-4 text-xs uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  간편결제
-                </button>
-              </div>
-              <p className="mt-6 text-[10px] text-zinc-400 text-center leading-relaxed">
-                결제 진행 시{' '}
-                <a href="/terms" className="underline hover:text-black transition-colors">
-                  이용약관
-                </a>
-                {' '}및{' '}
-                <a href="/privacy" className="underline hover:text-black transition-colors">
-                  개인정보처리방침
-                </a>
-                에 동의한 것으로 간주됩니다.
-              </p>
-            </div>
+            </Block>
+
+            <Block>
+              <button
+                disabled={payDisabled}
+                data-sound="firm"
+                onClick={() => handlePayment('CARD')}
+                className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed disabled:no-underline"
+              >
+                {submitting ? '결제 진행 중…' : '신용카드로 결제 →'}
+              </button>
+            </Block>
+            <Block>
+              <button
+                disabled={payDisabled}
+                data-sound="firm"
+                onClick={() => setIsEasyPayOpen(true)}
+                className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed disabled:no-underline"
+              >
+                간편결제 →
+              </button>
+            </Block>
+
+            <p className="text-xs text-zinc-400 leading-relaxed pl-3">
+              결제 진행 시{' '}
+              <a href="/terms" className="underline hover:text-black transition-colors">
+                이용약관
+              </a>
+              {' '}및{' '}
+              <a href="/privacy" className="underline hover:text-black transition-colors">
+                개인정보처리방침
+              </a>
+              에 동의한 것으로 간주됩니다.
+            </p>
           </div>
         </div>
 
         {isPostcodeOpen && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-6">
             <div className="bg-white p-4 w-full max-w-md relative">
               <button
                 type="button"
                 onClick={() => setIsPostcodeOpen(false)}
                 className="absolute top-2 right-2 p-2 hover:bg-zinc-100 rounded-full"
+                aria-label="닫기"
               >
                 ✕
               </button>
@@ -410,46 +410,44 @@ const CheckoutClientPage = () => {
             choice before kicking off the PortOne flow. */}
         {isEasyPayOpen && (
           <div
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-6"
             onClick={() => setIsEasyPayOpen(false)}
           >
             <div
-              className="bg-white w-full max-w-sm relative p-8"
+              className="bg-white w-full max-w-sm relative p-6"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 type="button"
                 onClick={() => setIsEasyPayOpen(false)}
-                className="absolute top-3 right-3 p-2 hover:bg-zinc-100 rounded-full text-zinc-500"
+                className="absolute top-3 right-3 p-2 text-zinc-400 hover:text-black"
                 aria-label="닫기"
               >
                 ✕
               </button>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-2 text-center">
-                Easy Pay
-              </p>
-              <h3 className="text-xl text-black mb-8 text-center">
-                간편결제 선택
-              </h3>
-              <div className="space-y-3">
-                {[
-                  { label: '카카오페이', provider: 'KAKAOPAY' },
-                  { label: '네이버페이', provider: 'NAVERPAY' },
-                  { label: '토스페이', provider: 'TOSSPAY' },
-                ].map(({ label, provider }) => (
-                  <button
-                    key={provider}
-                    disabled={submitting}
-                    onClick={() => {
-                      setIsEasyPayOpen(false);
-                      handlePayment('EASY_PAY', provider);
-                    }}
-                    className="w-full border border-zinc-200 text-black py-4 text-xs uppercase tracking-[0.2em] hover:border-black transition-colors disabled:opacity-50"
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
+              <Block>
+                <p className="text-sm mb-4">간편결제 선택</p>
+                <div className="space-y-3">
+                  {[
+                    { label: '카카오페이', provider: 'KAKAOPAY' },
+                    { label: '네이버페이', provider: 'NAVERPAY' },
+                    { label: '토스페이', provider: 'TOSSPAY' },
+                  ].map(({ label, provider }) => (
+                    <button
+                      key={provider}
+                      disabled={submitting}
+                      data-sound="firm"
+                      onClick={() => {
+                        setIsEasyPayOpen(false);
+                        handlePayment('EASY_PAY', provider);
+                      }}
+                      className="block text-sm md:text-base hover:underline disabled:text-zinc-400"
+                    >
+                      {label} →
+                    </button>
+                  ))}
+                </div>
+              </Block>
             </div>
           </div>
         )}

@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/shared/context/cart-context';
+import { Block } from '@/components/block';
 
 // Reached by two distinct paths:
 //
@@ -80,11 +81,12 @@ function SuccessBody() {
 
   if (phase === 'confirming') {
     return (
-      <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-6">Verifying</p>
-          <h1 className="text-2xl md:text-3xl text-black mb-4">결제를 확인하고 있습니다…</h1>
-          <p className="text-sm text-zinc-500">잠시만 기다려 주세요.</p>
+      <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+        <div className="container mx-auto px-6 md:px-12 max-w-screen-md">
+          <Block>
+            <h1 className="text-base md:text-lg">결제를 확인하고 있습니다…</h1>
+            <p className="text-sm text-zinc-500 mt-1">잠시만 기다려 주세요.</p>
+          </Block>
         </div>
       </div>
     );
@@ -93,62 +95,61 @@ function SuccessBody() {
   const isSoft = phase === 'received';
 
   return (
-    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-20">
-      <div className="container mx-auto px-4 md:px-8 max-w-screen-sm text-center">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-6">
-          {isSoft ? 'Order Received' : 'Order Confirmed'}
-        </p>
-        <h1 className="text-3xl md:text-4xl text-black mb-8 leading-tight">
-          주문이 접수되었습니다.
-        </h1>
-        <p className="text-sm text-zinc-600 leading-relaxed mb-10">
-          {isSoft ? (
-            <>
-              결제 확인이 진행 중입니다.<br />
-              확인이 완료되면 주문 확인 메일을 보내드립니다.
-            </>
-          ) : (
-            <>
-              결제가 정상적으로 완료되었습니다.<br />
-              주문 확인 메일을 발송했으니 받은 편지함을 확인해 주세요.
-            </>
-          )}
-        </p>
+    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+      <div className="container mx-auto px-6 md:px-12 max-w-screen-md">
+
+        <Block>
+          <h1 className="text-base md:text-lg">
+            {isSoft ? 'Order Received' : 'Order Confirmed'}
+          </h1>
+          <p className="text-sm text-zinc-700 mt-2 leading-relaxed">
+            {isSoft ? (
+              <>
+                주문이 접수되었습니다. 결제 확인이 진행 중이며,
+                <br className="hidden md:block" />
+                확인이 완료되면 주문 확인 메일을 보내드립니다.
+              </>
+            ) : (
+              <>
+                결제가 정상적으로 완료되었습니다.
+                <br className="hidden md:block" />
+                주문 확인 메일을 발송했으니 받은 편지함을 확인해 주세요.
+              </>
+            )}
+          </p>
+        </Block>
 
         {orderNumber && (
-          <div className="border-y border-zinc-200 py-6 mb-10">
-            <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 mb-2">
-              Order Number
-            </p>
-            <p className="text-lg text-black tracking-wide">{orderNumber}</p>
-          </div>
+          <Block className="mt-3">
+            <p className="text-sm mb-1">Order Number</p>
+            <p className="text-sm text-zinc-700 tracking-wide">{orderNumber}</p>
+          </Block>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            href="/shop"
-            className="bg-black text-white py-3 px-8 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors"
-          >
-            계속 쇼핑하기
-          </Link>
-          <Link
-            href="/my-page"
-            className="border border-black text-black py-3 px-8 text-[11px] uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors"
-          >
-            주문 내역
-          </Link>
+        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Block>
+            <Link href="/shop" className="text-sm md:text-base hover:underline">
+              계속 쇼핑하기 →
+            </Link>
+          </Block>
+          <Block>
+            <Link href="/my-page" className="text-sm md:text-base hover:underline">
+              주문 내역 →
+            </Link>
+          </Block>
         </div>
 
-        <p className="mt-8 text-[10px] text-zinc-400">
-          비회원으로 주문하셨나요?{' '}
-          <Link href="/order-lookup" className="underline hover:text-black transition-colors">
-            주문 조회
-          </Link>
-        </p>
-
-        <p className="mt-6 text-[10px] text-zinc-400 leading-relaxed">
-          문의는 contact@cage3000.com 으로 부탁드립니다.
-        </p>
+        <Block className="mt-3">
+          <p className="text-sm text-zinc-700">
+            비회원으로 주문하셨나요?{' '}
+            <Link href="/order-lookup" className="underline hover:text-zinc-500">
+              주문 조회
+            </Link>
+          </p>
+          <p className="text-xs text-zinc-500 mt-2">
+            문의는 contact@cage3000.com 으로 부탁드립니다.
+          </p>
+        </Block>
       </div>
     </div>
   );

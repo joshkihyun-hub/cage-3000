@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { Block } from '@/components/block';
 
 function VerifyEmailInner() {
   const params = useSearchParams();
@@ -42,40 +43,41 @@ function VerifyEmailInner() {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-6">
-      <div className="max-w-md w-full text-center">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-10">CAGE3000</p>
+    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+      <div className="container mx-auto px-6 md:px-12 max-w-screen-md">
 
         {state.status === 'loading' && (
-          <>
-            <h1 className="text-2xl mb-4">이메일을 인증하는 중...</h1>
-            <p className="text-sm text-zinc-500">잠시만 기다려 주세요.</p>
-          </>
+          <Block>
+            <h1 className="text-base md:text-lg">이메일을 인증하는 중…</h1>
+            <p className="text-sm text-zinc-500 mt-1">잠시만 기다려 주세요.</p>
+          </Block>
         )}
 
         {state.status === 'success' && (
           <>
-            <h1 className="text-3xl mb-4 text-black">Verified</h1>
-            <p className="text-sm text-zinc-600 mb-12">{state.message}</p>
-            <Link
-              href="/auth/signin"
-              className="inline-block bg-black text-white px-10 py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors"
-            >
-              로그인하기
-            </Link>
+            <Block>
+              <h1 className="text-base md:text-lg">Verified</h1>
+              <p className="text-sm text-zinc-700 mt-1">{state.message}</p>
+            </Block>
+            <Block className="mt-3">
+              <Link href="/auth/signin" className="text-sm md:text-base hover:underline">
+                로그인하기 →
+              </Link>
+            </Block>
           </>
         )}
 
         {state.status === 'error' && (
           <>
-            <h1 className="text-3xl mb-4 text-black">Verification Failed</h1>
-            <p className="text-sm text-red-500 mb-12">{state.message}</p>
-            <Link
-              href="/auth/signin"
-              className="inline-block border border-zinc-200 text-zinc-700 px-10 py-4 text-xs uppercase tracking-[0.2em] hover:border-black hover:text-black transition-colors"
-            >
-              로그인 페이지로
-            </Link>
+            <Block>
+              <h1 className="text-base md:text-lg">Verification Failed</h1>
+              <p className="text-sm text-red-600 mt-1">{state.message}</p>
+            </Block>
+            <Block className="mt-3">
+              <Link href="/auth/signin" className="text-sm md:text-base hover:underline">
+                로그인 페이지로 →
+              </Link>
+            </Block>
           </>
         )}
       </div>

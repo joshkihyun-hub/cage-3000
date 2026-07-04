@@ -5,8 +5,12 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { checkPasswordStrength, PASSWORD_MIN_LENGTH } from '@/lib/validation';
+import { Block } from '@/components/block';
 
 const strengthLabels = ['', '매우 약함', '약함', '보통', '강함', '매우 강함'];
+
+const inputClass =
+  'w-full border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none';
 
 function ResetPasswordInner() {
   const params = useSearchParams();
@@ -61,126 +65,134 @@ function ResetPasswordInner() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-6">
-        <div className="max-w-md w-full text-center">
-          <h1 className="text-3xl mb-4 text-black">Invalid Link</h1>
-          <p className="text-sm text-zinc-500 mb-12">재설정 토큰이 없습니다.</p>
-          <Link
-            href="/auth/forgot-password"
-            className="inline-block bg-black text-white px-10 py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800"
-          >
-            재설정 다시 요청
+      <PageShell>
+        <Block>
+          <h1 className="text-base md:text-lg">Invalid Link</h1>
+          <p className="text-sm text-zinc-700 mt-1">재설정 토큰이 없습니다.</p>
+        </Block>
+        <Block className="mt-3">
+          <Link href="/auth/forgot-password" className="text-sm md:text-base hover:underline">
+            재설정 다시 요청 →
           </Link>
-        </div>
-      </div>
+        </Block>
+      </PageShell>
     );
   }
 
   if (success) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-6">
-        <div className="max-w-md w-full text-center">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-10">CAGE3000</p>
-          <h1 className="text-3xl mb-4 text-black">Password Updated</h1>
-          <p className="text-sm text-zinc-600 mb-12">
-            새 비밀번호로 로그인해 주세요.
-          </p>
-          <Link
-            href="/auth/signin"
-            className="inline-block bg-black text-white px-10 py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800"
-          >
-            로그인하기
+      <PageShell>
+        <Block>
+          <h1 className="text-base md:text-lg">Password Updated</h1>
+          <p className="text-sm text-zinc-700 mt-1">새 비밀번호로 로그인해 주세요.</p>
+        </Block>
+        <Block className="mt-3">
+          <Link href="/auth/signin" className="text-sm md:text-base hover:underline">
+            로그인하기 →
           </Link>
-        </div>
-      </div>
+        </Block>
+      </PageShell>
     );
   }
 
   return (
-    <div className="bg-white text-zinc-900 min-h-screen flex items-center justify-center pt-20">
-      <div className="max-w-sm w-full p-8">
-        <h1 className="text-3xl text-center mb-12 text-black uppercase">
-          Reset Password
-        </h1>
-        <form onSubmit={handleSubmit}>
-          {error && (
-            <p className="text-red-500 text-center mb-4 text-xs bg-red-50 border border-red-100 py-3">
-              {error}
-            </p>
-          )}
+    <PageShell>
+      <Block>
+        <h1 className="text-base md:text-lg">Reset Password</h1>
+      </Block>
 
-          <div className="mb-6">
-            <label className="block text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+      <form onSubmit={handleSubmit} className="mt-3 space-y-3">
+        {error && (
+          <Block>
+            <p className="text-sm text-red-600">{error}</p>
+          </Block>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Block>
+            <label className="block text-sm mb-2" htmlFor="new-password">
               New Password
             </label>
             <div className="relative">
               <input
+                id="new-password"
                 type={show ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
-                className="w-full border-b border-zinc-200 py-2 text-sm focus:outline-none focus:border-black bg-transparent rounded-none"
+                className={inputClass}
               />
               <button
                 type="button"
                 onClick={() => setShow((s) => !s)}
-                className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-zinc-400 hover:text-black"
+                className="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-zinc-500 hover:text-black"
                 aria-label="비밀번호 표시 전환"
               >
-                {show ? <EyeOff size={16} /> : <Eye size={16} />}
+                {show ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
             {password && (
               <div className="mt-3 flex items-center gap-3">
-                <div className="flex-1 h-1 bg-zinc-100 overflow-hidden">
+                <div className="flex-1 h-px bg-zinc-200 overflow-hidden">
                   <div
                     className={`h-full transition-all duration-300 ${
                       strength.score <= 1
-                        ? 'bg-red-400'
+                        ? 'bg-red-500'
                         : strength.score === 2
-                        ? 'bg-orange-400'
+                        ? 'bg-orange-500'
                         : strength.score === 3
-                        ? 'bg-yellow-400'
-                        : 'bg-green-500'
+                        ? 'bg-yellow-500'
+                        : 'bg-green-600'
                     }`}
                     style={{ width: `${(strength.score / 4) * 100}%` }}
                   />
                 </div>
-                <p className="text-[11px] text-zinc-500 w-20 text-right">
+                <p className="text-xs text-zinc-600 w-16 text-right">
                   {strengthLabels[Math.max(1, strength.score)]}
                 </p>
               </div>
             )}
-            <p className="text-[11px] text-zinc-400 mt-2">
-              최소 {PASSWORD_MIN_LENGTH}자, 영문+숫자 포함.
+            <p className="text-xs text-zinc-500 mt-2">
+              최소 {PASSWORD_MIN_LENGTH}자, 영문·숫자 포함
             </p>
-          </div>
+          </Block>
 
-          <div className="mb-12">
-            <label className="block text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
-              Confirm Password
+          <Block>
+            <label className="block text-sm mb-2" htmlFor="confirm-password">
+              Confirm
             </label>
             <input
+              id="confirm-password"
               type={show ? 'text' : 'password'}
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               autoComplete="new-password"
-              className="w-full border-b border-zinc-200 py-2 text-sm focus:outline-none focus:border-black bg-transparent rounded-none"
+              className={inputClass}
             />
             {confirm && password !== confirm && (
-              <p className="text-[11px] text-red-500 mt-2">비밀번호가 일치하지 않습니다.</p>
+              <p className="text-xs text-red-600 mt-2">비밀번호가 일치하지 않습니다.</p>
             )}
-          </div>
+          </Block>
+        </div>
 
+        <Block>
           <button
             type="submit"
             disabled={!formValid || submitting}
-            className="w-full bg-black text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors disabled:bg-zinc-300 disabled:cursor-not-allowed"
+            className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed"
           >
-            {submitting ? '재설정 중...' : 'Update Password'}
+            {submitting ? '재설정 중…' : '비밀번호 변경 →'}
           </button>
-        </form>
-      </div>
+        </Block>
+      </form>
+    </PageShell>
+  );
+}
+
+function PageShell({ children }) {
+  return (
+    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+      <div className="container mx-auto px-6 md:px-12 max-w-screen-md">{children}</div>
     </div>
   );
 }
