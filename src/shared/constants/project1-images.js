@@ -1,5 +1,39 @@
 export const PROJECT1_ITEMS = [
   {
+    id: 6,
+    title: 'PUMA × MANCHESTER CITY POV',
+    subtitle: 'COLLABORATION / 2026',
+    image: '/asset/details/puma-pov/puma-pov1.jpg',
+    image_hover: '/asset/details/puma-pov/puma-pov2.jpg',
+    subImages: [
+      '/asset/details/puma-pov/puma-pov1.jpg',
+      '/asset/details/puma-pov/puma-pov2.jpg',
+    ],
+    credits: [
+      { role: 'Design', name: '@cage3k' },
+      { role: 'Model', name: '@kidcozyboy' },
+      { role: 'Brand', name: 'PUMA × Manchester City × POV' },
+    ],
+  },
+  {
+    id: 7,
+    title: 'PURYNN WEE-WOO',
+    subtitle: 'MUSIC VIDEO / 2026',
+    image: '/asset/details/purynn/purynn1.jpg',
+    image_hover: '/asset/details/purynn/purynn2.jpg',
+    subImages: [
+      '/asset/details/purynn/purynn1.jpg',
+      '/asset/details/purynn/purynn2.jpg',
+      '/asset/details/purynn/purynn3.jpg',
+      '/asset/details/purynn/purynn4.jpg',
+    ],
+    credits: [
+      { role: 'Mask Design', name: '@choppycocky' },
+      { role: 'Artist', name: '@purynn__' },
+      { role: 'Label', name: '@lucent_label' },
+    ],
+  },
+  {
     id: 0,
     title: 'ESQUIRE KOREA JUNE ISSUE',
     subtitle: 'EDITORIAL / 2026',
