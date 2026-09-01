@@ -87,6 +87,12 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
+  verification: {
+    other: {
+      // 네이버 서치어드바이저 사이트 소유확인
+      'naver-site-verification': 'b241ac4d96d0488d3057e76ea73237fc4a6ba8a3',
+    },
+  },
 };
 
 const organizationJsonLd = {
