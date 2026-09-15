@@ -22,7 +22,7 @@ const DEADZONE = 0.12; // 중앙 ±12% 안에서는 완전히 선명 — 정착 
 // • 흐림/스케일/투명도는 스크롤 위치(중앙으로부터의 거리)로 직접 계산해 매 프레임 갱신하므로
 //   React 재랜더 없이 부드럽게 흐르고, 정지 시 항상 중앙 한 장만 또렷하다.
 // • 페이지 도트/카운터는 없다 — 흐림 자체가 "더 있다"는 예고.
-function ImageCarousel({ images }) {
+function ImageCarousel({ images, title }) {
     const containerRef = useRef(null);
     const cardRefs = useRef([]);
     const rafRef = useRef(0);
@@ -114,7 +114,7 @@ function ImageCarousel({ images }) {
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={src}
-                            alt={`detail ${idx + 1}`}
+                            alt={`${title} — ${idx + 1}`}
                             draggable={false}
                             onLoad={paint}
                             style={{ willChange: 'filter, transform' }}
@@ -165,6 +165,7 @@ export default function ProjectsPage() {
     return (
         <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-32">
             <div className="max-w-screen-2xl mx-auto px-6 md:px-12">
+                <h1 className="sr-only">CAGE3000 Projects</h1>
                 <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-12 lg:gap-20 items-start">
                     {/* === Left column: project list === */}
                     <ul className="space-y-2 md:space-y-4">
@@ -210,7 +211,7 @@ export default function ProjectsPage() {
                                                     exit={{ opacity: 0, y: -10 }}
                                                     transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                                                 >
-                                                    <ImageCarousel images={carouselImages} />
+                                                    <ImageCarousel images={carouselImages} title={activeItem.title} />
                                                 </motion.div>
                                             </AnimatePresence>
                                         </div>
@@ -231,7 +232,7 @@ export default function ProjectsPage() {
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                                 >
-                                    <ImageCarousel images={carouselImages} />
+                                    <ImageCarousel images={carouselImages} title={activeItem.title} />
                                 </motion.div>
                             )}
                         </AnimatePresence>

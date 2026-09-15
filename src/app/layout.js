@@ -7,6 +7,7 @@ import Header from '../components/header';
 import UISound from '../components/ui-sound';
 import UICursor from '../components/ui-cursor';
 import { CartProvider } from '../shared/context/cart-context';
+import { OPEN_GRAPH_BASE, SITE_NAME, SITE_URL, toJsonLd } from '@/lib/seo';
 
 // 본문용 폰트 설정
 const bodoni = Bodoni_Moda({
@@ -15,8 +16,6 @@ const bodoni = Bodoni_Moda({
   display: 'swap',
 });
 
-const SITE_URL = 'https://cage3000.com';
-const SITE_NAME = 'CAGE3000';
 const SITE_DESCRIPTION =
   'CAGE3000 — 서울 기반 모자 브랜드. 디자이너 김기현이 이끄는 made-to-order 밀리너리 컬렉션. Sculpted felt caps, asymmetric brims, avant-garde headwear in Suri Alpaca & wool.';
 
@@ -51,30 +50,23 @@ export const metadata = {
   category: 'fashion',
   alternates: {
     canonical: '/',
+    // 네이버 서치어드바이저 RSS 제출용 피드 (src/app/rss.xml/route.js)
+    types: { 'application/rss+xml': [{ url: '/rss.xml', title: SITE_NAME }] },
   },
   // Favicons are auto-discovered from src/app/icon.png + apple-icon.png
   // (Next.js App Router convention) — no need to declare them here.
+  // 공유 이미지는 src/app/opengraph-image.jsx(와 페이지별 opengraph-image)가 만든다 —
+  // 여기에 images를 넣으면 파일 기반 이미지가 무시된다.
   openGraph: {
-    type: 'website',
-    locale: 'ko_KR',
+    ...OPEN_GRAPH_BASE,
     url: SITE_URL,
-    siteName: SITE_NAME,
     title: 'CAGE3000 — Sculpted Headwear from Seoul',
     description: SITE_DESCRIPTION,
-    images: [
-      {
-        url: '/kl.png',
-        width: 800,
-        height: 600,
-        alt: 'CAGE3000',
-      },
-    ],
   },
+  // title/description/images는 각 페이지의 openGraph에서 자동으로 이어받는다 —
+  // 여기서 고정하면 모든 하위 페이지가 홈 문구로 공유된다.
   twitter: {
     card: 'summary_large_image',
-    title: 'CAGE3000 — Sculpted Headwear from Seoul',
-    description: SITE_DESCRIPTION,
-    images: ['/kl.png'],
     creator: '@cage3k',
   },
   robots: {
@@ -96,8 +88,8 @@ export const metadata = {
 };
 
 const organizationJsonLd = {
-  '@context': 'https://schema.org',
   '@type': 'Organization',
+  '@id': `${SITE_URL}/#organization`,
   name: 'CAGE3000',
   alternateName: ['케이지3000', 'KHN', '케이에이치엔'],
   url: SITE_URL,
@@ -117,13 +109,30 @@ const organizationJsonLd = {
   sameAs: ['https://instagram.com/cage3k'],
 };
 
+// WebSite의 name/alternateName은 구글 검색결과에 도메인 대신 "CAGE3000"을
+// 사이트 이름으로 띄우는 신호다.
+const websiteJsonLd = {
+  '@type': 'WebSite',
+  '@id': `${SITE_URL}/#website`,
+  name: SITE_NAME,
+  alternateName: ['케이지3000', 'CAGE 3000'],
+  url: SITE_URL,
+  inLanguage: 'ko-KR',
+  publisher: { '@id': `${SITE_URL}/#organization` },
+};
+
+const siteJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [organizationJsonLd, websiteJsonLd],
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="ko" data-scroll-behavior="smooth">
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: toJsonLd(siteJsonLd) }}
         />
       </head>
       <body className={`${bodoni.variable} font-sans bg-background text-foreground min-h-screen flex flex-col antialiased selection:bg-primary/10 selection:text-primary`}>
@@ -158,7 +167,6 @@ export default function RootLayout({ children }) {
                     <p><span className="text-zinc-600 font-medium">대표자</span> &nbsp;김기현</p>
                     <p><span className="text-zinc-600 font-medium">사업자등록번호</span> &nbsp;830-32-01740</p>
                     <p><span className="text-zinc-600 font-medium">사업장 주소</span> &nbsp;서울특별시 서대문구 연희로11사길 13 (연희동)</p>
-                    <p><span className="text-zinc-600 font-medium">전화번호</span> &nbsp;010-4890-9497</p>
                     <p><span className="text-zinc-600 font-medium">이메일</span> &nbsp;contact@cage3000.com</p>
                   </div>
 

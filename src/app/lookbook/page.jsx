@@ -53,7 +53,7 @@ function GalleryCard({ src, index, onClick }) {
         >
             <Image
                 src={src}
-                alt={`green lookbook image ${index + 1}`}
+                alt={`CAGE3000 lookbook ${index + 1}`}
                 fill
                 placeholder="blur"
                 sizes="(max-width: 768px) 100vw, 640px"
@@ -69,6 +69,7 @@ export default function LookbookPage() {
 
     return (
         <div className="relative bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-40">
+            <h1 className="sr-only">CAGE3000 Lookbook</h1>
             {/* Image stack — full vertical scroll-driven gallery. */}
             <div className="relative px-4 md:px-8 space-y-24 md:space-y-32">
                 {galleryImages.map((img, idx) => (

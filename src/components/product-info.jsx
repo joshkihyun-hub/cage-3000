@@ -4,6 +4,8 @@ import { useCart } from '@/shared/context/cart-context';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { ShareButton } from '@/components/share-button';
+import { isPricePublic } from '@/shared/constants/shop-items';
 
 // 상품 정보 패널 — 로그인/회원가입 페이지와 같은 Block 디자인 언어
 // (border-t + border-l 검정 라인, 텍스트 버튼 "… →")로 통일.
@@ -38,7 +40,7 @@ export const ProductInfo = ({ item }) => {
         router.push('/checkout');
     };
 
-    const priceText = item.name === '03' || item.name === '07' ? item.price : 'Order Made';
+    const priceText = isPricePublic(item) ? item.price : 'Order Made';
 
     return (
         <div className="w-full md:max-w-md text-zinc-900 p-6 md:p-0">
@@ -105,6 +107,13 @@ export const ProductInfo = ({ item }) => {
                     >
                         Buy Now →
                     </button>
+                </Block>
+
+                <Block>
+                    <ShareButton
+                        title={`CAGE3000 ${item.name}`}
+                        className="text-sm md:text-base hover:underline"
+                    />
                 </Block>
             </div>
         </div>

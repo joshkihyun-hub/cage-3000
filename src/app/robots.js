@@ -1,4 +1,4 @@
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cage3000.com';
+import { SITE_URL } from '@/lib/seo';
 
 // Auto-generated robots.txt (Next App Router serves this at /robots.txt).
 export default function robots() {

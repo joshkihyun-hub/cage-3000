@@ -169,3 +169,7 @@ export const items = [
     ]
   }
 ];
+
+// 03·07만 가격을 공개하고 나머지는 "Order Made"로 표기한다 — 상품 카드·상세 패널·
+// 공유 카드·구조화 데이터가 모두 이 기준을 따른다.
+export const isPricePublic = (item) => item.name === '03' || item.name === '07';
