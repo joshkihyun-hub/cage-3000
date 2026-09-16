@@ -30,9 +30,9 @@ export function GET() {
     })),
     ...PROJECT1_ITEMS.map((project) => ({
       title: `${project.title} — CAGE3000`,
-      link: `${SITE_URL}/projects`,
-      guid: `cage3000-project-${project.id}`,
-      description: `${project.subtitle} · CAGE3000 headwear project`,
+      link: `${SITE_URL}/projects/${project.slug}`,
+      guid: `${SITE_URL}/projects/${project.slug}`,
+      description: project.description_ko,
     })),
   ];
 

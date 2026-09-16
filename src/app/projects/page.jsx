@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PROJECT1_ITEMS } from '../../shared/constants/project1-images';
@@ -174,10 +175,19 @@ export default function ProjectsPage() {
                             const isActive = item.id === activeId;
                             return (
                                 <li key={item.id}>
-                                    <button
-                                        type="button"
+                                    {/* 제목 자체가 상세 페이지 링크 — 8개 링크가 항상 DOM에 있어
+                                        크롤러가 전부 따라간다. 데스크탑은 hover로 미리보기가 뜨고,
+                                        hover가 없는 모바일은 첫 탭에서 미리보기를 열고, 이미 열린
+                                        항목을 다시 탭할 때 상세로 넘어간다. */}
+                                    <Link
+                                        href={`/projects/${item.slug}`}
                                         onMouseEnter={() => setActiveId(item.id)}
-                                        onClick={() => setActiveId(item.id)}
+                                        onClick={(event) => {
+                                            if (!isActive && window.matchMedia('(pointer: coarse)').matches) {
+                                                event.preventDefault();
+                                                setActiveId(item.id);
+                                            }
+                                        }}
                                         className={[
                                             'group flex flex-nowrap md:flex-wrap items-center gap-x-2 md:gap-x-5 gap-y-2 text-left w-full',
                                             'transition-all duration-500 ease-out cursor-pointer transform-gpu',
@@ -198,7 +208,7 @@ export default function ProjectsPage() {
                                                 {year}
                                             </span>
                                         )}
-                                    </button>
+                                    </Link>
 
                                     {/* Mobile-only: carousel appears directly under the tapped title */}
                                     {isActive && (

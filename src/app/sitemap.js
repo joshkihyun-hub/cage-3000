@@ -29,6 +29,14 @@ export default function sitemap() {
     images: images.map(absoluteUrl),
   }));
 
+  const projectRoutes = PROJECT1_ITEMS.map((project) => ({
+    url: `${SITE_URL}/projects/${project.slug}`,
+    lastModified: now,
+    changeFrequency: 'yearly',
+    priority: 0.7,
+    images: (project.subImages?.length ? project.subImages : [project.image]).map(absoluteUrl),
+  }));
+
   const productRoutes = items.map((item) => ({
     url: `${SITE_URL}/shop/${item.id}`,
     lastModified: now,
@@ -37,5 +45,5 @@ export default function sitemap() {
     images: (item.images?.length ? item.images : [item.imageUrl]).map(absoluteUrl),
   }));
 
-  return [...staticRoutes, ...productRoutes];
+  return [...staticRoutes, ...projectRoutes, ...productRoutes];
 }

@@ -1,6 +1,8 @@
 export const PROJECT1_ITEMS = [
   {
     id: 6,
+    slug: 'puma-manchester-city-pov',
+    description_ko: "푸마(PUMA) × 맨체스터 시티(Manchester City) × POV 협업 프로젝트의 CAGE3000 헤드웨어 작업.",
     title: 'PUMA × MANCHESTER CITY POV',
     subtitle: 'COLLABORATION / 2026',
     image: '/asset/details/puma-pov/puma-pov1.jpg',
@@ -17,6 +19,8 @@ export const PROJECT1_ITEMS = [
   },
   {
     id: 7,
+    slug: 'purynn-wee-woo',
+    description_ko: "퓨린(PURYNN) — Wee-Woo 뮤직비디오 마스크 디자인 프로젝트.",
     title: 'PURYNN WEE-WOO',
     subtitle: 'MUSIC VIDEO / 2026',
     image: '/asset/details/purynn/purynn1.jpg',
@@ -35,6 +39,8 @@ export const PROJECT1_ITEMS = [
   },
   {
     id: 0,
+    slug: 'esquire-korea-june-issue',
+    description_ko: "에스콰이어 코리아(Esquire Korea) 6월호 에디토리얼 헤드웨어 작업.",
     title: 'ESQUIRE KOREA JUNE ISSUE',
     subtitle: 'EDITORIAL / 2026',
     image: '/asset/details/esquire/esquire1.jpg',
@@ -46,6 +52,8 @@ export const PROJECT1_ITEMS = [
   },
   {
     id: 4,
+    slug: 'nmixx-heavy-serenade',
+    description_ko: "엔믹스(NMIXX) — Heavy Serenade 뮤직비디오 헤드웨어 작업.",
     title: 'NMIXX HEAVY SERENADE',
     subtitle: 'MUSIC VIDEO / 2026',
     image: '/asset/details/heavy-serenade/heavy-serenade2.jpg',
@@ -61,6 +69,8 @@ export const PROJECT1_ITEMS = [
   },
   {
     id: 5,
+    slug: 'harpers-bazaar-sik-k',
+    description_ko: "하퍼스 바자(Harper's Bazaar) 4월호 식케이(SIK-K) 화보 헤드웨어 작업.",
     title: "HARPER'S BAZAAR APRIL ISSUE SIK-K",
     subtitle: 'EDITORIAL / 2026',
     image: '/asset/details/bazaar-sikk/bazaar-sikk1.jpg',
@@ -72,6 +82,8 @@ export const PROJECT1_ITEMS = [
   },
   {
     id: 1,
+    slug: 'dazed-bat-apt',
+    description_ko: "데이즈드(Dazed) 2025년 6월호 BAT APT 패션 프로젝트.",
     title: 'DAZED 2025 JUNE BAT APT',
     subtitle: 'FASHION / 2025', // 부제목 추가
     image: '/asset/details/batapt1.JPG',
@@ -88,6 +100,8 @@ export const PROJECT1_ITEMS = [
   },
   {
     id: 2,
+    slug: 'i-gr-whrrr-i-plrrsr',
+    description_ko: "2025년 패션 프로젝트 \" I gr whrrr I plrrsr \".",
     title: '" I gr whrrr I plrrsr "',
     subtitle: 'FASHION / 2025', // 부제목 추가
     image: '/asset/details/bike/bike.png',
@@ -109,6 +123,8 @@ export const PROJECT1_ITEMS = [
   },
   {
     id: 3,
+    slug: 'exoskeletal',
+    description_ko: "2024년 패션 프로젝트 EXOSKELETAL.",
     title: 'EXOSKELETAL',
     subtitle: 'FASHION / 2024', // 
     image: '/asset/head1.png',
