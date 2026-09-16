@@ -6,9 +6,9 @@ import { pageMetadata } from '@/lib/seo';
 export const metadata = pageMetadata({
   title: 'Shop',
   description:
-    'CAGE3000 컬렉션 — 서울에서 한 점씩 손으로 빚은 조각적 펠트 모자와 아방가르드 헤드웨어. Sculpted felt caps & avant-garde millinery, made to order.',
+    'CAGE3000 컬렉션 — 서울 기반 디자이너 패션 브랜드가 한 점씩 주문 제작하는 제품. 현재 컬렉션은 조각적 펠트 모자와 아방가르드 헤드웨어입니다.',
   path: '/shop',
-  ogDescription: 'CAGE3000 컬렉션 — 조각적 펠트 모자와 아방가르드 헤드웨어.',
+  ogDescription: 'CAGE3000 컬렉션 — 서울에서 한 점씩 주문 제작합니다.',
 });
 
 export default function ShopLayout({ children }) {

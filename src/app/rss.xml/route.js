@@ -41,7 +41,7 @@ export function GET() {
 <channel>
 <title>${SITE_NAME}</title>
 <link>${SITE_URL}</link>
-<description>CAGE3000 — 서울 기반 모자 브랜드. Sculpted headwear, made to order.</description>
+<description>CAGE3000 — 서울 기반 디자이너 패션 브랜드. 의상과 헤드웨어를 주문 제작합니다.</description>
 <language>ko</language>
 ${entries.map(renderItem).join('\n')}
 </channel>

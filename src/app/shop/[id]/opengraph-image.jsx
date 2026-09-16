@@ -1,7 +1,7 @@
 import { OG_CONTENT_TYPE, OG_SIZE, renderOgImage } from '@/lib/og-image';
 import { items } from '@/shared/constants/shop-items';
 
-export const alt = 'CAGE3000 headwear';
+export const alt = 'CAGE3000';
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

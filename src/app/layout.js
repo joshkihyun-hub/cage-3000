@@ -17,12 +17,12 @@ const bodoni = Bodoni_Moda({
 });
 
 const SITE_DESCRIPTION =
-  'CAGE3000 — 서울 기반 모자 브랜드. 디자이너 김기현이 이끄는 made-to-order 밀리너리 컬렉션. Sculpted felt caps, asymmetric brims, avant-garde headwear in Suri Alpaca & wool.';
+  'CAGE3000 — 서울 기반 디자이너 패션 브랜드. 디자이너 김기현이 이끄는 made-to-order 컬렉션으로, 조각적인 실루엣의 의상과 헤드웨어를 한 점씩 만듭니다. A designer fashion label from Seoul.';
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'CAGE3000 — Sculpted Headwear from Seoul',
+    default: 'CAGE3000 — Designer Fashion from Seoul',
     template: '%s · CAGE3000',
   },
   description: SITE_DESCRIPTION,
@@ -34,15 +34,16 @@ export const metadata = {
     'KHN',
     '김기현',
     'Kihyun Kim',
+    '디자이너 패션 브랜드',
+    '서울 패션 브랜드',
+    '주문 제작',
     '모자 브랜드',
-    '디자이너 모자',
     '밀리너리',
-    'millinery',
-    'made-to-order hat',
-    'sculpted felt cap',
-    'avant-garde hat',
+    'designer fashion brand',
     'Seoul fashion brand',
-    'Suri Alpaca hat',
+    'made to order',
+    'millinery',
+    'avant-garde headwear',
   ],
   authors: [{ name: 'Kihyun Kim' }],
   creator: 'Kihyun Kim',
@@ -60,7 +61,7 @@ export const metadata = {
   openGraph: {
     ...OPEN_GRAPH_BASE,
     url: SITE_URL,
-    title: 'CAGE3000 — Sculpted Headwear from Seoul',
+    title: 'CAGE3000 — Designer Fashion from Seoul',
     description: SITE_DESCRIPTION,
   },
   // title/description/images는 각 페이지의 openGraph에서 자동으로 이어받는다 —
@@ -95,9 +96,38 @@ const organizationJsonLd = {
   url: SITE_URL,
   logo: `${SITE_URL}/logo_new.png`,
   email: 'contact@cage3000.com',
+  // 브랜드가 무엇을 하는 곳인지 기계가 읽을 수 있게 — 검색엔진과 AI 검색이
+  // "CAGE3000 = 서울의 디자이너 패션 브랜드"로 개체를 연결하는 근거가 된다.
+  description: SITE_DESCRIPTION,
+  knowsAbout: [
+    '디자이너 패션',
+    '패션 디자인',
+    '주문 제작',
+    '밀리너리',
+    '헤드웨어',
+    'designer fashion',
+    'made-to-order fashion',
+    'millinery',
+    'avant-garde headwear',
+  ],
+  areaServed: 'KR',
+  foundingLocation: {
+    '@type': 'Place',
+    name: 'Seoul, Republic of Korea',
+  },
+  makesOffer: {
+    '@type': 'Offer',
+    itemOffered: {
+      '@type': 'Product',
+      name: 'Made-to-order pieces — garments and headwear',
+      category: 'Fashion',
+    },
+  },
   founder: {
     '@type': 'Person',
     name: 'Kihyun Kim',
+    alternateName: '김기현',
+    jobTitle: 'Designer',
     sameAs: 'https://instagram.com/cage3k',
   },
   address: {
@@ -172,6 +202,7 @@ export default function RootLayout({ children }) {
 
                   {/* Policy Links */}
                   <div className="flex flex-col gap-2 text-[10px] text-zinc-400">
+                    <Link href="/faq" className="hover:text-black transition-colors tracking-wide">FAQ</Link>
                     <Link href="/order-lookup" className="hover:text-black transition-colors tracking-wide">주문조회</Link>
                     <Link href="/terms" className="hover:text-black transition-colors tracking-wide">이용약관</Link>
                     <Link href="/privacy" className="hover:text-black transition-colors tracking-wide">개인정보처리방침</Link>

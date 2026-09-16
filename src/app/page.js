@@ -30,7 +30,7 @@ const {
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
-      <h1 className="sr-only">CAGE3000 — Sculpted Headwear from Seoul</h1>
+      <h1 className="sr-only">CAGE3000 — Designer Fashion from Seoul</h1>
 
       {/* Hero Section */}
       <section className="relative h-[100dvh] w-full overflow-hidden">

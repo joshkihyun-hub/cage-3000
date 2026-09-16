@@ -20,7 +20,7 @@ export async function generateMetadata({ params }) {
   return {
     // `absolute` so the brand suffix is guaranteed (nested layout doesn't inherit
     // the root title template).
-    title: { absolute: `${item.name} — Headwear · CAGE3000` },
+    title: { absolute: `${item.name} · CAGE3000` },
     // null이어야 루트 레이아웃의 브랜드 설명문까지 상속되지 않는다.
     description: null,
     alternates: { canonical: url },

@@ -18,6 +18,7 @@ export default function sitemap() {
       images: PROJECT1_ITEMS.flatMap((project) => project.subImages),
     },
     { path: '/about', priority: 0.6, changeFrequency: 'monthly', images: ['/about_profile.png'] },
+    { path: '/faq', priority: 0.5, changeFrequency: 'monthly' },
     { path: '/terms', priority: 0.3, changeFrequency: 'yearly' },
     { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' },
     { path: '/refund', priority: 0.3, changeFrequency: 'yearly' },
