@@ -84,6 +84,9 @@ export const metadata = {
     other: {
       // 네이버 서치어드바이저 사이트 소유확인
       'naver-site-verification': 'b241ac4d96d0488d3057e76ea73237fc4a6ba8a3',
+      // Bing 웹마스터 도구 사이트 소유확인 — ChatGPT·Copilot의 웹 검색이 쓰는 인덱스라
+      // 여기에 들어가는 것이 AI 답변 노출로 가는 길이다.
+      'msvalidate.01': '5FC00D794F28B21B3CC76EF29C0F2DBF',
     },
   },
 };
