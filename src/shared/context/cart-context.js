@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
+import { items } from '@/shared/constants/shop-items';
 
 const CartContext = createContext();
 
@@ -13,13 +14,25 @@ function readStoredCart() {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    // Drop malformed entries so a corrupt localStorage value doesn't crash render.
-    return parsed.filter(
-      (item) =>
-        item &&
-        typeof item === 'object' &&
-        item.id !== undefined &&
-        Number.isFinite(item.quantity)
+    return (
+      parsed
+        // Drop malformed entries so a corrupt localStorage value doesn't crash render.
+        .filter(
+          (item) =>
+            item &&
+            typeof item === 'object' &&
+            item.id !== undefined &&
+            Number.isFinite(item.quantity)
+        )
+        // Stored entries are a snapshot from when the item was added, so a price
+        // change would leave the old price on screen while checkout charges the
+        // current catalog price (the server recomputes it). Re-resolve against the
+        // catalog and keep only the quantity; drop products that no longer exist.
+        .map((stored) => {
+          const product = items.find((item) => String(item.id) === String(stored.id));
+          return product ? { ...product, quantity: stored.quantity } : null;
+        })
+        .filter(Boolean)
     );
   } catch {
     return [];

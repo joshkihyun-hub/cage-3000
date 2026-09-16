@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { ShareButton } from '@/components/share-button';
-import { isPricePublic } from '@/shared/constants/shop-items';
 
 // 상품 정보 패널 — 로그인/회원가입 페이지와 같은 Block 디자인 언어
 // (border-t + border-l 검정 라인, 텍스트 버튼 "… →")로 통일.
@@ -40,14 +39,12 @@ export const ProductInfo = ({ item }) => {
         router.push('/checkout');
     };
 
-    const priceText = isPricePublic(item) ? item.price : 'Order Made';
-
     return (
         <div className="w-full md:max-w-md text-zinc-900 p-6 md:p-0">
             <div className="space-y-3">
                 <Block>
                     <h1 className="text-lg md:text-xl">{item.name}</h1>
-                    <p className="text-sm text-zinc-500 mt-1">{priceText}</p>
+                    <p className="text-sm text-zinc-500 mt-1">{item.price}</p>
                 </Block>
 
                 {/* Made-to-order lead time — 설명을 열기 전에 제작 기간부터 보이게. */}

@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useRef } from 'react';
-import { isPricePublic } from '@/shared/constants/shop-items';
 
 // `priority` should only be true for above-the-fold cards (e.g. the first grid
 // row on /shop). Marking every card priority forces the browser to preload all
@@ -111,20 +110,15 @@ export const ShopItemCard = ({ item, priority = false }) => {
                         </span>
                         <span className="relative">{item.name}</span>
                     </h3>
-                    {(() => {
-                        const priceText = isPricePublic(item) ? item.price : 'ORDER MADE';
-                        return (
-                            <p className="relative text-[10px] md:text-xs font-medium tracking-widest text-zinc-900">
-                                <span
-                                    aria-hidden="true"
-                                    className="absolute inset-0 -translate-x-[3px] text-zinc-200/70 pointer-events-none"
-                                >
-                                    {priceText}
-                                </span>
-                                <span className="relative">{priceText}</span>
-                            </p>
-                        );
-                    })()}
+                    <p className="relative text-[10px] md:text-xs font-medium tracking-widest text-zinc-900">
+                        <span
+                            aria-hidden="true"
+                            className="absolute inset-0 -translate-x-[3px] text-zinc-200/70 pointer-events-none"
+                        >
+                            {item.price}
+                        </span>
+                        <span className="relative">{item.price}</span>
+                    </p>
                 </div>
                 <div className="w-2 h-2 bg-black rounded-full mb-2 shrink-0"></div>
             </div>

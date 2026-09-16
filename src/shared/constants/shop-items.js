@@ -3,8 +3,8 @@ export const items = [
     id: 1,
     name: '01',
     imageUrl: '/asset/details/shop/9hat/hat1/shop_hat1_ main_1.jpeg',
-    price: '₩350,000',
-    priceNum: 350000,
+    price: '₩650,000',
+    priceNum: 650000,
     description: 'A masterpiece of structural design, this sculpted felt cap redefines modern headwear. Its unique silhouette offers a bold statement while maintaining an air of understated elegance.',
     description_ko: '구조적 디자인의 걸작인 이 조각된 펠트 캡은 현대적인 모자를 재정의합니다. 독특한 실루엣은 절제된 우아함을 유지하면서도 대담한 표현을 제공합니다.',
     material: 'Material : 40% Suri Alpaca, 60% Wool\nLining : 100% Cotton',
@@ -60,8 +60,8 @@ export const items = [
     id: 4,
     name: '04',
     imageUrl: '/asset/details/shop/9hat/hat4/shop_hat4_main1.jpeg',
-    price: '₩350,000',
-    priceNum: 350000,
+    price: '₩650,000',
+    priceNum: 650000,
     description: 'Pushing the boundaries of design, this avant-garde headpiece is more than an accessory; it is wearable art. Intricate details and a striking profile make it the centerpiece of any ensemble.',
     description_ko: '디자인의 한계를 뛰어넘는 이 아방가르드 헤드피스는 액세서리 그 이상입니다. 착용 가능한 예술입니다. 복잡한 디테일과 눈에 띄는 프로필은 어떤 앙상블에서도 중심이 됩니다.',
     material: 'Material : 40% Suri Alpaca, 60% Wool\nLining : 100% Cotton',
@@ -78,8 +78,8 @@ export const items = [
     id: 5,
     name: '05',
     imageUrl: '/asset/details/shop/9hat/hat5/shop_hat5_main2.jpeg',
-    price: '₩350,000',
-    priceNum: 350000,
+    price: '₩650,000',
+    priceNum: 650000,
     description: 'Rich in texture and depth, this layered hat explores the interplay of shadow and light. The meticulous construction creates a multi-dimensional look that is both intriguing and sophisticated.',
     description_ko: '질감과 깊이가 풍부한 이 레이어드 모자는 그림자와 빛의 상호 작용을 탐구합니다. 세심한 구조는 흥미롭고 세련된 다차원적인 룩을 연출합니다.',
     material: 'Material : 40% Suri Alpaca, 60% Wool\nLining : 100% Cotton',
@@ -169,7 +169,3 @@ export const items = [
     ]
   }
 ];
-
-// 03·07만 가격을 공개하고 나머지는 "Order Made"로 표기한다 — 상품 카드·상세 패널·
-// 공유 카드·구조화 데이터가 모두 이 기준을 따른다.
-export const isPricePublic = (item) => item.name === '03' || item.name === '07';

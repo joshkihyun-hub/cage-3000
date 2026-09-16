@@ -57,11 +57,7 @@ export default function CartPage() {
                       <div className="flex flex-col justify-between">
                         <div>
                           <p className="text-sm md:text-base">{item.name}</p>
-                          <p className="text-sm text-zinc-600 mt-1">
-                            {item.name === '03' || item.name === '07'
-                              ? item.price
-                              : 'Order Made'}
-                          </p>
+                          <p className="text-sm text-zinc-600 mt-1">{item.price}</p>
                           <div className="mt-2 flex items-center gap-4 text-sm text-zinc-700">
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
