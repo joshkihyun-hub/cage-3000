@@ -9,6 +9,17 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { motion } from 'framer-motion';
 
+function ProductGrid() {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-16">
+      {items.map((item, index) => (
+        // Only the first grid row is above the fold — preload just those.
+        <ShopItemCard key={item.id} item={item} priority={index < 3} />
+      ))}
+    </div>
+  );
+}
+
 function ShopContent() {
   const searchParams = useSearchParams();
   const category = searchParams.get('category');
@@ -49,14 +60,7 @@ function ShopContent() {
     );
   }
 
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-16">
-      {items.map((item, index) => (
-        // Only the first grid row is above the fold — preload just those.
-        <ShopItemCard key={item.id} item={item} priority={index < 3} />
-      ))}
-    </div>
-  );
+  return <ProductGrid />;
 }
 
 export default function ShopPage() {
@@ -64,7 +68,11 @@ export default function ShopPage() {
     <PageContainer>
       <div className="min-h-screen bg-white pt-32 md:pt-40 pb-24">
         <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
-          <Suspense fallback={<div className="min-h-[50vh]" />}>
+          {/* useSearchParams()는 정적 렌더링 때 가장 가까운 Suspense 경계를 fallback으로
+              내보낸다. fallback이 빈 칸이면 서버 HTML(검색엔진이 보는 화면)에 상품이 하나도
+              안 담기므로, 기본값인 상품 그리드를 fallback으로 둔다. ?category=clothes일 때만
+              클라이언트에서 COMING SOON으로 바뀐다. */}
+          <Suspense fallback={<ProductGrid />}>
             <ShopContent />
           </Suspense>
         </div>
