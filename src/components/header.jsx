@@ -137,12 +137,20 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ease-[cubic-bezier(0.32,0.725,0.25,1)] pointer-events-none ${showGlass
-        ? 'bg-white/60 backdrop-blur-3xl backdrop-brightness-105 border-b border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]'
-        : 'bg-transparent border-transparent'
-        } ${scrolled ? 'py-4' : 'py-6'}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ease-[cubic-bezier(0.32,0.725,0.25,1)] pointer-events-none ${scrolled ? 'py-4' : 'py-6'}`}
     >
-      <div className="max-w-screen-2xl mx-auto px-6 md:px-12 pointer-events-auto">
+      {/* 유리판은 내용과 분리된 레이어로 두고 아래쪽을 마스크로 흐린다.
+          backdrop-blur는 요소 끝에서 칼같이 잘려 경계가 선처럼 드러나므로,
+          테두리·그림자로 선을 긋는 대신 서서히 사라지게 한다. */}
+      <div
+        aria-hidden="true"
+        className={`absolute inset-0 bg-white/60 backdrop-blur-3xl backdrop-brightness-105 transition-opacity duration-700 ease-[cubic-bezier(0.32,0.725,0.25,1)] ${showGlass ? 'opacity-100' : 'opacity-0'}`}
+        style={{
+          WebkitMaskImage: 'linear-gradient(to bottom, #000 calc(100% - 36px), transparent 100%)',
+          maskImage: 'linear-gradient(to bottom, #000 calc(100% - 36px), transparent 100%)',
+        }}
+      />
+      <div className="relative max-w-screen-2xl mx-auto px-6 md:px-12 pointer-events-auto">
         <div className="flex justify-between items-center h-20 md:h-24 relative">
 
           {/* Mobile Menu Button */}
@@ -262,7 +270,10 @@ export default function Header() {
           className={`md:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.32,0.725,0.25,1)] ${isMobileMenuOpen ? 'max-h-[600px] opacity-100 mt-4' : 'max-h-0 opacity-0 mt-0'
             }`}
         >
-          <nav className="flex flex-col items-center gap-y-4 py-6 bg-white/10 backdrop-blur-lg rounded-2xl mt-2 border border-white/20">
+          {/* 헤더 자체가 이미 유리판이다 — 그 위에 반투명 패널을 한 겹 더 얹으면
+              패널의 테두리와 둥근 모서리가 화면을 가로질러 잘린 선처럼 드러난다.
+              메뉴는 헤더 유리 위에 그대로 얹는다. */}
+          <nav className="flex flex-col items-center gap-y-4 pt-6 pb-14">
             {[...navItemsLeft, ...navItemsRight].map((item, idx) => (
               <div key={item.name} className="flex flex-col items-center w-full">
                 {item.subItems ? (
