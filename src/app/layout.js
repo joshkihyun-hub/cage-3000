@@ -81,6 +81,8 @@ export const metadata = {
     },
   },
   verification: {
+    // 구글 서치 콘솔 사이트 소유확인 — Next가 google-site-verification 메타로 내보낸다.
+    google: 'g9a2cCctZgmG0J7dx9vAIDM0XOx5r2yFpJfqSR3npqM',
     other: {
       // 네이버 서치어드바이저 사이트 소유확인
       'naver-site-verification': 'b241ac4d96d0488d3057e76ea73237fc4a6ba8a3',
