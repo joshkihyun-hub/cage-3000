@@ -62,3 +62,6 @@ src/app/favicon.ico
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Raw video/design sources — kept out of the deploy bundle
+/media-src/
