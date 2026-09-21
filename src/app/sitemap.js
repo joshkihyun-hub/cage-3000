@@ -8,7 +8,7 @@ export default function sitemap() {
   const now = new Date();
 
   const staticRoutes = [
-    { path: '', priority: 1.0, changeFrequency: 'weekly', images: ['/asset/details/lookbook/9hat/A3.jpeg'] },
+    { path: '', priority: 1.0, changeFrequency: 'weekly', images: ['/asset/og/hero-still.jpg'] },
     { path: '/shop', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/lookbook', priority: 0.7, changeFrequency: 'monthly' },
     {

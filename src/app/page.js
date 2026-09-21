@@ -22,9 +22,10 @@ const PANELS = [
   // 좌우를 뒤집어 걷는 방향을 돌렸다. CSS는 translate를 적용한 뒤 scale을
   // 걸어서(p -> T - p) 미러가 이동까지 뒤집는다 — 뒤집지 않았다면 +9%였을
   // 자리에 -9%가 들어가 있다.
-  // 소재 안에서 53.50s + 20.00s 구간이 스스로 맞물린다(실측 차이 1.26 ≈ 0.5초
-  // 건너뛴 정도). 전환 효과가 필요 없다.
-  { key: 'hero-1', shift: 'translate-x-[-9%]', mirrored: true, veiled: false, seam: false },
+  // 인물이 걸어 들어오는 도입부를 시작점으로 잡았다(원본 6.95s + 25.00s).
+  // 빈 흰 화면에서 시작해 작업 중에 끝나므로 자체 루프가 맞지 않는다 —
+  // hero-2와 같이 흰색 디졸브 + 디포커스로 잇는다.
+  { key: 'hero-1', shift: 'translate-x-[-9%]', mirrored: true, veiled: false, seam: true },
   // 중앙 — test1, 두 사람이 양 끝에서 들어와 가운데서 만난다
   // 걸어 들어와 작업하는 일방향 서사라 되돌아오는 자세가 없다 — 소재 전체를
   // 훑어도 맞물리는 지점이 없어서(최선 9.34) 이 패널만 흰색 디졸브를 쓴다.
@@ -39,7 +40,7 @@ const PANELS = [
 // 그래서 셋을 같이 쓴다: 적당한 블러 + 낮은 불투명도(흰 배경 위로 옅게) +
 // 가장자리 마스크(네모 테두리를 지운다).
 // blur()는 퍼센트를 못 받아서 패널 높이에 비례시키는 계산만 JS로 한다.
-const VEIL_RATIO = 0.065;
+const VEIL_RATIO = 0.05;
 const VEIL_OPACITY = 0.5;
 const VEIL_EDGE =
   'linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%), ' +
