@@ -194,17 +194,17 @@ export default function ProjectsPage() {
                                             isActive ? 'blur-none' : 'blur-sm',
                                         ].join(' ')}
                                     >
-                                        <span className="font-sans text-[15px] md:text-3xl lg:text-4xl leading-none tracking-tight text-black truncate min-w-0">
+                                        <span className="font-sans text-[15px] md:text-2xl lg:text-3xl leading-none tracking-tight text-black truncate min-w-0">
                                             {item.title}
                                         </span>
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
                                             src={item.image}
                                             alt={item.title}
-                                            className="h-6 md:h-10 lg:h-12 w-auto shrink-0 object-contain transition-transform duration-700 group-hover:scale-105"
+                                            className="h-6 md:h-8 lg:h-10 w-auto shrink-0 object-contain transition-transform duration-700 group-hover:scale-105"
                                         />
                                         {year && (
-                                            <span className="font-sans text-[12px] md:text-xl lg:text-2xl text-zinc-400 leading-none shrink-0">
+                                            <span className="font-sans text-[12px] md:text-lg lg:text-xl text-zinc-400 leading-none shrink-0">
                                                 {year}
                                             </span>
                                         )}
