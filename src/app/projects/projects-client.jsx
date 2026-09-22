@@ -187,6 +187,8 @@ export default function ProjectsClient({ imageSizes }) {
                                     const isActive = item.id === activeId;
                                     return (
                                         <li key={item.id}>
+                                            {/* lg+ 크기는 화면 너비에 비례(최대 28px) — 2단 레이아웃에서 가장 긴
+                                                제목도 연도까지 한 줄에 들어가게. 비율은 5월 28일의 3:4:2. */}
                                             {/* 제목 자체가 상세 페이지 링크 — 8개 링크가 항상 DOM에 있어
                                                 크롤러가 전부 따라간다. 데스크탑은 hover로 미리보기가 뜨고,
                                                 hover가 없는 모바일은 첫 탭에서 미리보기를 열고, 이미 열린
@@ -206,7 +208,7 @@ export default function ProjectsClient({ imageSizes }) {
                                                     isActive ? 'blur-none' : 'blur-sm',
                                                 ].join(' ')}
                                             >
-                                                <span className="font-sans font-bold text-[15px] md:text-3xl lg:text-4xl leading-none tracking-tight text-black truncate min-w-0">
+                                                <span className="font-sans font-bold text-[15px] md:text-3xl lg:text-[min(1.8vw,28px)] leading-none tracking-tight text-black truncate min-w-0">
                                                     {item.title}
                                                 </span>
                                                 <Image
@@ -215,10 +217,10 @@ export default function ProjectsClient({ imageSizes }) {
                                                     width={imageSizes[item.image].width}
                                                     height={imageSizes[item.image].height}
                                                     sizes="64px"
-                                                    className="h-6 md:h-10 lg:h-12 w-auto shrink-0 object-contain transition-transform duration-700 group-hover:scale-105"
+                                                    className="h-6 md:h-10 lg:h-[min(2.4vw,37px)] w-auto shrink-0 object-contain transition-transform duration-700 group-hover:scale-105"
                                                 />
                                                 {year && (
-                                                    <span className="font-sans text-[12px] md:text-xl lg:text-2xl text-zinc-400 leading-none shrink-0">
+                                                    <span className="font-sans text-[12px] md:text-xl lg:text-[min(1.2vw,19px)] text-zinc-400 leading-none shrink-0">
                                                         {year}
                                                     </span>
                                                 )}
