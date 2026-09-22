@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 const providers = [];
 
@@ -39,12 +40,19 @@ providers.push(
         email: { label: 'Email', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
         const email = credentials.email.trim().toLowerCase();
+
+        // 비밀번호 대입 방지 — bcrypt 비교 전에 IP·계정 단위로 시도 횟수를 제한한다.
+        const byIp = await rateLimit(`login:ip:${getClientIp(req)}`, { limit: 20, windowMs: 10 * 60_000 });
+        const byEmail = await rateLimit(`login:email:${email}`, { limit: 10, windowMs: 10 * 60_000 });
+        if (!byIp.ok || !byEmail.ok) {
+          throw new Error('RATE_LIMITED');
+        }
 
         const user = await prisma.user.findUnique({
           where: { email },

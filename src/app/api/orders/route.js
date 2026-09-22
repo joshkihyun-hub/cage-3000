@@ -19,7 +19,7 @@ const GUEST_COOKIE_MAX_AGE = 60 * 60; // 1 hour — long enough for any payment 
 // up later. Pricing is computed server-side; client cart prices are ignored.
 export async function POST(req) {
   // Soft per-IP guard against draft-order spam (best-effort; see lib/rate-limit).
-  const limited = rateLimit(`orders:${getClientIp(req)}`, { limit: 10, windowMs: 60_000 });
+  const limited = await rateLimit(`orders:${getClientIp(req)}`, { limit: 10, windowMs: 60_000 });
   if (!limited.ok) {
     return NextResponse.json(
       { error: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.' },

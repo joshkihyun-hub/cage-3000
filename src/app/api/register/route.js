@@ -9,8 +9,18 @@ import {
 } from '@/lib/validation';
 import { issueEmailToken } from '@/lib/email-tokens';
 import { sendVerificationEmail } from '@/lib/email';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(req) {
+  // 가입마다 인증 메일이 나가므로 IP당 가입 시도를 묶어 둔다.
+  const limited = await rateLimit(`register:${getClientIp(req)}`, { limit: 5, windowMs: 10 * 60_000 });
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.' },
+      { status: 429, headers: { 'Retry-After': String(limited.retryAfter) } }
+    );
+  }
+
   let body;
   try {
     body = await req.json();

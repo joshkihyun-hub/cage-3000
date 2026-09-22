@@ -65,6 +65,8 @@ function SignInForm() {
           setError('정지된 계정입니다. 관리자에게 문의해 주세요.');
         } else if (result.error === 'WITHDRAWN') {
           setError('탈퇴 처리된 계정입니다.');
+        } else if (result.error === 'RATE_LIMITED') {
+          setError('로그인 시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.');
         } else {
           setError('이메일 또는 비밀번호가 올바르지 않습니다.');
         }

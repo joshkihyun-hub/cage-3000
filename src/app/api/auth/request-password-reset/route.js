@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { issueEmailToken } from '@/lib/email-tokens';
 import { sendPasswordResetEmail } from '@/lib/email';
 import { isValidEmail } from '@/lib/validation';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 // Always return success regardless of whether the email exists so that this
 // endpoint cannot be used to enumerate registered emails.
@@ -12,6 +13,16 @@ export async function POST(req) {
   const email = String(body?.email || '').trim().toLowerCase();
 
   if (!isValidEmail(email)) {
+    return NextResponse.json({ status: 'ok' });
+  }
+
+  // Caps mail volume per sender and per inbox so this can't be used to flood
+  // someone's mailbox or burn the Resend quota. Over the limit we skip the
+  // send but still answer 'ok' — the limit applies whether or not the email
+  // exists, so it leaks nothing.
+  const byIp = await rateLimit(`pwreset:ip:${getClientIp(req)}`, { limit: 5, windowMs: 10 * 60_000 });
+  const byEmail = await rateLimit(`pwreset:email:${email}`, { limit: 3, windowMs: 15 * 60_000 });
+  if (!byIp.ok || !byEmail.ok) {
     return NextResponse.json({ status: 'ok' });
   }
 

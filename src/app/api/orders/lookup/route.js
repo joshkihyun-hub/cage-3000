@@ -10,7 +10,7 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 // fields. Any mismatch returns a generic 404 so the endpoint can't be used to
 // probe which orders/emails exist. Rate-limited to blunt enumeration.
 export async function POST(req) {
-  const limited = rateLimit(`lookup:${getClientIp(req)}`, { limit: 20, windowMs: 60_000 });
+  const limited = await rateLimit(`lookup:${getClientIp(req)}`, { limit: 20, windowMs: 60_000 });
   if (!limited.ok) {
     return NextResponse.json(
       { error: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.' },
