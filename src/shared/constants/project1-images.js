@@ -109,8 +109,8 @@ export const PROJECT1_ITEMS = [
   {
     id: 1,
     slug: 'dazed-bat-apt',
-    category: 'personal',
-    description_ko: "데이즈드(Dazed) 2025년 6월호 BAT APT 패션 프로젝트.",
+    category: 'sponsored',
+    description_ko: "데이즈드(Dazed) 2025년 6월호 BAT APT 화보에 CAGE3000 협찬.",
     title: 'DAZED 2025 JUNE BAT APT',
     subtitle: 'FASHION / 2025', // 부제목 추가
     image: '/asset/details/batapt1.JPG',
