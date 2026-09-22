@@ -35,26 +35,15 @@ function getContext() {
   return ctx;
 }
 
-// 가족 전체의 음색을 한 곳에서 조절한다. 값을 내리면 더 둔탁해진다.
-//   TONE:   모든 주파수에 곱하는 배율(1 = 원래 밝기)
-//   MUFFLE: 마지막에 거는 로우패스 — 고음의 '챙' 하는 끝을 걷어낸다
-const TONE = 0.72;
-const MUFFLE_HZ = 3800;
-
 // One dampened metallic tick. Everything below is a variation of this:
 // a couple of decaying sine partials plus a tiny high-passed noise transient.
 function tickSound(ac, { volume, partials, noise }) {
   const now = ac.currentTime;
   const out = ac.createGain();
   out.gain.setValueAtTime(volume, now);
-  const muffle = ac.createBiquadFilter();
-  muffle.type = 'lowpass';
-  muffle.frequency.setValueAtTime(MUFFLE_HZ, now);
-  muffle.Q.setValueAtTime(0.5, now);
-  out.connect(muffle);
-  muffle.connect(ac.destination);
+  out.connect(ac.destination);
 
-  const pitch = TONE * (0.97 + Math.random() * 0.06); // never sounds sampled
+  const pitch = 0.97 + Math.random() * 0.06; // never sounds sampled
   for (const p of partials) {
     const osc = ac.createOscillator();
     const g = ac.createGain();
@@ -80,10 +69,9 @@ function tickSound(ac, { volume, partials, noise }) {
     src.buffer = buffer;
     const hp = ac.createBiquadFilter();
     hp.type = 'highpass';
-    hp.frequency.setValueAtTime(noise.freq * TONE, now);
+    hp.frequency.setValueAtTime(noise.freq, now);
     const g = ac.createGain();
-    // 딸깍하는 접촉음도 줄여야 끝이 뭉툭해진다
-    g.gain.setValueAtTime(noise.gain * 0.6, now);
+    g.gain.setValueAtTime(noise.gain, now);
     src.connect(hp);
     hp.connect(g);
     g.connect(out);
