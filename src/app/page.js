@@ -122,6 +122,9 @@ export default function HomePage() {
 
     // 가림 블러 + 이음새 디포커스를 합쳐 한자리에서 적용한다. 이음새 쪽은
     // currentTime에서 직접 계산하므로 루프와 절대 어긋나지 않는다.
+    // 마지막으로 칠한 블러 값. 대부분의 프레임은 값이 그대로라(가림 블러는 고정,
+    // 디포커스는 끝 1.6초만) 바뀐 프레임에만 style을 건드린다.
+    const lastBlur = videos.map(() => -1);
     let raf = 0;
     const paint = () => {
       videos.forEach((v, i) => {
@@ -129,10 +132,13 @@ export default function HomePage() {
         const left = v.duration - v.currentTime;
         const t = Number.isFinite(left) ? Math.max(0, 1 - left / DEFOCUS_LEAD) : 0;
         // 뒤로 갈수록 가파르게 — 앞부분에서는 거의 티가 나지 않는다
-        const blur =
+        const raw =
           (PANELS[i].veiled ? h * VEIL_RATIO : 0) +
           (PANELS[i].seam ? DEFOCUS_MAX * t * t : 0);
-        if (blur < 0.05) {
+        const blur = raw < 0.05 ? 0 : Math.round(raw * 100) / 100;
+        if (blur === lastBlur[i]) return;
+        lastBlur[i] = blur;
+        if (blur === 0) {
           v.style.filter = BASE_FILTER;
           v.style.scale = '';   // 비워두면 Tailwind의 scale-x-[-1]이 다시 먹는다
           return;
