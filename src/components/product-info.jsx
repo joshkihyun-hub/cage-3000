@@ -4,7 +4,9 @@ import { useCart } from '@/shared/context/cart-context';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 import { ShareButton } from '@/components/share-button';
+import { PROJECT1_ITEMS } from '@/shared/constants/project1-images';
 
 // 상품 정보 패널 — 로그인/회원가입 페이지와 같은 Block 디자인 언어
 // (border-t + border-l 검정 라인, 텍스트 버튼 "… →")로 통일.
@@ -33,6 +35,11 @@ export const ProductInfo = ({ item }) => {
         addedTimer.current = setTimeout(() => setAdded(false), 1600);
     };
 
+    // 이 모자가 등장한 프로젝트 — 상품 데이터의 wornIn(프로젝트 slug 목록)으로 잇는다.
+    const wornIn = (item.wornIn || [])
+        .map((slug) => PROJECT1_ITEMS.find((project) => project.slug === slug))
+        .filter(Boolean);
+
     const handleBuyNow = () => {
         clearCart();
         addToCart(item, 1);
@@ -46,6 +53,24 @@ export const ProductInfo = ({ item }) => {
                     <h1 className="text-lg md:text-xl">{item.name}</h1>
                     <p className="text-sm text-zinc-500 mt-1">{item.price}</p>
                 </Block>
+
+                {wornIn.length > 0 && (
+                    <Block>
+                        <p className="text-sm mb-2">Worn in</p>
+                        <ul className="space-y-1">
+                            {wornIn.map((project) => (
+                                <li key={project.slug}>
+                                    <Link
+                                        href={`/projects/${project.slug}`}
+                                        className="text-sm text-zinc-700 hover:underline"
+                                    >
+                                        {project.title}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </Block>
+                )}
 
                 {/* Made-to-order lead time — 설명을 열기 전에 제작 기간부터 보이게. */}
                 <Block>

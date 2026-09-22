@@ -8,7 +8,6 @@ function findItem(id) {
 // Per-product metadata. 상품 페이지에는 description을 두지 않는다 — 카카오톡·인스타
 // 공유 카드에 상품 설명문이 딸려 나오는 걸 원치 않아서다. Next는 openGraph.description을
 // 비워도 페이지 description을 그대로 승계하므로, 없애려면 둘 다 없어야 한다.
-// (설명문은 아래 Product 구조화 데이터에 남아 검색엔진은 계속 읽는다.)
 // 공유 이미지는 ./opengraph-image.jsx가 만들므로 openGraph에 `images` 키를 넣지 않는다.
 export async function generateMetadata({ params }) {
   const { id } = await params;
@@ -55,7 +54,6 @@ function productJsonLd(item) {
         name,
         url,
         image: (item.images?.length ? item.images : [item.imageUrl]).map(absoluteUrl),
-        description: item.description_ko || item.description,
         brand: { '@type': 'Brand', name: SITE_NAME },
         offers: {
           '@type': 'Offer',

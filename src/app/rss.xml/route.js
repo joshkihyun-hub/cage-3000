@@ -26,7 +26,8 @@ export function GET() {
       title: `CAGE3000 ${item.name}`,
       link: `${SITE_URL}/shop/${item.id}`,
       guid: `${SITE_URL}/shop/${item.id}`,
-      description: item.description_ko || item.description,
+      // 상품 설명문은 두지 않는다 — 사실만 적는다.
+      description: `CAGE3000 ${item.name} — Handmade millinery, made to order. ${item.price}`,
     })),
     ...PROJECT1_ITEMS.map((project) => ({
       title: `${project.title} — CAGE3000`,
@@ -41,7 +42,7 @@ export function GET() {
 <channel>
 <title>${SITE_NAME}</title>
 <link>${SITE_URL}</link>
-<description>CAGE3000 — 서울 기반 디자이너 패션 브랜드. 의상과 헤드웨어를 주문 제작합니다.</description>
+<description>CAGE3000 — 서울 기반 디자이너 패션 브랜드. 의상과 헤드웨어를 주문 제작하며, 커스텀 메이드 제작도 가능합니다.</description>
 <language>ko</language>
 ${entries.map(renderItem).join('\n')}
 </channel>
