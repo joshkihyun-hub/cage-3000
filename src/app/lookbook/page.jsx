@@ -38,16 +38,13 @@ function GalleryCard({ src, index, onClick }) {
         // 화면 상단을 막 빠져나가는 순간 progress=1
         offset: ['start end', 'end start'],
     });
-    // 중앙(0.5) 근처에서만 blur 0, 양 끝으로 갈수록 16px까지 흐려짐.
-    // 데드존(0.4~0.6)을 두어 중앙에서는 완전히 선명해 보이게.
-    const blurValue = useTransform(scrollYProgress, [0, 0.4, 0.6, 1], [18, 0, 0, 18]);
-    const filter = useTransform(blurValue, (b) => `blur(${b}px)`);
+    // 룩북은 제품을 보여주는 곳이라 흐림 없이 또렷하게 — 스크롤 중 아주 옅은 크기 변화만 남긴다.
     const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.94, 1, 0.94]);
 
     return (
         <motion.div
             ref={ref}
-            style={{ filter, scale }}
+            style={{ scale }}
             onClick={onClick}
             className="relative w-full max-w-2xl mx-auto aspect-[3/4] cursor-zoom-in"
         >
