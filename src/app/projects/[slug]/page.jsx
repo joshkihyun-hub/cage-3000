@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { PROJECT1_ITEMS } from '@/shared/constants/project1-images';
+import { PROJECT1_ITEMS, projectCategory } from '@/shared/constants/project1-images';
 import { getPublicImageSize } from '@/lib/image-size';
 import { OPEN_GRAPH_BASE, SITE_NAME, SITE_URL, absoluteUrl, toJsonLd } from '@/lib/seo';
 
@@ -79,6 +79,7 @@ export default async function ProjectPage({ params }) {
   const { slug } = await params;
   const project = findProject(slug);
   if (!project) notFound();
+  const category = projectCategory(project);
 
   // 원본 크기를 빌드 때 읽어 next/image에 넘긴다 — 비율 왜곡도, 로딩 중 밀림도 없다.
   const images = await Promise.all(
@@ -96,6 +97,9 @@ export default async function ProjectPage({ params }) {
         {/* 라인·박스 없이 텍스트만 — 사진이 주인공이고 글은 작게 물러선다. */}
         <div className="max-w-xl space-y-5">
           <h1 className="text-xs md:text-sm tracking-wide">{project.title}</h1>
+          {category && (
+            <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-zinc-400">{category.label}</p>
+          )}
 
           {project.credits?.length > 0 && (
             <div className="space-y-1">

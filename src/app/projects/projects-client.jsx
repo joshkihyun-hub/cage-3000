@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PROJECT1_ITEMS } from '../../shared/constants/project1-images';
+import { PROJECT1_ITEMS, PROJECT_GROUPS } from '../../shared/constants/project1-images';
 
 // "FASHION / 2025" 형태의 subtitle에서 연도만 뽑아낸다.
 function extractYear(subtitle) {
@@ -158,7 +158,8 @@ function ImageCarousel({ images, title, imageSizes }) {
 }
 
 export default function ProjectsClient({ imageSizes }) {
-    const [activeId, setActiveId] = useState(PROJECT1_ITEMS[0]?.id);
+    // 처음엔 목록 맨 위(첫 분류의 첫 작업)를 미리 보여준다.
+    const [activeId, setActiveId] = useState(PROJECT_GROUPS[0]?.items[0]?.id);
     const activeItem = PROJECT1_ITEMS.find((p) => p.id === activeId);
 
     // 캐러셀에 넘길 이미지 — subImages가 있으면 그걸 쓰고, 없으면 메인 이미지 1장.
@@ -173,70 +174,88 @@ export default function ProjectsClient({ imageSizes }) {
             <div className="max-w-screen-2xl mx-auto px-6 md:px-12">
                 <h1 className="sr-only">CAGE3000 Projects</h1>
                 <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-12 lg:gap-20 items-start">
-                    {/* === Left column: project list === */}
-                    <ul className="space-y-2 md:space-y-4">
-                        {PROJECT1_ITEMS.map((item) => {
-                            const year = extractYear(item.subtitle);
-                            const isActive = item.id === activeId;
-                            return (
-                                <li key={item.id}>
-                                    {/* 제목 자체가 상세 페이지 링크 — 8개 링크가 항상 DOM에 있어
-                                        크롤러가 전부 따라간다. 데스크탑은 hover로 미리보기가 뜨고,
-                                        hover가 없는 모바일은 첫 탭에서 미리보기를 열고, 이미 열린
-                                        항목을 다시 탭할 때 상세로 넘어간다. */}
-                                    <Link
-                                        href={`/projects/${item.slug}`}
-                                        onMouseEnter={() => setActiveId(item.id)}
-                                        onClick={(event) => {
-                                            if (!isActive && window.matchMedia('(pointer: coarse)').matches) {
-                                                event.preventDefault();
-                                                setActiveId(item.id);
-                                            }
-                                        }}
-                                        className={[
-                                            'group flex flex-nowrap md:flex-wrap items-center gap-x-2 md:gap-x-5 gap-y-2 text-left w-full',
-                                            'transition-all duration-500 ease-out cursor-pointer transform-gpu',
-                                            isActive ? 'blur-none' : 'blur-sm',
-                                        ].join(' ')}
-                                    >
-                                        <span className="font-sans text-[15px] md:text-2xl lg:text-3xl leading-none tracking-tight text-black truncate min-w-0">
-                                            {item.title}
-                                        </span>
-                                        <Image
-                                            src={item.image}
-                                            alt={item.title}
-                                            width={imageSizes[item.image].width}
-                                            height={imageSizes[item.image].height}
-                                            sizes="64px"
-                                            className="h-6 md:h-8 lg:h-10 w-auto shrink-0 object-contain transition-transform duration-700 group-hover:scale-105"
-                                        />
-                                        {year && (
-                                            <span className="font-sans text-[12px] md:text-lg lg:text-xl text-zinc-400 leading-none shrink-0">
-                                                {year}
-                                            </span>
-                                        )}
-                                    </Link>
+                    {/* === Left column: project list, grouped by category === */}
+                    <div className="space-y-12 md:space-y-16">
+                        {PROJECT_GROUPS.map((group) => (
+                            <section key={group.key}>
+                                <h2 className="mb-4 md:mb-6 text-[10px] md:text-xs uppercase tracking-[0.25em] text-zinc-400">
+                                    {group.label}
+                                </h2>
+                                <ul className="space-y-2 md:space-y-4">
+                                    {group.items.map((item) => {
+                                    const year = extractYear(item.subtitle);
+                                    const isActive = item.id === activeId;
+                                    return (
+                                        <li key={item.id}>
+                                            {/* 제목 자체가 상세 페이지 링크 — 8개 링크가 항상 DOM에 있어
+                                                크롤러가 전부 따라간다. 데스크탑은 hover로 미리보기가 뜨고,
+                                                hover가 없는 모바일은 첫 탭에서 미리보기를 열고, 이미 열린
+                                                항목을 다시 탭할 때 상세로 넘어간다. */}
+                                            <Link
+                                                href={`/projects/${item.slug}`}
+                                                onMouseEnter={() => setActiveId(item.id)}
+                                                onClick={(event) => {
+                                                    if (!isActive && window.matchMedia('(pointer: coarse)').matches) {
+                                                        event.preventDefault();
+                                                        setActiveId(item.id);
+                                                    }
+                                                }}
+                                                className={[
+                                                    'group flex flex-nowrap md:flex-wrap items-center gap-x-2 md:gap-x-5 gap-y-2 text-left w-full',
+                                                    'transition-all duration-500 ease-out cursor-pointer transform-gpu',
+                                                    isActive ? 'blur-none' : 'blur-sm',
+                                                ].join(' ')}
+                                            >
+                                                <span className="font-sans text-[15px] md:text-2xl lg:text-3xl leading-none tracking-tight text-black truncate min-w-0">
+                                                    {item.title}
+                                                </span>
+                                                <Image
+                                                    src={item.image}
+                                                    alt={item.title}
+                                                    width={imageSizes[item.image].width}
+                                                    height={imageSizes[item.image].height}
+                                                    sizes="64px"
+                                                    className="h-6 md:h-8 lg:h-10 w-auto shrink-0 object-contain transition-transform duration-700 group-hover:scale-105"
+                                                />
+                                                {year && (
+                                                    <span className="font-sans text-[12px] md:text-lg lg:text-xl text-zinc-400 leading-none shrink-0">
+                                                        {year}
+                                                    </span>
+                                                )}
+                                            </Link>
 
-                                    {/* Mobile-only: carousel appears directly under the tapped title */}
-                                    {isActive && (
-                                        <div className="lg:hidden mt-6 mb-8">
-                                            <AnimatePresence mode="wait">
-                                                <motion.div
-                                                    key={item.id}
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    exit={{ opacity: 0, y: -10 }}
-                                                    transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                                                >
-                                                    <ImageCarousel images={carouselImages} title={activeItem.title} imageSizes={imageSizes} />
-                                                </motion.div>
-                                            </AnimatePresence>
-                                        </div>
-                                    )}
-                                </li>
-                            );
-                        })}
-                    </ul>
+                                            {/* Mobile-only: carousel appears directly under the tapped title */}
+                                            {isActive && (
+                                                <div className="lg:hidden mt-6 mb-8">
+                                                    <AnimatePresence mode="wait">
+                                                        <motion.div
+                                                            key={item.id}
+                                                            initial={{ opacity: 0, y: 10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            exit={{ opacity: 0, y: -10 }}
+                                                            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                                                        >
+                                                            <ImageCarousel images={carouselImages} title={activeItem.title} imageSizes={imageSizes} />
+                                                        </motion.div>
+                                                    </AnimatePresence>
+                                                </div>
+                                            )}
+                                        </li>
+                                    );
+                                    })}
+                                </ul>
+                                {/* 의뢰 제작 입구 — 목록과 같은 톤으로 조용히 한 줄. */}
+                                {group.key === 'custom' && (
+                                    <a
+                                        href="mailto:contact@cage3000.com?subject=Commission%20Inquiry"
+                                        className="mt-6 md:mt-8 inline-block text-[10px] md:text-xs uppercase tracking-[0.25em] text-zinc-400 hover:text-black transition-colors"
+                                    >
+                                        Commission inquiry →
+                                    </a>
+                                )}
+                            </section>
+                        ))}
+                    </div>
 
                     {/* === Right column (lg+): sticky horizontal-swipe carousel === */}
                     <div className="hidden lg:block lg:sticky lg:top-32">
