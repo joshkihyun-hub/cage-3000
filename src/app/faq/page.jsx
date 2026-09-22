@@ -59,8 +59,13 @@ function buildFaqs() {
     },
     {
       q: 'CAGE3000은 어떤 브랜드인가요?',
-      a: 'CAGE3000(케이지3000)은 서울 연희동을 기반으로 디자이너 김기현이 이끄는 디자이너 패션 브랜드입니다. 조각적인 실루엣의 의상과 헤드웨어를 주문 제작으로 한 점씩 만듭니다.',
-      en: 'CAGE3000 is a designer fashion brand based in Seoul, led by designer Kihyun Kim — garments and headwear, made to order, one piece at a time.',
+      a: 'CAGE3000(케이지3000)은 서울 연희동을 기반으로 디자이너 김기현이 이끄는 디자이너 패션 브랜드입니다. 조각적인 실루엣의 의상과 헤드웨어를 주문 제작으로 한 점씩 만들며, 커스텀 메이드 제작도 가능합니다.',
+      en: 'CAGE3000 is a designer fashion brand based in Seoul, led by designer Kihyun Kim — garments and headwear, made to order, one piece at a time. Custom-made pieces are available on request.',
+    },
+    {
+      q: '커스텀 메이드도 가능한가요?',
+      a: '네. 아티스트나 작품을 위해 새로 디자인하고 제작하는 커스텀 메이드도 진행합니다. 퓨린(PURYNN) Wee-Woo, 엔믹스(NMIXX) Heavy Serenade 뮤직비디오의 헤드웨어가 커스텀 메이드 작업입니다. 용도와 일정을 contact@cage3000.com 으로 보내 주시면 상담 후 진행합니다.',
+      en: 'Yes. We design and make one-off pieces for artists and productions — the headwear in PURYNN "Wee-Woo" and NMIXX "Heavy Serenade" was custom made. Send your project and timeline to contact@cage3000.com.',
     },
     {
       q: '문의는 어디로 하면 되나요?',

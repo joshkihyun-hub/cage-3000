@@ -1,5 +1,15 @@
 import Image from 'next/image';
 
+const ABOUT_FACTS = [
+    { label: 'Atelier', value: 'Yeonhui-dong, Seoul' },
+    { label: '', value: 'Handmade millinery' },
+    { label: 'Designer', value: 'Kihyun Kim' },
+    {
+        label: 'Selected clients',
+        value: "NMIXX, PURYNN, Harper's Bazaar, Esquire Korea, PUMA × Manchester City, DAZED",
+    },
+];
+
 export default function AboutPage() {
     return (
         <div className="bg-white text-zinc-900 min-h-screen font-sans">
@@ -26,7 +36,21 @@ export default function AboutPage() {
                     <p className="relative text-zinc-900 font-sans text-xs md:text-sm font-medium leading-relaxed tracking-wider z-10">
                         A studio working between garment, shelter, and gesture, in Seoul.
                     </p>
+                    {/* 커스텀 메이드 안내 — 본문보다 한 톤 물러선 한 줄 */}
+                    <p className="relative mt-4 text-zinc-400 font-sans text-[10px] md:text-xs leading-relaxed tracking-wider z-10">
+                        Custom-made pieces on request.
+                    </p>
                 </div>
+
+                {/* 스튜디오 사실 네 줄 — 라벨은 옅게, 내용은 본문 톤으로 */}
+                <dl className="mt-16 md:mt-20 space-y-3 text-center font-sans text-[10px] md:text-xs leading-relaxed tracking-wider">
+                    {ABOUT_FACTS.map(({ label, value }) => (
+                        <div key={label}>
+                            {label && <dt className="inline text-zinc-400">{label} — </dt>}
+                            <dd className="inline text-zinc-900">{value}</dd>
+                        </div>
+                    ))}
+                </dl>
 
                 {/* Archival Metadata Section (Three-Pillar Architectural Columns) */}
                 <div className="mt-20 md:mt-24 flex flex-wrap items-center justify-center gap-x-16 md:gap-x-24 gap-y-3 w-full mx-auto text-center">

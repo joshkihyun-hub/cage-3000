@@ -17,7 +17,7 @@ const bodoni = Bodoni_Moda({
 });
 
 const SITE_DESCRIPTION =
-  'CAGE3000 — 서울 기반 디자이너 패션 브랜드. 디자이너 김기현이 이끄는 made-to-order 컬렉션으로, 조각적인 실루엣의 의상과 헤드웨어를 한 점씩 만듭니다. A designer fashion label from Seoul.';
+  'CAGE3000 — 서울 기반 디자이너 패션 브랜드. 디자이너 김기현이 이끄는 made-to-order 컬렉션으로, 조각적인 실루엣의 의상과 헤드웨어를 한 점씩 만들며, 아티스트·작품을 위한 커스텀 메이드 제작도 가능합니다. A designer fashion label from Seoul — custom-made pieces on request.';
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -37,11 +37,15 @@ export const metadata = {
     '디자이너 패션 브랜드',
     '서울 패션 브랜드',
     '주문 제작',
+    '커스텀 메이드',
+    '뮤직비디오 의상 제작',
     '모자 브랜드',
     '밀리너리',
     'designer fashion brand',
     'Seoul fashion brand',
     'made to order',
+    'custom made',
+    'custom headwear',
     'millinery',
     'avant-garde headwear',
   ],
@@ -108,10 +112,12 @@ const organizationJsonLd = {
     '디자이너 패션',
     '패션 디자인',
     '주문 제작',
+    '커스텀 메이드',
     '밀리너리',
     '헤드웨어',
     'designer fashion',
     'made-to-order fashion',
+    'custom-made headwear',
     'millinery',
     'avant-garde headwear',
   ],

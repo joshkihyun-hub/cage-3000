@@ -3,9 +3,9 @@ import { pageMetadata } from '@/lib/seo';
 export const metadata = pageMetadata({
   title: 'About',
   description:
-    'CAGE3000와 디자이너 김기현(KHN) 이야기 — 서울을 기반으로 한 점 한 점 손으로 만드는 made-to-order 디자이너 패션 브랜드.',
+    'CAGE3000와 디자이너 김기현(KHN) 이야기 — 서울을 기반으로 한 점 한 점 손으로 만드는 made-to-order 디자이너 패션 브랜드. 커스텀 메이드 제작도 가능합니다.',
   path: '/about',
-  ogDescription: '서울 기반 made-to-order 디자이너 패션 브랜드 CAGE3000와 디자이너 김기현(KHN).',
+  ogDescription: '서울 기반 made-to-order 디자이너 패션 브랜드 CAGE3000와 디자이너 김기현(KHN). 커스텀 메이드 제작 가능.',
 });
 
 export default function AboutLayout({ children }) {
