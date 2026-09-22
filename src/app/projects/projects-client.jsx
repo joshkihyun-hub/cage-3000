@@ -206,7 +206,7 @@ export default function ProjectsClient({ imageSizes }) {
                                                     isActive ? 'blur-none' : 'blur-sm',
                                                 ].join(' ')}
                                             >
-                                                <span className="font-sans text-[15px] md:text-2xl lg:text-3xl leading-none tracking-tight text-black truncate min-w-0">
+                                                <span className="font-sans font-bold text-[15px] md:text-2xl lg:text-3xl leading-none tracking-tight text-black truncate min-w-0">
                                                     {item.title}
                                                 </span>
                                                 <Image
