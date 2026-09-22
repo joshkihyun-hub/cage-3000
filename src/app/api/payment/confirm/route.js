@@ -45,6 +45,7 @@ export async function POST(request) {
     where: orderId ? { id: orderId } : { orderNumber: paymentId },
     select: {
       id: true,
+      orderNumber: true,
       userId: true,
       guestToken: true,
       status: true,
@@ -54,6 +55,13 @@ export async function POST(request) {
 
   if (!order) {
     return NextResponse.json({ message: '주문을 찾을 수 없습니다.' }, { status: 404 });
+  }
+
+  // The PortOne paymentId IS the orderNumber. Without this check, an already
+  // PAID paymentId (e.g. the caller's own earlier order) with the same amount
+  // could be replayed to settle a different, unpaid order.
+  if (order.orderNumber !== paymentId) {
+    return NextResponse.json({ message: '결제 정보가 주문과 일치하지 않습니다.' }, { status: 400 });
   }
 
   // Authorization: the order must belong to either the current session,
