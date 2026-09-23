@@ -1,0 +1,131 @@
+'use client';
+
+import { useRef, useState } from 'react';
+import Image from 'next/image';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { grotesk } from '@/shared/fonts';
+import { LOOKBOOK_COLLECTIONS } from '@/shared/constants/lookbook';
+
+const COLLECTION = LOOKBOOK_COLLECTIONS.find((c) => c.slug === 'green');
+
+// Static imports — placeholder="blur" + next/image optimization rely on these.
+import A1 from '../../../../public/asset/details/lookbook/9hat/A1.jpg';
+import A2 from '../../../../public/asset/details/lookbook/9hat/A2.jpg';
+import A3 from '../../../../public/asset/details/lookbook/9hat/A3.jpeg';
+import B1 from '../../../../public/asset/details/lookbook/9hat/B1.jpg';
+import B3 from '../../../../public/asset/details/lookbook/9hat/B3.jpg';
+import C1 from '../../../../public/asset/details/lookbook/9hat/C1.jpg';
+import C2 from '../../../../public/asset/details/lookbook/9hat/C2.jpg';
+import D1 from '../../../../public/asset/details/lookbook/9hat/D1.jpg';
+import D2 from '../../../../public/asset/details/lookbook/9hat/D2.jpg';
+import D3 from '../../../../public/asset/details/lookbook/9hat/D3.jpg';
+import E1 from '../../../../public/asset/details/lookbook/9hat/E1.jpeg';
+import E2 from '../../../../public/asset/details/lookbook/9hat/E2.jpg';
+import E3 from '../../../../public/asset/details/lookbook/9hat/E3.jpg';
+import F1 from '../../../../public/asset/details/lookbook/9hat/F1.jpg';
+import F2 from '../../../../public/asset/details/lookbook/9hat/F2.jpg';
+import G1 from '../../../../public/asset/details/lookbook/9hat/G1.jpg';
+import G2 from '../../../../public/asset/details/lookbook/9hat/G2.jpg';
+import H1 from '../../../../public/asset/details/lookbook/9hat/H1.jpg';
+import H2 from '../../../../public/asset/details/lookbook/9hat/H2.jpg';
+import H3 from '../../../../public/asset/details/lookbook/9hat/H3.jpg';
+
+const galleryImages = [A1, A2, A3, B1, B3, C1, C2, D1, D2, D3, E1, E2, E3, F1, F2, G1, G2, H1, H2, H3];
+
+// 스크롤 위치에 따라 블러·스케일이 부드럽게 변하는 갤러리 카드.
+// 각 카드가 뷰포트 중앙에 있을 때만 선명해지고, 위·아래로 멀어질수록 흐려진다.
+function GalleryCard({ src, index, onClick }) {
+    const ref = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        // 카드가 화면 하단에 막 진입하는 순간 progress=0,
+        // 화면 상단을 막 빠져나가는 순간 progress=1
+        offset: ['start end', 'end start'],
+    });
+    // 룩북은 제품을 보여주는 곳이라 흐림 없이 또렷하게 — 스크롤 중 아주 옅은 크기 변화만 남긴다.
+    const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.94, 1, 0.94]);
+
+    return (
+        <motion.div
+            ref={ref}
+            style={{ scale }}
+            onClick={onClick}
+            className="relative w-full max-w-2xl mx-auto aspect-[3/4] cursor-zoom-in"
+        >
+            <Image
+                src={src}
+                alt={`CAGE3000 lookbook ${index + 1}`}
+                fill
+                placeholder="blur"
+                sizes="(max-width: 768px) 100vw, 640px"
+                className="object-cover"
+                priority={index < 2}
+            />
+        </motion.div>
+    );
+}
+
+export default function LookbookPage() {
+    const [lightboxImage, setLightboxImage] = useState(null);
+
+    return (
+        <div className="relative bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-40">
+            {/* 목록(/lookbook)과 같은 한 줄 — 왼쪽 컬렉션 이름, 오른쪽 공개 날짜. */}
+            <div className={`${grotesk.className} px-4 md:px-12 mb-16 md:mb-24 flex justify-between text-[11px] md:text-[13px] font-medium tracking-[0.01em] tabular-nums`}>
+                <h1>{COLLECTION.title}</h1>
+                <span>{COLLECTION.date}</span>
+            </div>
+            {/* Image stack — full vertical scroll-driven gallery. */}
+            <div className="relative px-4 md:px-8 space-y-24 md:space-y-32">
+                {galleryImages.map((img, idx) => (
+                    <GalleryCard
+                        key={idx}
+                        src={img}
+                        index={idx}
+                        onClick={() => setLightboxImage(img)}
+                    />
+                ))}
+            </div>
+
+            {/* Lightbox — single tap opens the focused image at full viewport. */}
+            <AnimatePresence>
+                {lightboxImage && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="fixed inset-0 z-50 bg-white/95 flex items-center justify-center p-4 md:p-12 cursor-zoom-out"
+                        onClick={() => setLightboxImage(null)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.96 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.96 }}
+                            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                            className="relative w-full h-full max-w-5xl max-h-[90vh]"
+                        >
+                            <Image
+                                src={lightboxImage}
+                                alt="Enlarged view"
+                                fill
+                                sizes="100vw"
+                                className="object-contain"
+                                priority
+                            />
+                        </motion.div>
+                        <button
+                            className="absolute top-8 right-8 text-black hover:text-zinc-600 transition-colors z-50 p-2"
+                            onClick={(e) => { e.stopPropagation(); setLightboxImage(null); }}
+                            aria-label="Close"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}

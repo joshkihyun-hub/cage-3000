@@ -11,6 +11,7 @@ export default function sitemap() {
     { path: '', priority: 1.0, changeFrequency: 'weekly', images: ['/asset/og/hero-still.jpg'] },
     { path: '/shop', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/lookbook', priority: 0.7, changeFrequency: 'monthly' },
+    { path: '/lookbook/green', priority: 0.6, changeFrequency: 'monthly', images: ['/asset/details/lookbook/9hat/A3.jpeg'] },
     {
       path: '/projects',
       priority: 0.7,

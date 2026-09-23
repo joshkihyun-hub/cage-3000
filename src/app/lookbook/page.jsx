@@ -1,123 +1,89 @@
-'use client';
-
-import { useRef, useState } from 'react';
 import Image from 'next/image';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { getPublicImageSize } from '@/lib/image-size';
+import { grotesk } from '@/shared/fonts';
+import { LOOKBOOK_COLLECTIONS } from '@/shared/constants/lookbook';
 
-// Static imports — placeholder="blur" + next/image optimization rely on these.
-import A1 from '../../../public/asset/details/lookbook/9hat/A1.jpg';
-import A2 from '../../../public/asset/details/lookbook/9hat/A2.jpg';
-import A3 from '../../../public/asset/details/lookbook/9hat/A3.jpeg';
-import B1 from '../../../public/asset/details/lookbook/9hat/B1.jpg';
-import B3 from '../../../public/asset/details/lookbook/9hat/B3.jpg';
-import C1 from '../../../public/asset/details/lookbook/9hat/C1.jpg';
-import C2 from '../../../public/asset/details/lookbook/9hat/C2.jpg';
-import D1 from '../../../public/asset/details/lookbook/9hat/D1.jpg';
-import D2 from '../../../public/asset/details/lookbook/9hat/D2.jpg';
-import D3 from '../../../public/asset/details/lookbook/9hat/D3.jpg';
-import E1 from '../../../public/asset/details/lookbook/9hat/E1.jpeg';
-import E2 from '../../../public/asset/details/lookbook/9hat/E2.jpg';
-import E3 from '../../../public/asset/details/lookbook/9hat/E3.jpg';
-import F1 from '../../../public/asset/details/lookbook/9hat/F1.jpg';
-import F2 from '../../../public/asset/details/lookbook/9hat/F2.jpg';
-import G1 from '../../../public/asset/details/lookbook/9hat/G1.jpg';
-import G2 from '../../../public/asset/details/lookbook/9hat/G2.jpg';
-import H1 from '../../../public/asset/details/lookbook/9hat/H1.jpg';
-import H2 from '../../../public/asset/details/lookbook/9hat/H2.jpg';
-import H3 from '../../../public/asset/details/lookbook/9hat/H3.jpg';
+const label = 'absolute top-1/2 -translate-y-1/2 text-[11px] md:text-[13px] font-medium tracking-[0.01em] tabular-nums';
 
-const galleryImages = [A1, A2, A3, B1, B3, C1, C2, D1, D2, D3, E1, E2, E3, F1, F2, G1, G2, H1, H2, H3];
+// 공개 전 티저의 가장자리 — 사진 모양은 그대로 두고 테두리만 부드럽게 흰 바탕으로 풀어 준다.
+// 페이드는 부드러운 곡선(smoothstep)을 촘촘한 단계로 풀어 쓴다 — 단계가 적으면 꺾이는
+// 자리마다 네모난 선이 비쳐 보인다. 가로·세로 페더를 겹쳐(intersect) 모서리는 조금 더 둥글게.
+const FEATHER_WIDTH = 12; // %
+const FEATHER = (() => {
+  const steps = Array.from({ length: 13 }, (_, i) => i / 12);
+  const ease = (t) => t * t * (3 - 2 * t);
+  const fadeIn = steps.map((t) => `rgba(0,0,0,${ease(t).toFixed(3)}) ${(t * FEATHER_WIDTH).toFixed(2)}%`);
+  const fadeOut = steps.map((t) => `rgba(0,0,0,${ease(1 - t).toFixed(3)}) ${(100 - FEATHER_WIDTH + t * FEATHER_WIDTH).toFixed(2)}%`);
+  return [...fadeIn, ...fadeOut].join(', ');
+})();
+const FOG_MASK = `linear-gradient(to right, ${FEATHER}), linear-gradient(to bottom, ${FEATHER})`;
+const fogStyle = {
+  maskImage: FOG_MASK,
+  WebkitMaskImage: FOG_MASK,
+  maskComposite: 'intersect',
+  WebkitMaskComposite: 'source-in',
+};
 
-// 스크롤 위치에 따라 블러·스케일이 부드럽게 변하는 갤러리 카드.
-// 각 카드가 뷰포트 중앙에 있을 때만 선명해지고, 위·아래로 멀어질수록 흐려진다.
-function GalleryCard({ src, index, onClick }) {
-    const ref = useRef(null);
-    const { scrollYProgress } = useScroll({
-        target: ref,
-        // 카드가 화면 하단에 막 진입하는 순간 progress=0,
-        // 화면 상단을 막 빠져나가는 순간 progress=1
-        offset: ['start end', 'end start'],
-    });
-    // 룩북은 제품을 보여주는 곳이라 흐림 없이 또렷하게 — 스크롤 중 아주 옅은 크기 변화만 남긴다.
-    const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.94, 1, 0.94]);
+// 컬렉션 목록 — 가운데에 대표 이미지 한 장(원본 비율), 왼쪽 끝엔 컬렉션 이름, 오른쪽 끝엔 공개 날짜.
+// 가로 사진은 조금 넓게, 세로 사진은 조금 좁게 놓아 줄마다 크기가 달라진다.
+export default async function LookbookPage() {
+  const collections = await Promise.all(
+    LOOKBOOK_COLLECTIONS.map(async (c) => ({ ...c, size: await getPublicImageSize(c.cover) }))
+  );
 
-    return (
-        <motion.div
-            ref={ref}
-            style={{ scale }}
-            onClick={onClick}
-            className="relative w-full max-w-2xl mx-auto aspect-[3/4] cursor-zoom-in"
-        >
-            <Image
-                src={src}
-                alt={`CAGE3000 lookbook ${index + 1}`}
-                fill
-                placeholder="blur"
-                sizes="(max-width: 768px) 100vw, 640px"
-                className="object-cover"
-                priority={index < 2}
-            />
-        </motion.div>
-    );
-}
-
-export default function LookbookPage() {
-    const [lightboxImage, setLightboxImage] = useState(null);
-
-    return (
-        <div className="relative bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-40">
-            <h1 className="sr-only">CAGE3000 Lookbook</h1>
-            {/* Image stack — full vertical scroll-driven gallery. */}
-            <div className="relative px-4 md:px-8 space-y-24 md:space-y-32">
-                {galleryImages.map((img, idx) => (
-                    <GalleryCard
-                        key={idx}
-                        src={img}
-                        index={idx}
-                        onClick={() => setLightboxImage(img)}
-                    />
-                ))}
-            </div>
-
-            {/* Lightbox — single tap opens the focused image at full viewport. */}
-            <AnimatePresence>
-                {lightboxImage && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="fixed inset-0 z-50 bg-white/95 flex items-center justify-center p-4 md:p-12 cursor-zoom-out"
-                        onClick={() => setLightboxImage(null)}
-                    >
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.96 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.96 }}
-                            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                            className="relative w-full h-full max-w-5xl max-h-[90vh]"
-                        >
-                            <Image
-                                src={lightboxImage}
-                                alt="Enlarged view"
-                                fill
-                                sizes="100vw"
-                                className="object-contain"
-                                priority
-                            />
-                        </motion.div>
-                        <button
-                            className="absolute top-8 right-8 text-black hover:text-zinc-600 transition-colors z-50 p-2"
-                            onClick={(e) => { e.stopPropagation(); setLightboxImage(null); }}
-                            aria-label="Close"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </motion.div>
+  return (
+    <div className={`${grotesk.className} bg-white text-black min-h-screen pt-40 md:pt-48 pb-32`}>
+      <h1 className="sr-only">CAGE3000 Lookbook</h1>
+      <ul className="px-4 md:px-12 space-y-6 md:space-y-8">
+        {collections.map((c, idx) => {
+          const landscape = c.size.width > c.size.height;
+          const inner = (
+            <>
+              <span className={`${label} left-0 ${c.upcoming ? '' : 'group-hover:underline underline-offset-2'}`}>{c.title}</span>
+              <div className={`group/cover relative ${landscape ? 'w-[56vw] md:w-[40vw] md:max-w-[640px]' : 'w-[48vw] md:w-[26vw] md:max-w-[420px]'}`}>
+                <Image
+                  src={c.cover}
+                  alt={c.upcoming ? `${c.title} — ${c.date} 공개 예정` : `${c.title} lookbook`}
+                  width={c.size.width}
+                  height={c.size.height}
+                  sizes={landscape ? '(min-width: 768px) 40vw, 56vw' : '(min-width: 768px) 26vw, 48vw'}
+                  priority={idx === 0}
+                  style={c.upcoming ? fogStyle : undefined}
+                  // 이미 흐리게 만든 파일이라 다시 압축하면 매끈한 번짐에 네모난 얼룩이 생긴다 — 그대로 보낸다.
+                  unoptimized={c.upcoming}
+                  className="block w-full h-auto"
+                />
+                {/* 공개 전 티저: 올리면(모바일은 누르는 동안) 덜 흐린 버전이 천천히 비쳐 올라오고, 놓으면 돌아간다. */}
+                {c.coverHover && (
+                  <Image
+                    src={c.coverHover}
+                    alt=""
+                    aria-hidden
+                    width={c.size.width}
+                    height={c.size.height}
+                    style={fogStyle}
+                    unoptimized
+                    className="absolute inset-0 block w-full h-auto opacity-0 transition-opacity duration-700 ease-out group-hover/cover:opacity-100 group-active/cover:opacity-100"
+                  />
                 )}
-            </AnimatePresence>
-        </div>
-    );
+              </div>
+              <span className={`${label} right-0`}>{c.date}</span>
+            </>
+          );
+          return (
+            <li key={c.slug}>
+              {c.upcoming ? (
+                <div className="relative flex justify-center">{inner}</div>
+              ) : (
+                <Link href={`/lookbook/${c.slug}`} className="group relative flex justify-center">
+                  {inner}
+                </Link>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
 }
