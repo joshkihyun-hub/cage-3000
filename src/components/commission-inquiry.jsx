@@ -84,7 +84,7 @@ export default function CommissionInquiry({ triggerClassName, className = '', ch
                     ) : (
                         <form onSubmit={onSubmit} className="pt-4">
                             <Dialog.Description className="text-[13px] leading-relaxed text-zinc-600 break-keep">
-                                아티스트·작품을 위한 커스텀 메이드 헤드웨어 제작을 문의해 주세요. 일정이나 참고 자료 링크가 있다면 함께 적어 주시면 좋아요.
+                                아티스트·작품을 위한 커스텀 메이드 의상 제작을 문의해 주세요. 일정이나 참고 자료 링크가 있다면 함께 적어 주시면 좋아요.
                             </Dialog.Description>
 
                             <div className="mt-7 space-y-6">
