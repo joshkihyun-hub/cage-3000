@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useRef } from 'react';
+import { grotesk } from '@/shared/fonts';
 
 // `priority` should only be true for above-the-fold cards (e.g. the first grid
 // row on /shop). Marking every card priority forces the browser to preload all
@@ -97,30 +98,14 @@ export const ShopItemCard = ({ item, priority = false }) => {
             </div>
 
             <div className="mt-auto flex justify-between items-end">
-                <div className="space-y-1 select-none">
-                    {/* Ghost-offset labels: same misregistration trick used on /about
-                        — a faded duplicate sits a few pixels to the left of the real
-                        text so it reads like a slightly mis-printed press proof. */}
-                    <h3 className="relative text-[10px] md:text-xs font-medium uppercase tracking-widest text-black">
-                        <span
-                            aria-hidden="true"
-                            className="absolute inset-0 -translate-x-[3px] text-zinc-200/70 pointer-events-none"
-                        >
-                            {item.name}
-                        </span>
-                        <span className="relative">{item.name}</span>
-                    </h3>
-                    <p className="relative text-[10px] md:text-xs font-medium tracking-widest text-zinc-900">
-                        <span
-                            aria-hidden="true"
-                            className="absolute inset-0 -translate-x-[3px] text-zinc-200/70 pointer-events-none"
-                        >
-                            {item.price}
-                        </span>
-                        <span className="relative">{item.price}</span>
-                    </p>
+                {/* 번호와 가격은 한 세트 — About·Projects와 같은 그로테스크, 같은 크기.
+                    번호는 옅게, 가격은 또렷하게. 숫자 폭을 고르게(tabular-nums) 맞추고
+                    모바일은 한 단계 작게, 자간은 살짝 벌려 숫자가 붙어 보이지 않게. */}
+                <div className={`${grotesk.className} select-none text-[11px] md:text-[12px] font-medium leading-[1.4] tracking-[0.02em] md:tracking-[0.01em] tabular-nums`}>
+                    <h3 className="text-zinc-400">{item.name}</h3>
+                    <p className="text-black">{item.price}</p>
                 </div>
-                <div className="w-2 h-2 bg-black rounded-full mb-2 shrink-0"></div>
+                <div className="w-2 h-2 bg-black rounded-full mb-1 shrink-0"></div>
             </div>
         </Link>
     );
