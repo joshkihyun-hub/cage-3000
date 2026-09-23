@@ -24,7 +24,7 @@ const SITE_URL =
   process.env.NEXTAUTH_URL ||
   'https://cage3000.com';
 
-export async function sendEmail({ to, subject, html, text }) {
+export async function sendEmail({ to, subject, html, text, replyTo }) {
   const client = getClient();
   const payload = {
     from: FROM,
@@ -34,7 +34,8 @@ export async function sendEmail({ to, subject, html, text }) {
     text,
   };
   // Resend SDK v4+ uses camelCase (`replyTo`, not `reply_to`).
-  if (REPLY_TO) payload.replyTo = REPLY_TO;
+  // 호출 쪽이 넘긴 replyTo(예: 문의자 주소)가 기본 회신 주소보다 우선한다.
+  if (replyTo || REPLY_TO) payload.replyTo = replyTo || REPLY_TO;
 
   const { data, error } = await client.emails.send(payload);
   if (error) {
@@ -328,5 +329,55 @@ export async function sendPasswordResetEmail({ to, name, token }) {
     subject: '[CAGE3000] 비밀번호 재설정',
     html,
     text: `비밀번호 재설정 링크: ${url}\n링크는 1시간 동안 유효합니다.`,
+  });
+}
+
+// 사용자가 입력한 문자열을 HTML 메일에 넣기 전에 이스케이프.
+const escapeHtml = (s) =>
+  String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+// 프로젝트 페이지의 커미션(커스텀 메이드) 문의 → 운영자에게 전달.
+// 회신 주소를 문의자 이메일로 두어 메일함에서 바로 답장할 수 있게 한다.
+// 받는 주소는 INQUIRY_NOTIFY_EMAIL → ORDER_NOTIFY_EMAIL → contact@cage3000.com 순.
+export async function sendCommissionInquiry({ name, email, organization, message }) {
+  const rawRecipients =
+    process.env.INQUIRY_NOTIFY_EMAIL || process.env.ORDER_NOTIFY_EMAIL || 'contact@cage3000.com';
+  const recipients = rawRecipients.split(',').map((s) => s.trim()).filter(Boolean);
+
+  const row = (label, value) => `
+      <tr>
+        <td style="padding:10px 0;font-size:12px;color:#71717a;width:90px;vertical-align:top;">${label}</td>
+        <td style="padding:10px 0;font-size:13px;color:#27272a;">${value}</td>
+      </tr>`;
+
+  const body = `
+    <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">Commission Inquiry</p>
+    <p style="margin:0 0 24px 0;font-size:14px;color:#27272a;">프로젝트 페이지에서 새 제작 문의가 도착했습니다. 이 메일에 답장하면 문의자에게 바로 전달됩니다.</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e4e4e7;border-bottom:1px solid #e4e4e7;margin:0 0 24px 0;">
+      ${row('이름', escapeHtml(name))}
+      ${row('이메일', `<a href="mailto:${escapeHtml(email)}" style="color:#000;">${escapeHtml(email)}</a>`)}
+      ${organization ? row('소속·프로젝트', escapeHtml(organization)) : ''}
+    </table>
+    <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">Message</p>
+    <div style="font-size:14px;line-height:1.7;color:#18181b;white-space:pre-wrap;">${escapeHtml(message)}</div>
+  `;
+
+  const html = shellTemplate({
+    headline: 'New Commission Inquiry',
+    body,
+    footnote: '본 메일은 cage3000.com 프로젝트 페이지의 문의 양식에서 자동 발송됩니다.',
+  });
+
+  return sendEmail({
+    to: recipients,
+    replyTo: email,
+    subject: `[CAGE3000] 제작 문의 — ${name}${organization ? ` · ${organization}` : ''}`,
+    html,
+    text: `제작 문의\n이름: ${name}\n이메일: ${email}${organization ? `\n소속·프로젝트: ${organization}` : ''}\n\n${message}`,
   });
 }
