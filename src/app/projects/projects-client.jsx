@@ -4,11 +4,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Inter_Tight } from 'next/font/google';
 import { PROJECT1_ITEMS, PROJECT_CATEGORIES } from '../../shared/constants/project1-images';
 import CommissionInquiry from '../../components/commission-inquiry';
-
-const grotesk = Inter_Tight({ subsets: ['latin'], weight: ['400', '500'], display: 'swap' });
+import { grotesk } from '../../shared/fonts';
 
 const FILTERS = [
     { key: 'all', label: 'All' },

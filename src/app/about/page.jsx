@@ -1,57 +1,49 @@
 import Image from 'next/image';
+import { grotesk } from '@/shared/fonts';
+import CommissionInquiry from '@/components/commission-inquiry';
 
+const lineLink = 'hover:underline underline-offset-2 decoration-1';
+
+// 두 단 — 왼쪽엔 작은 흑백 사진 한 장, 오른쪽 절반에 작은 글씨 세 덩어리(소개 · 연락처 · 스튜디오 주소).
 export default function AboutPage() {
     return (
-        <div className="bg-white text-zinc-900 min-h-screen font-sans">
-            <section className="max-w-screen-md mx-auto px-6 md:px-12 pt-40 md:pt-48 pb-40 md:pb-48 flex flex-col items-center">
-
-                {/* Profile Picture (Vertical Rectangular Archival Print) */}
-                <div className="relative w-28 h-36 md:w-32 md:h-40 overflow-hidden border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+        <div className={`${grotesk.className} bg-white text-black min-h-screen pt-32 md:pt-44 pb-40`}>
+            <div className="px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 gap-y-12">
+                <div className="relative w-28 md:w-[150px] aspect-[4/5] overflow-hidden">
                     <Image
                         src="/about_profile.png"
                         alt="Kihyun Kim"
                         fill
-                        className="object-cover object-[38%_center] grayscale brightness-[0.98] contrast-[1.02] transition-transform duration-700 hover:scale-105"
+                        sizes="150px"
                         priority
+                        className="object-cover object-[38%_center] grayscale"
                     />
                 </div>
 
-                {/* Description (Creative Ghost / Double-Exposure Text Layer) */}
-                <div className="relative max-w-sm md:max-w-md mx-auto mt-20 md:mt-24 text-center select-none">
-                    {/* Ghost Offset Layer (Artistic Print Misregistration) */}
-                    <p className="absolute left-[-10px] right-[10px] top-0 text-zinc-200/70 font-sans text-xs md:text-sm font-medium leading-relaxed tracking-wider pointer-events-none">
-                        A studio working between garment, shelter, and gesture, in Seoul.
+                <div className="text-[12px] md:text-[13px] font-medium leading-[1.3] tracking-[-0.005em] space-y-[2.6em]">
+                    <p className="max-w-[22rem]">
+                        A studio working between garment, shelter, and gesture, in&nbsp;Seoul.
                     </p>
-                    {/* Main Text Layer */}
-                    <p className="relative text-zinc-900 font-sans text-xs md:text-sm font-medium leading-relaxed tracking-wider z-10">
-                        A studio working between garment, shelter, and gesture, in Seoul.
-                    </p>
+
+                    <div className="flex flex-col items-start">
+                        <a href="mailto:contact@cage3000.com" className={lineLink}>contact@cage3000.com</a>
+                        <a href="https://instagram.com/cage3k" target="_blank" rel="noopener noreferrer" className={lineLink}>
+                            Instagram
+                        </a>
+                        <CommissionInquiry className={grotesk.className} triggerClassName={`text-left ${lineLink}`}>
+                            Commission inquiry
+                        </CommissionInquiry>
+                    </div>
+
+                    <address className="not-italic">
+                        13, Yeonhui-ro 11sa-gil
+                        <br />
+                        Seodaemun-gu, Seoul
+                        <br />
+                        Republic of Korea
+                    </address>
                 </div>
-
-                {/* Archival Metadata Section (Three-Pillar Architectural Columns) */}
-                <div className="mt-20 md:mt-24 flex flex-wrap items-center justify-center gap-x-16 md:gap-x-24 gap-y-3 w-full mx-auto text-center">
-                    <span className="text-zinc-900 font-sans text-xs md:text-sm font-medium leading-relaxed tracking-wider">
-                        CAGE3000
-                    </span>
-
-                    <a
-                        href="https://instagram.com/cage3k"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-zinc-900 font-sans text-xs md:text-sm font-medium leading-relaxed tracking-wider hover:text-black border-b border-transparent hover:border-black transition-colors"
-                    >
-                        @cage3k
-                    </a>
-
-                    <a
-                        href="mailto:contact@cage3000.com"
-                        className="text-zinc-900 font-sans text-xs md:text-sm font-medium leading-relaxed tracking-wider hover:text-black border-b border-transparent hover:border-black transition-colors"
-                    >
-                        contact@cage3000.com
-                    </a>
-                </div>
-
-            </section>
+            </div>
         </div>
     );
 }
