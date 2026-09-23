@@ -146,11 +146,14 @@ export default function ProjectsClient({ imageSizes }) {
                             </button>
                         ))}
                     </div>
+                    {/* 필터(회색)와 구분되게 검정 + 보드 번호와 같은 점. hover면 화살표만 살짝 앞으로. */}
                     <CommissionInquiry
                         className={grotesk.className}
-                        triggerClassName="md:ml-auto uppercase text-zinc-400 hover:text-black transition-colors"
+                        triggerClassName="group/inquiry md:ml-auto inline-flex items-center gap-1.5 uppercase text-black"
                     >
-                        Commission inquiry →
+                        <span aria-hidden className="w-1.5 h-1.5 rounded-full bg-black" />
+                        Commission inquiry
+                        <span aria-hidden className="inline-block transition-transform duration-300 ease-out group-hover/inquiry:translate-x-0.5">→</span>
                     </CommissionInquiry>
                 </div>
 
