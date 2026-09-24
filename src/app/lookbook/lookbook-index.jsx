@@ -7,7 +7,6 @@ import { grotesk } from '@/shared/fonts';
 import LookbookLightbox from './lightbox';
 
 const label = 'absolute top-1/2 -translate-y-1/2 text-[11px] md:text-[13px] font-medium tracking-[0.01em] tabular-nums';
-const EXPO = [0.16, 1, 0.3, 1];
 const pad = (n) => String(n).padStart(2, '0');
 
 // 공개 전 티저의 가장자리 — 사진 모양은 그대로 두고 테두리만 부드럽게 흰 바탕으로 풀어 준다.
@@ -29,66 +28,46 @@ const fogStyle = {
   WebkitMaskComposite: 'source-in',
 };
 
-// 격자 열 수 — 아래 grid-cols-* 클래스와 같은 기준. 대각선 물결 순서를 계산할 때 쓴다.
-function gridColumns() {
-  const w = window.innerWidth;
-  if (w >= 1024) return 7;
-  if (w >= 768) return 5;
-  if (w >= 480) return 4;
-  return 3;
-}
+// 펼쳐지는 사진 격자 — 담백하게. 칸마다 옅게 나타나며 6px쯤 떠오를 뿐이고,
+// 읽는 순서(왼쪽 → 오른쪽, 위 → 아래)대로 짧게 이어진다.
+// 펼칠 때 높이는 애니메이션하지 않는다 — height:auto를 재는 동안 framer가 스크롤 위치를 되돌려
+// 격자 쪽으로 내려가는 스크롤을 끊어 버린다.
+const SOFT = [0.33, 1, 0.68, 1];
 
-// 펼쳐지는 사진 격자. 각 칸은 아래에서 위로 커튼이 걷히듯 드러나고, 사진은 살짝 확대된 채
-// 제자리로 가라앉는다. 드러나는 순서는 왼쪽 위 → 오른쪽 아래 대각선 물결.
-function CollectionGrid({ collection, columns, onOpen }) {
+function CollectionGrid({ collection, onOpen }) {
   return (
-    // 펼칠 때 높이는 애니메이션하지 않는다 — height:auto를 재는 동안 framer가 스크롤 위치를 되돌려
-    // 격자 쪽으로 내려가는 스크롤을 끊어 버린다. 칸마다 커튼이 걷히는 것만으로 충분히 펼쳐 보인다.
     <motion.div
-      exit={{ height: 0, opacity: 0, transition: { duration: 0.55, ease: EXPO } }}
+      exit={{ height: 0, opacity: 0, transition: { duration: 0.4, ease: SOFT } }}
       className="overflow-hidden"
     >
       <div className="grid grid-cols-3 min-[480px]:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-x-2 gap-y-4 md:gap-x-3 md:gap-y-5 pt-10 md:pt-14 pb-16 md:pb-24">
-        {collection.images.map((img, i) => {
-          const delay = 0.12 + (Math.floor(i / columns) + (i % columns)) * 0.06;
-          return (
-            <div key={img.src}>
-              <motion.button
-                type="button"
-                onClick={() => onOpen(i)}
-                aria-label={`${collection.title} ${pad(i + 1)} 크게 보기`}
-                initial={{ clipPath: 'inset(100% 0% 0% 0%)' }}
-                animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
-                transition={{ duration: 1.1, ease: EXPO, delay }}
-                className="group/thumb relative block w-full aspect-[3/4] overflow-hidden bg-zinc-100 cursor-zoom-in"
-              >
-                <motion.div
-                  className="absolute inset-0"
-                  initial={{ scale: 1.22 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 1.6, ease: EXPO, delay }}
-                >
-                  <Image
-                    src={img}
-                    alt={`${collection.title} lookbook ${i + 1}`}
-                    fill
-                    placeholder="blur"
-                    sizes="(min-width: 1024px) 14vw, (min-width: 768px) 20vw, (min-width: 480px) 25vw, 33vw"
-                    className="object-cover transition-transform duration-700 ease-out group-hover/thumb:scale-[1.04]"
-                  />
-                </motion.div>
-              </motion.button>
-              <motion.span
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: EXPO, delay: delay + 0.35 }}
-                className="block mt-1.5 text-[10px] md:text-[11px] font-medium tabular-nums text-zinc-400"
-              >
-                {pad(i + 1)}
-              </motion.span>
-            </div>
-          );
-        })}
+        {collection.images.map((img, i) => (
+          <motion.div
+            key={img.src}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: SOFT, delay: 0.1 + i * 0.03 }}
+          >
+            <button
+              type="button"
+              onClick={() => onOpen(i)}
+              aria-label={`${collection.title} ${pad(i + 1)} 크게 보기`}
+              className="group/thumb relative block w-full aspect-[3/4] overflow-hidden bg-zinc-100 cursor-zoom-in"
+            >
+              <Image
+                src={img}
+                alt={`${collection.title} lookbook ${i + 1}`}
+                fill
+                placeholder="blur"
+                sizes="(min-width: 1024px) 14vw, (min-width: 768px) 20vw, (min-width: 480px) 25vw, 33vw"
+                className="object-cover transition-transform duration-700 ease-out group-hover/thumb:scale-[1.03]"
+              />
+            </button>
+            <span className="block mt-1.5 text-[10px] md:text-[11px] font-medium tabular-nums text-zinc-400">
+              {pad(i + 1)}
+            </span>
+          </motion.div>
+        ))}
       </div>
     </motion.div>
   );
@@ -98,7 +77,6 @@ function CollectionGrid({ collection, columns, onOpen }) {
 // 사진이 있는 컬렉션을 누르면 그 줄 아래로 격자가 펼쳐지고, 격자의 사진을 누르면 크게 본다.
 export default function LookbookIndex({ collections }) {
   const [openSlug, setOpenSlug] = useState(null);
-  const [columns, setColumns] = useState(7);
   const [lightbox, setLightbox] = useState(null);
   const rowRefs = useRef({});
 
@@ -107,7 +85,6 @@ export default function LookbookIndex({ collections }) {
       setOpenSlug(null);
       return;
     }
-    setColumns(gridColumns());
     setOpenSlug(slug);
     // 펼쳐지는 격자가 화면 안에서 보이도록 그 줄을 헤더 바로 아래로 부드럽게 올린다.
     // 격자가 그려진 다음 프레임에 움직여야 페이지가 충분히 길어져 끝까지 내려간다.
@@ -176,7 +153,7 @@ export default function LookbookIndex({ collections }) {
                 <div className="relative flex justify-center">{inner}</div>
               )}
               <AnimatePresence initial={false}>
-                {isOpen && <CollectionGrid key={c.slug} collection={c} columns={columns} onOpen={setLightbox} />}
+                {isOpen && <CollectionGrid key={c.slug} collection={c} onOpen={setLightbox} />}
               </AnimatePresence>
             </li>
           );
