@@ -2,6 +2,8 @@
 
 import { items } from '@/shared/constants/shop-items';
 import { ProductInfo } from '@/components/product-info';
+import { ShopItemCard } from '@/components/shop-item-card';
+import { grotesk } from '@/shared/fonts';
 import Image from 'next/image';
 import Link from 'next/link';
 import { use, useState } from 'react';
@@ -120,19 +122,21 @@ export default function ShopItemPage({ params }) {
     return <div className="text-center py-32">Item not found</div>;
   }
 
-  const relatedItems = items.filter((i) => i.id !== item.id).slice(0, 3);
+  // 다른 상품 — 지금 상품의 다음 번호부터 3개(끝에서는 처음으로 돌아간다). 상품마다 다른 줄이 보인다.
+  const at = items.findIndex((i) => i.id === item.id);
+  const relatedItems = [1, 2, 3].map((step) => items[(at + step) % items.length]);
 
   return (
     <div className="min-h-screen bg-white">
       {/* ==========================================
           MOBILE LAYOUT (Stacked)
           ========================================== */}
-      <div className="md:hidden flex flex-col pt-20">
+      <div className="md:hidden flex flex-col pt-32">
         {/* Image Section */}
         {/* Image Section */}
         {/* Image Slider Section */}
         <div className="w-full relative aspect-[3/4] bg-white">
-          <div className="absolute inset-0 flex overflow-x-auto snap-x snap-mandatory no-scrollbar">
+          <div className="absolute inset-0 flex overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {item.images && item.images.length > 0 ? (
               item.images.map((imgSrc, idx) => (
                 <div key={idx} className="relative w-full h-full flex-shrink-0 snap-center">
@@ -182,7 +186,8 @@ export default function ShopItemPage({ params }) {
       <div className="hidden md:block">
         <div className="grid grid-cols-2 min-h-screen">
           {/* Carousel Images (Left) */}
-          <div className="relative w-full h-[calc(100vh-80px)] top-[80px] bg-white flex items-center justify-center overflow-hidden">
+          {/* 다른 페이지와 같은 시작선(160px) — 예전엔 80px에서 시작해 로고·메뉴가 사진 위에 겹쳤다. */}
+          <div className="relative w-full h-[calc(100vh-160px)] top-[160px] bg-white flex items-center justify-center overflow-hidden">
             <DesktopCarousel item={item} />
           </div>
 
@@ -196,8 +201,18 @@ export default function ShopItemPage({ params }) {
       </div>
 
       {/* ==========================================
-          SHARED: View More Section
+          SHARED: 다른 상품 — 쇼핑 페이지와 같은 카드. 모바일은 2개, 데스크탑은 3개.
           ========================================== */}
+      <section className="px-6 md:px-12 pt-16 md:pt-24 pb-24">
+        <h2 className={`${grotesk.className} mb-5 md:mb-8 text-[11px] font-medium uppercase tracking-[0.04em] text-zinc-500`}>
+          More pieces
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-8 [&>*:nth-child(3)]:hidden md:[&>*:nth-child(3)]:flex">
+          {relatedItems.map((related) => (
+            <ShopItemCard key={related.id} item={related} />
+          ))}
+        </div>
+      </section>
 
     </div>
   );

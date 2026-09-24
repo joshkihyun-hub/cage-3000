@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import { items } from '@/shared/constants/shop-items';
 import { ShopItemCard } from '@/components/shop-item-card';
-import PageContainer from '@/components/page-container';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { motion } from 'framer-motion';
@@ -65,18 +64,17 @@ function ShopContent() {
 
 export default function ShopPage() {
   return (
-    <PageContainer>
-      <div className="min-h-screen bg-white pt-32 md:pt-40 pb-24">
-        <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
-          {/* useSearchParams()는 정적 렌더링 때 가장 가까운 Suspense 경계를 fallback으로
-              내보낸다. fallback이 빈 칸이면 서버 HTML(검색엔진이 보는 화면)에 상품이 하나도
-              안 담기므로, 기본값인 상품 그리드를 fallback으로 둔다. ?category=clothes일 때만
-              클라이언트에서 COMING SOON으로 바뀐다. */}
-          <Suspense fallback={<ProductGrid />}>
-            <ShopContent />
-          </Suspense>
-        </div>
+    <div className="min-h-screen bg-white pt-32 md:pt-40 pb-24">
+      {/* 여백은 헤더·푸터와 같은 24/48px 한 겹 — 예전엔 공용 틀(PageContainer)과 겹쳐 32/80px이었다. */}
+      <div className="max-w-screen-2xl mx-auto px-6 md:px-12">
+        {/* useSearchParams()는 정적 렌더링 때 가장 가까운 Suspense 경계를 fallback으로
+            내보낸다. fallback이 빈 칸이면 서버 HTML(검색엔진이 보는 화면)에 상품이 하나도
+            안 담기므로, 기본값인 상품 그리드를 fallback으로 둔다. ?category=clothes일 때만
+            클라이언트에서 COMING SOON으로 바뀐다. */}
+        <Suspense fallback={<ProductGrid />}>
+          <ShopContent />
+        </Suspense>
       </div>
-    </PageContainer>
+    </div>
   );
 }

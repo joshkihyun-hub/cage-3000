@@ -99,9 +99,9 @@ export default function LookbookIndex({ collections }) {
   const active = collections.find((c) => c.slug === openSlug);
 
   return (
-    <div className={`${grotesk.className} bg-white text-black min-h-screen pt-40 md:pt-48 pb-32`}>
+    <div className={`${grotesk.className} bg-white text-black min-h-screen pt-32 md:pt-40 pb-32`}>
       <h1 className="sr-only">CAGE3000 Lookbook</h1>
-      <ul className="px-4 md:px-12 space-y-6 md:space-y-8">
+      <ul className="px-6 md:px-12 space-y-6 md:space-y-8">
         {collections.map((c, idx) => {
           const landscape = c.size.width > c.size.height;
           const isOpen = openSlug === c.slug;

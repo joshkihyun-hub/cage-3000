@@ -5,8 +5,8 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="bg-white min-h-screen pt-36 pb-24">
-      <div className="max-w-2xl mx-auto px-6 md:px-8">
+    <div className="bg-white min-h-screen pt-32 md:pt-40 pb-24">
+      <div className="max-w-2xl mx-auto px-6 md:px-12">
         <h1 className="text-3xl text-black mb-2 tracking-widest uppercase">이용약관</h1>
         <p className="text-[10px] text-zinc-400 mb-12 tracking-wide">최종 업데이트: 2025년 07월 27일</p>
 

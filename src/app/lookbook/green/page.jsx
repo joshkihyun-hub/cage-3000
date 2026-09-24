@@ -50,12 +50,12 @@ export default function LookbookPage() {
     return (
         <div className="relative bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-40">
             {/* 목록(/lookbook)과 같은 한 줄 — 왼쪽 컬렉션 이름, 오른쪽 공개 날짜. */}
-            <div className={`${grotesk.className} px-4 md:px-12 mb-16 md:mb-24 flex justify-between text-[11px] md:text-[13px] font-medium tracking-[0.01em] tabular-nums`}>
+            <div className={`${grotesk.className} px-6 md:px-12 mb-16 md:mb-24 flex justify-between text-[11px] md:text-[13px] font-medium tracking-[0.01em] tabular-nums`}>
                 <h1>{COLLECTION.title}</h1>
                 <span>{COLLECTION.date}</span>
             </div>
             {/* Image stack — full vertical scroll-driven gallery. */}
-            <div className="relative px-4 md:px-8 space-y-24 md:space-y-32">
+            <div className="relative px-6 md:px-12 space-y-24 md:space-y-32">
                 {galleryImages.map((img, idx) => (
                     <GalleryCard
                         key={idx}

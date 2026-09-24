@@ -7,7 +7,7 @@ const lineLink = 'hover:underline underline-offset-2 decoration-1';
 // 두 단 — 왼쪽엔 작은 흑백 사진 한 장, 오른쪽 절반에 작은 글씨 세 덩어리(소개 · 연락처 · 스튜디오 주소).
 export default function AboutPage() {
     return (
-        <div className={`${grotesk.className} bg-white text-black min-h-screen pt-32 md:pt-44 pb-40`}>
+        <div className={`${grotesk.className} bg-white text-black min-h-screen pt-32 md:pt-40 pb-40`}>
             <div className="px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 gap-y-12">
                 <div className="relative w-28 md:w-[150px] aspect-[4/5] overflow-hidden">
                     <Image
