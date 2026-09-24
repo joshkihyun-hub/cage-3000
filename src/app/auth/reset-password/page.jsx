@@ -6,11 +6,12 @@ import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { checkPasswordStrength, PASSWORD_MIN_LENGTH } from '@/lib/validation';
 import { Block } from '@/components/block';
+import { grotesk } from '@/shared/fonts';
 
 const strengthLabels = ['', '매우 약함', '약함', '보통', '강함', '매우 강함'];
 
 const inputClass =
-  'w-full border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none';
+  'w-full border-b border-zinc-900 py-1 text-[16px] md:text-[13px] focus:outline-none bg-transparent rounded-none';
 
 function ResetPasswordInner() {
   const params = useSearchParams();
@@ -67,11 +68,11 @@ function ResetPasswordInner() {
     return (
       <PageShell>
         <Block>
-          <h1 className="text-base md:text-lg">Invalid Link</h1>
-          <p className="text-sm text-zinc-700 mt-1">재설정 토큰이 없습니다.</p>
+          <h1 className="text-[16px] md:text-[20px] font-medium tracking-[-0.01em]">Invalid Link</h1>
+          <p className="text-[13px] text-zinc-700 mt-1">재설정 토큰이 없습니다.</p>
         </Block>
         <Block className="mt-3">
-          <Link href="/auth/forgot-password" className="text-sm md:text-base hover:underline">
+          <Link href="/auth/forgot-password" className="text-[13px] font-medium hover:underline underline-offset-2">
             재설정 다시 요청 →
           </Link>
         </Block>
@@ -83,11 +84,11 @@ function ResetPasswordInner() {
     return (
       <PageShell>
         <Block>
-          <h1 className="text-base md:text-lg">Password Updated</h1>
-          <p className="text-sm text-zinc-700 mt-1">새 비밀번호로 로그인해 주세요.</p>
+          <h1 className="text-[16px] md:text-[20px] font-medium tracking-[-0.01em]">Password Updated</h1>
+          <p className="text-[13px] text-zinc-700 mt-1">새 비밀번호로 로그인해 주세요.</p>
         </Block>
         <Block className="mt-3">
-          <Link href="/auth/signin" className="text-sm md:text-base hover:underline">
+          <Link href="/auth/signin" className="text-[13px] font-medium hover:underline underline-offset-2">
             로그인하기 →
           </Link>
         </Block>
@@ -98,19 +99,19 @@ function ResetPasswordInner() {
   return (
     <PageShell>
       <Block>
-        <h1 className="text-base md:text-lg">Reset Password</h1>
+        <h1 className="text-[16px] md:text-[20px] font-medium tracking-[-0.01em]">Reset Password</h1>
       </Block>
 
       <form onSubmit={handleSubmit} className="mt-3 space-y-3">
         {error && (
           <Block>
-            <p className="text-sm text-red-600">{error}</p>
+            <p className="text-[13px] text-red-600">{error}</p>
           </Block>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Block>
-            <label className="block text-sm mb-2" htmlFor="new-password">
+            <label className="block text-[11px] uppercase tracking-[0.04em] text-zinc-500 mb-2" htmlFor="new-password">
               New Password
             </label>
             <div className="relative">
@@ -147,18 +148,18 @@ function ResetPasswordInner() {
                     style={{ width: `${(strength.score / 4) * 100}%` }}
                   />
                 </div>
-                <p className="text-xs text-zinc-600 w-16 text-right">
+                <p className="text-[11px] text-zinc-600 w-16 text-right">
                   {strengthLabels[Math.max(1, strength.score)]}
                 </p>
               </div>
             )}
-            <p className="text-xs text-zinc-500 mt-2">
+            <p className="text-[11px] text-zinc-500 mt-2">
               최소 {PASSWORD_MIN_LENGTH}자, 영문·숫자 포함
             </p>
           </Block>
 
           <Block>
-            <label className="block text-sm mb-2" htmlFor="confirm-password">
+            <label className="block text-[11px] uppercase tracking-[0.04em] text-zinc-500 mb-2" htmlFor="confirm-password">
               Confirm
             </label>
             <input
@@ -170,7 +171,7 @@ function ResetPasswordInner() {
               className={inputClass}
             />
             {confirm && password !== confirm && (
-              <p className="text-xs text-red-600 mt-2">비밀번호가 일치하지 않습니다.</p>
+              <p className="text-[11px] text-red-600 mt-2">비밀번호가 일치하지 않습니다.</p>
             )}
           </Block>
         </div>
@@ -179,7 +180,7 @@ function ResetPasswordInner() {
           <button
             type="submit"
             disabled={!formValid || submitting}
-            className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed"
+            className="text-[13px] font-medium hover:underline underline-offset-2 disabled:text-zinc-400 disabled:cursor-not-allowed"
           >
             {submitting ? '재설정 중…' : '비밀번호 변경 →'}
           </button>
@@ -191,7 +192,7 @@ function ResetPasswordInner() {
 
 function PageShell({ children }) {
   return (
-    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+    <div className={`${grotesk.className} bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24`}>
       <div className="container mx-auto px-6 md:px-12 max-w-screen-md">{children}</div>
     </div>
   );

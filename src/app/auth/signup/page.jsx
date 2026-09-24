@@ -13,12 +13,14 @@ import {
   checkPasswordStrength,
   PASSWORD_MIN_LENGTH,
 } from '@/lib/validation';
+import { grotesk } from '@/shared/fonts';
+import { Block } from '@/components/block';
 
 const inputClass =
-  'w-full border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none';
+  'w-full border-b border-zinc-900 py-1 text-[16px] md:text-[13px] focus:outline-none bg-transparent rounded-none';
 
 const errorInputClass =
-  'w-full border-b border-red-500 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none';
+  'w-full border-b border-red-500 py-1 text-[16px] md:text-[13px] focus:outline-none bg-transparent rounded-none';
 
 const strengthLabels = ['', '매우 약함', '약함', '보통', '강함', '매우 강함'];
 
@@ -144,15 +146,15 @@ export default function SignUp() {
   };
 
   return (
-    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+    <div className={`${grotesk.className} bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24`}>
       <div className="container mx-auto px-6 md:px-12 max-w-screen-md">
 
         <Block>
-          <h1 className="text-base md:text-lg">Register Account</h1>
+          <h1 className="text-[16px] md:text-[20px] font-medium tracking-[-0.01em]">Register Account</h1>
         </Block>
 
         <Block className="mt-3">
-          <p className="text-sm text-zinc-700">
+          <p className="text-[13px] text-zinc-700">
             이미 회원이신가요?{' '}
             <Link href="/auth/signin" className="underline hover:text-zinc-500">
               로그인
@@ -165,11 +167,11 @@ export default function SignUp() {
             <button
               type="button"
               onClick={() => signIn('google', { callbackUrl: '/' })}
-              className="text-sm md:text-base hover:underline"
+              className="text-[13px] font-medium hover:underline underline-offset-2"
             >
               Continue with Google →
             </button>
-            <p className="mt-2 text-xs text-zinc-500 leading-relaxed">
+            <p className="mt-2 text-[11px] text-zinc-500 leading-relaxed">
               구글로 가입 시{' '}
               <Link href="/terms" target="_blank" className="underline hover:text-black">
                 이용약관
@@ -186,7 +188,7 @@ export default function SignUp() {
         <form onSubmit={handleSubmit} className="mt-3 space-y-3" noValidate>
           {serverError && (
             <Block>
-              <p className="text-sm text-red-600">{serverError}</p>
+              <p className="text-[13px] text-red-600">{serverError}</p>
             </Block>
           )}
 
@@ -242,7 +244,7 @@ export default function SignUp() {
             <div className="space-y-3">
               <div className="flex gap-3 items-center">
                 <input
-                  className="w-32 border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none"
+                  className="w-32 border-b border-zinc-900 py-1 text-[16px] md:text-[13px] focus:outline-none bg-transparent rounded-none"
                   placeholder="우편번호"
                   value={zipCode}
                   readOnly
@@ -250,7 +252,7 @@ export default function SignUp() {
                 <button
                   type="button"
                   onClick={() => setIsPostcodeOpen(true)}
-                  className="text-sm hover:underline"
+                  className="text-[13px] hover:underline underline-offset-2"
                 >
                   검색
                 </button>
@@ -322,12 +324,12 @@ export default function SignUp() {
                       style={{ width: `${(strength.score / 4) * 100}%` }}
                     />
                   </div>
-                  <p className="text-xs text-zinc-600 w-16 text-right">
+                  <p className="text-[11px] text-zinc-600 w-16 text-right">
                     {strengthLabels[Math.max(1, strength.score)]}
                   </p>
                 </div>
               )}
-              <p className="text-xs text-zinc-500 mt-2">
+              <p className="text-[11px] text-zinc-500 mt-2">
                 최소 {PASSWORD_MIN_LENGTH}자, 영문·숫자 포함
               </p>
               {shouldShow('password') && <ErrorText>{errors.password}</ErrorText>}
@@ -368,7 +370,7 @@ export default function SignUp() {
                   onChange={toggleAll}
                   className="w-4 h-4 accent-black"
                 />
-                <span className="text-sm">전체 동의</span>
+                <span className="text-[13px]">전체 동의</span>
               </label>
 
               <div className="pl-6 space-y-2">
@@ -379,7 +381,7 @@ export default function SignUp() {
                     onChange={(e) => setTermsAgreed(e.target.checked)}
                     className="mt-1 w-4 h-4 accent-black"
                   />
-                  <span className="text-sm text-zinc-700 leading-relaxed">
+                  <span className="text-[13px] text-zinc-700 leading-relaxed">
                     <span className="text-red-600 mr-1">*</span>
                     <Link href="/terms" target="_blank" className="underline hover:text-black">
                       이용약관
@@ -395,7 +397,7 @@ export default function SignUp() {
                     onChange={(e) => setPrivacyAgreed(e.target.checked)}
                     className="mt-1 w-4 h-4 accent-black"
                   />
-                  <span className="text-sm text-zinc-700 leading-relaxed">
+                  <span className="text-[13px] text-zinc-700 leading-relaxed">
                     <span className="text-red-600 mr-1">*</span>
                     <Link href="/privacy" target="_blank" className="underline hover:text-black">
                       개인정보 수집 및 이용
@@ -411,7 +413,7 @@ export default function SignUp() {
                     onChange={(e) => setMarketingConsent(e.target.checked)}
                     className="mt-1 w-4 h-4 accent-black"
                   />
-                  <span className="text-sm text-zinc-500 leading-relaxed">
+                  <span className="text-[13px] text-zinc-500 leading-relaxed">
                     마케팅 정보 수신(이메일·SMS)에 동의합니다.
                   </span>
                 </label>
@@ -423,7 +425,7 @@ export default function SignUp() {
             <button
               type="submit"
               disabled={submitting || !formValid}
-              className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed"
+              className="text-[13px] font-medium hover:underline underline-offset-2 disabled:text-zinc-400 disabled:cursor-not-allowed"
             >
               {submitting ? '처리 중…' : '회원가입 →'}
             </button>
@@ -434,24 +436,17 @@ export default function SignUp() {
   );
 }
 
-function Block({ children, className = '' }) {
-  return (
-    <section className={`border-t border-l border-zinc-900 pt-2 pl-3 pb-4 ${className}`}>
-      {children}
-    </section>
-  );
-}
 
 function Label({ htmlFor, required, optional, children }) {
   return (
-    <label htmlFor={htmlFor} className="block text-sm mb-2">
+    <label htmlFor={htmlFor} className="block text-[11px] uppercase tracking-[0.04em] text-zinc-500 mb-2">
       {children}
       {required && <span className="text-red-600 ml-1">*</span>}
-      {optional && <span className="text-zinc-500 ml-1 text-xs">선택</span>}
+      {optional && <span className="text-zinc-500 ml-1 text-[11px]">선택</span>}
     </label>
   );
 }
 
 function ErrorText({ children }) {
-  return <p className="text-xs text-red-600 mt-2">{children}</p>;
+  return <p className="text-[11px] text-red-600 mt-2">{children}</p>;
 }

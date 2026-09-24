@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Block } from '@/components/block';
+import { grotesk } from '@/shared/fonts';
 
 function VerifyEmailInner() {
   const params = useSearchParams();
@@ -43,24 +44,24 @@ function VerifyEmailInner() {
   }, [token]);
 
   return (
-    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+    <div className={`${grotesk.className} bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24`}>
       <div className="container mx-auto px-6 md:px-12 max-w-screen-md">
 
         {state.status === 'loading' && (
           <Block>
-            <h1 className="text-base md:text-lg">이메일을 인증하는 중…</h1>
-            <p className="text-sm text-zinc-500 mt-1">잠시만 기다려 주세요.</p>
+            <h1 className="text-[16px] md:text-[20px] font-medium tracking-[-0.01em]">이메일을 인증하는 중…</h1>
+            <p className="text-[13px] text-zinc-500 mt-1">잠시만 기다려 주세요.</p>
           </Block>
         )}
 
         {state.status === 'success' && (
           <>
             <Block>
-              <h1 className="text-base md:text-lg">Verified</h1>
-              <p className="text-sm text-zinc-700 mt-1">{state.message}</p>
+              <h1 className="text-[16px] md:text-[20px] font-medium tracking-[-0.01em]">Verified</h1>
+              <p className="text-[13px] text-zinc-700 mt-1">{state.message}</p>
             </Block>
             <Block className="mt-3">
-              <Link href="/auth/signin" className="text-sm md:text-base hover:underline">
+              <Link href="/auth/signin" className="text-[13px] font-medium hover:underline underline-offset-2">
                 로그인하기 →
               </Link>
             </Block>
@@ -70,11 +71,11 @@ function VerifyEmailInner() {
         {state.status === 'error' && (
           <>
             <Block>
-              <h1 className="text-base md:text-lg">Verification Failed</h1>
-              <p className="text-sm text-red-600 mt-1">{state.message}</p>
+              <h1 className="text-[16px] md:text-[20px] font-medium tracking-[-0.01em]">Verification Failed</h1>
+              <p className="text-[13px] text-red-600 mt-1">{state.message}</p>
             </Block>
             <Block className="mt-3">
-              <Link href="/auth/signin" className="text-sm md:text-base hover:underline">
+              <Link href="/auth/signin" className="text-[13px] font-medium hover:underline underline-offset-2">
                 로그인 페이지로 →
               </Link>
             </Block>

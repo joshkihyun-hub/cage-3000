@@ -4,6 +4,8 @@ import { Suspense, useEffect, useState } from 'react';
 import { getProviders, signIn, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { grotesk } from '@/shared/fonts';
+import { Block } from '@/components/block';
 
 // NextAuth가 ?error=로 돌려보내는 코드 → 사용자 메시지.
 const URL_ERROR_MESSAGES = {
@@ -82,16 +84,16 @@ function SignInForm() {
   };
 
   return (
-    <div className="bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24 font-sans">
+    <div className={`${grotesk.className} bg-white text-zinc-900 min-h-screen pt-32 md:pt-40 pb-24`}>
       <div className="container mx-auto px-6 md:px-12 max-w-screen-md">
 
         <Block>
-          <h1 className="text-base md:text-lg">Sign In</h1>
+          <h1 className="text-[16px] md:text-[20px] font-medium tracking-[-0.01em]">Sign In</h1>
         </Block>
 
         {fromCheckout && (
           <Block className="mt-3">
-            <p className="text-sm leading-relaxed">
+            <p className="text-[13px] leading-relaxed">
               계정 없이 구매하실 수 있어요.{' '}
               <Link href="/checkout" className="underline hover:text-zinc-600">
                 비회원으로 주문하기
@@ -102,7 +104,7 @@ function SignInForm() {
 
         {registered && (
           <Block className="mt-3">
-            <p className="text-sm leading-relaxed">
+            <p className="text-[13px] leading-relaxed">
               회원가입이 완료되었습니다. 인증 메일을 발송했으니 이메일을 확인해 주세요.
             </p>
           </Block>
@@ -111,17 +113,17 @@ function SignInForm() {
         <form onSubmit={handleSubmit} className="mt-3 space-y-3">
           {error && (
             <Block>
-              <p className="text-sm text-red-600">{error}</p>
+              <p className="text-[13px] text-red-600">{error}</p>
             </Block>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Block>
-              <label className="block text-sm mb-2" htmlFor="email">
+              <label className="block text-[11px] uppercase tracking-[0.04em] text-zinc-500 mb-2" htmlFor="email">
                 Email
               </label>
               <input
-                className="w-full border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none"
+                className="w-full border-b border-zinc-900 py-1 text-[16px] md:text-[13px] focus:outline-none bg-transparent rounded-none"
                 id="email"
                 type="email"
                 autoComplete="email"
@@ -131,11 +133,11 @@ function SignInForm() {
             </Block>
 
             <Block>
-              <label className="block text-sm mb-2" htmlFor="password">
+              <label className="block text-[11px] uppercase tracking-[0.04em] text-zinc-500 mb-2" htmlFor="password">
                 Password
               </label>
               <input
-                className="w-full border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none"
+                className="w-full border-b border-zinc-900 py-1 text-[16px] md:text-[13px] focus:outline-none bg-transparent rounded-none"
                 id="password"
                 type="password"
                 autoComplete="current-password"
@@ -149,7 +151,7 @@ function SignInForm() {
             <button
               type="submit"
               disabled={submitting}
-              className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed"
+              className="text-[13px] font-medium hover:underline underline-offset-2 disabled:text-zinc-400 disabled:cursor-not-allowed"
             >
               {submitting ? '로그인 중…' : 'Submit →'}
             </button>
@@ -160,7 +162,7 @@ function SignInForm() {
               <button
                 type="button"
                 onClick={() => signIn('google', { callbackUrl })}
-                className="text-sm md:text-base hover:underline"
+                className="text-[13px] font-medium hover:underline underline-offset-2"
               >
                 Continue with Google →
               </button>
@@ -169,12 +171,12 @@ function SignInForm() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Block>
-              <Link href="/auth/forgot-password" className="text-sm hover:underline">
+              <Link href="/auth/forgot-password" className="text-[13px] hover:underline underline-offset-2">
                 Forgot Password
               </Link>
             </Block>
             <Block>
-              <Link href="/auth/signup" className="text-sm hover:underline">
+              <Link href="/auth/signup" className="text-[13px] hover:underline underline-offset-2">
                 Register
               </Link>
             </Block>
@@ -185,13 +187,6 @@ function SignInForm() {
   );
 }
 
-function Block({ children, className = '' }) {
-  return (
-    <section className={`border-t border-l border-zinc-900 pt-2 pl-3 pb-4 ${className}`}>
-      {children}
-    </section>
-  );
-}
 
 export default function SignIn() {
   return (
