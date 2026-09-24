@@ -185,26 +185,27 @@ export default function RootLayout({ children }) {
             <main className="flex-grow w-full">
               {children}
             </main>
+            {/* 사업자 정보 푸터 — 법정 표기라 빼지 않되, 작은 글씨·좁은 줄간격으로 자리를 적게 차지하게.
+                모바일에선 브랜드 줄과 정책 링크를 가로로 흘려 세로 길이를 줄인다. */}
             <footer className="w-full border-t border-zinc-200 bg-white">
-              {/* Business Info Section */}
-              <div className="max-w-screen-2xl mx-auto px-6 md:px-12 py-10">
-                <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-8">
+              <div className="max-w-screen-2xl mx-auto px-6 md:px-12 py-6 md:py-7 text-[9px] leading-[1.5]">
+                <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3.5 md:gap-8">
                   {/* Brand */}
-                  <div className="flex flex-col gap-2">
-                    <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-800 font-medium">CAGE3000</p>
-                    <p className="text-[10px] text-zinc-400 tracking-wide">케이에이치엔(KHN)</p>
+                  <div className="flex flex-row flex-wrap items-baseline gap-x-3 gap-y-0.5 md:flex-col md:gap-0.5">
+                    <p className="uppercase tracking-[0.04em] text-zinc-800 font-medium">CAGE3000</p>
+                    <p className="text-zinc-400 tracking-wide">케이에이치엔(KHN)</p>
                     <a
                       href="https://instagram.com/cage3k"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-1 text-[10px] uppercase tracking-[0.2em] text-zinc-400 hover:text-black transition-colors"
+                      className="uppercase tracking-[0.04em] text-zinc-400 hover:text-black transition-colors"
                     >
                       Instagram ↗
                     </a>
                   </div>
 
                   {/* Business Details */}
-                  <div className="flex flex-col gap-1.5 text-[10px] text-zinc-400 leading-relaxed">
+                  <div className="flex flex-col text-zinc-400">
                     <p><span className="text-zinc-600 font-medium">대표자</span> &nbsp;김기현</p>
                     <p><span className="text-zinc-600 font-medium">사업자등록번호</span> &nbsp;830-32-01740</p>
                     <p><span className="text-zinc-600 font-medium">사업장 주소</span> &nbsp;서울특별시 서대문구 연희로11사길 13 (연희동)</p>
@@ -212,7 +213,7 @@ export default function RootLayout({ children }) {
                   </div>
 
                   {/* Policy Links */}
-                  <div className="flex flex-col gap-2 text-[10px] text-zinc-400">
+                  <div className="flex flex-row flex-wrap gap-x-3 gap-y-0.5 md:flex-col md:gap-0.5 text-zinc-400">
                     <Link href="/faq" className="hover:text-black transition-colors tracking-wide">FAQ</Link>
                     <Link href="/order-lookup" className="hover:text-black transition-colors tracking-wide">주문조회</Link>
                     <Link href="/terms" className="hover:text-black transition-colors tracking-wide">이용약관</Link>
@@ -222,7 +223,7 @@ export default function RootLayout({ children }) {
                 </div>
 
                 {/* Divider + Copyright */}
-                <div className="mt-8 pt-6 border-t border-zinc-100 flex flex-col md:flex-row md:justify-between items-center gap-2 text-[10px] text-zinc-300">
+                <div className="mt-4 pt-3 border-t border-zinc-100 flex flex-col md:flex-row md:justify-between items-center gap-0.5 text-zinc-300">
                   <p>&copy; {new Date().getFullYear()} CAGE3000 / 케이에이치엔(KHN). All rights reserved.</p>
                   <p>통신판매업 신고번호 제2026-서울서대문-0621호</p>
                 </div>
