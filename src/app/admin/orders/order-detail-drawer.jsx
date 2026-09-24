@@ -21,6 +21,7 @@ export default function OrderDetailDrawer({ orderId, onClose, onUpdated }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [notice, setNotice] = useState(''); // 저장 후 고객 알림 메일 결과
 
   const [statusDraft, setStatusDraft] = useState('pending');
   const [carrierDraft, setCarrierDraft] = useState('');
@@ -32,6 +33,7 @@ export default function OrderDetailDrawer({ orderId, onClose, onUpdated }) {
     let cancelled = false;
     setLoading(true);
     setError('');
+    setNotice('');
     fetch(`/api/admin/orders/${orderId}`)
       .then(async (res) => {
         if (!res.ok) throw new Error('조회 실패');
@@ -68,7 +70,7 @@ export default function OrderDetailDrawer({ orderId, onClose, onUpdated }) {
 
   const handleSave = async () => {
     if (!order) return;
-    setSaving(true); setError('');
+    setSaving(true); setError(''); setNotice('');
     try {
       const res = await fetch(`/api/admin/orders/${order.id}`, {
         method: 'PATCH',
@@ -84,6 +86,8 @@ export default function OrderDetailDrawer({ orderId, onClose, onUpdated }) {
       if (!res.ok) throw new Error(json.error || '저장 실패');
       setOrder(json.order);
       onUpdated?.(json.order);
+      if (json.notified) setNotice(`고객에게 '${ORDER_STATUS_LABEL[json.notified]}' 알림 메일을 보냈습니다.`);
+      if (json.notifyError) setError(json.notifyError);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -250,6 +254,17 @@ export default function OrderDetailDrawer({ orderId, onClose, onUpdated }) {
                     placeholder="내부 메모"
                   />
                 </div>
+
+                {/* '제작 중'·'배송 중'으로 저장하면 고객에게 알림 메일이 간다 — 미리 알려 준다. */}
+                {statusDraft !== order.status && (statusDraft === 'preparing' || statusDraft === 'shipped') && (
+                  <p className="text-[11px] text-zinc-600 leading-relaxed bg-zinc-50 border border-zinc-100 px-3 py-2">
+                    저장하면 고객에게 &lsquo;{ORDER_STATUS_LABEL[statusDraft]}&rsquo; 알림 메일이 발송됩니다.
+                    {statusDraft === 'shipped' && !trackingDraft.trim() && (
+                      <> 운송장 번호가 비어 있어요 — 입력하면 메일에 함께 들어갑니다.</>
+                    )}
+                  </p>
+                )}
+                {notice && <p className="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-2">{notice}</p>}
 
                 <div className="flex justify-end">
                   <button

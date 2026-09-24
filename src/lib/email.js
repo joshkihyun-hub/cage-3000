@@ -381,3 +381,76 @@ export async function sendCommissionInquiry({ name, email, organization, message
     text: `제작 문의\n이름: ${name}\n이메일: ${email}${organization ? `\n소속·프로젝트: ${organization}` : ''}\n\n${message}`,
   });
 }
+
+// 주문 진행 알림 — 관리자가 주문 상태를 '제작 중' 또는 '배송 중'으로 바꾸는 순간 고객에게 간다.
+// 회원은 마이페이지, 비회원은 주문조회 페이지로 안내한다.
+const ORDER_PROGRESS = {
+  preparing: {
+    headline: 'Now in the Making',
+    subject: (orderNumber) => `[CAGE3000] 주문하신 상품의 제작을 시작했습니다 — ${orderNumber}`,
+    lead: '주문하신 상품의 제작을 시작했습니다. 한 점씩 손으로 만들어 영업일 기준 4–6일 안에 완성한 뒤 발송해 드릴게요.',
+  },
+  shipped: {
+    headline: 'On Its Way',
+    subject: (orderNumber) => `[CAGE3000] 주문하신 상품을 발송했습니다 — ${orderNumber}`,
+    lead: '제작을 마친 상품을 발송했습니다. 아래 운송장 번호로 배송 상황을 확인하실 수 있어요.',
+  },
+};
+
+export async function sendOrderProgressEmail({
+  to,
+  name,
+  orderNumber,
+  status, // 'preparing' | 'shipped'
+  trackingCarrier,
+  trackingNumber,
+  isGuest,
+}) {
+  const copy = ORDER_PROGRESS[status];
+  if (!copy || !to) return null;
+
+  const greeting = name ? `${escapeHtml(name)}님,` : '안녕하세요,';
+  const ctaUrl = `${SITE_URL}${isGuest ? '/order-lookup' : '/my-page'}`;
+  const hasTracking = status === 'shipped' && trackingNumber;
+
+  const trackingBlock = hasTracking
+    ? `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e4e4e7;border-bottom:1px solid #e4e4e7;margin:0 0 24px 0;">
+      <tr>
+        <td style="padding:10px 0;font-size:12px;color:#71717a;width:90px;">택배사</td>
+        <td style="padding:10px 0;font-size:13px;color:#27272a;">${escapeHtml(trackingCarrier || '-')}</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 0;font-size:12px;color:#71717a;">운송장 번호</td>
+        <td style="padding:10px 0;font-size:15px;color:#000;font-weight:600;letter-spacing:0.03em;">${escapeHtml(trackingNumber)}</td>
+      </tr>
+    </table>`
+    : '';
+
+  const body = `
+    <p style="margin:0 0 20px 0;">${greeting}</p>
+    <p style="margin:0 0 20px 0;">${copy.lead}</p>
+    <p style="margin:0 0 24px 0;font-size:13px;color:#71717a;">주문번호 <strong style="color:#000;letter-spacing:0.05em;">${escapeHtml(orderNumber)}</strong></p>
+    ${trackingBlock}
+  `;
+
+  const html = shellTemplate({
+    headline: copy.headline,
+    body,
+    ctaLabel: 'View Order',
+    ctaUrl,
+    footnote: '주문 진행 상황이 바뀔 때 자동으로 발송되는 메일입니다. 문의는 이 메일에 회신해 주세요.',
+  });
+
+  const text = [
+    name ? `${name}님,` : '안녕하세요,',
+    '',
+    copy.lead,
+    `주문번호: ${orderNumber}`,
+    ...(hasTracking ? [`택배사: ${trackingCarrier || '-'}`, `운송장 번호: ${trackingNumber}`] : []),
+    '',
+    `주문 확인: ${ctaUrl}`,
+  ].join('\n');
+
+  return sendEmail({ to, subject: copy.subject(orderNumber), html, text });
+}

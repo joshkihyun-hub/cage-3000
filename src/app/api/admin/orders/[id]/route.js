@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-guards';
 import { isValidOrderStatus } from '@/lib/order-status';
+import { sendOrderProgressEmail } from '@/lib/email';
 
 export async function GET(_req, { params }) {
   const { error } = await requireAdmin();
@@ -95,7 +96,36 @@ export async function PATCH(req, { params }) {
         user: { select: { id: true, name: true, email: true } },
       },
     });
-    return NextResponse.json({ order: updated });
+    // '제작 중' · '배송 중'으로 넘어가는 순간에만 고객에게 진행 알림을 보낸다(같은 상태로 다시 저장하면 안 감).
+    // 메일이 실패해도 상태 변경은 유지하고, 관리자 화면에 결과만 알린다.
+    let notified = null;
+    let notifyError = null;
+    const becameProgress =
+      data.status && data.status !== existing.status && ['preparing', 'shipped'].includes(data.status);
+    if (becameProgress) {
+      const to = updated.user?.email || updated.guestEmail;
+      if (!to) {
+        notifyError = '고객 이메일이 없어 알림을 보내지 못했습니다.';
+      } else {
+        try {
+          await sendOrderProgressEmail({
+            to,
+            name: updated.user?.name || updated.recipientName,
+            orderNumber: updated.orderNumber,
+            status: data.status,
+            trackingCarrier: updated.trackingCarrier,
+            trackingNumber: updated.trackingNumber,
+            isGuest: !updated.userId,
+          });
+          notified = data.status;
+        } catch (mailErr) {
+          console.error('[admin/orders] progress email failed', { orderNumber: updated.orderNumber, message: mailErr?.message });
+          notifyError = '상태는 저장됐지만 알림 메일 발송에 실패했습니다.';
+        }
+      }
+    }
+
+    return NextResponse.json({ order: updated, notified, notifyError });
   } catch (err) {
     console.error('Order update error:', err);
     return NextResponse.json({ error: 'Update failed' }, { status: 500 });
