@@ -18,9 +18,9 @@ const MOBILE_QUERY = '(max-width: 767.98px)';   // Tailwind md 브레이크포�
 //
 // veiled: 아직 공개 전이라 가려둔 패널. 공개할 때 false로 바꾸기만 하면 된다.
 // seam:   루프 이음새에 처리가 필요한 패널. 자체 루프가 맞는 소재는 false다.
-// still:  재생이 막혔을 때 걸어둘 장면(초). `${key}-still.jpg`가 인코딩된 영상의
-//         바로 이 시점 프레임이라, 터치로 풀리면 정지 화면에서 그대로 움직인다.
-//         첫 프레임부터 인물이 보이는 소재는 null — 기존 포스터로 충분하다.
+// still:  <img>로도 못 움직이는 브라우저에서 걸어둘 장면(초). `${key}-still.jpg`가
+//         인코딩된 영상의 바로 이 시점 프레임이라, 터치로 풀리면 정지 화면에서
+//         그대로 움직인다. 첫 프레임부터 인물이 보이는 소재는 null — 포스터로 충분하다.
 const PANELS = [
   // 맨 위 — test3, 남자. 먼저 공개하는 영상이라 가리지 않는다.
   // 좌우를 뒤집어 걷는 방향을 돌렸다. CSS는 translate를 적용한 뒤 scale을
@@ -42,11 +42,24 @@ const PANELS = [
 ];
 
 // 자동재생이 막히는 곳이 있다 — 저전력 모드의 iPhone, 그리고 인스타그램 같은
-// 인앱 브라우저(WKWebView 기본값이 음소거 영상에도 터치를 요구한다). 이때는
-// 정지 화면을 걸어두고 화면 어디든 첫 터치에서 재생을 건다. 로고를 눌러 홈을
-// 다시 띄우면 되던 것도 같은 원리다 — 터치 직후 몇 초는 재생이 허락된다.
+// 인앱 브라우저(WKWebView 기본값이 음소거 영상에도 터치를 요구하고, 앱 설정이라
+// 페이지에서는 풀 수 없다). 로고를 눌러 홈을 다시 띄우면 되던 것도 터치 직후
+// 몇 초는 재생이 허락되기 때문이다.
+//
+// 그래서 막히면 같은 영상을 <img>로 띄운다. WebKit은 <img>에 넣은 MP4를 GIF처럼
+// 움직이는 이미지로 디코딩하는데, 미디어가 아니라서 자동재생 정책이 닿지 않는다.
+// 다만 파일을 다 받은 뒤에야 움직이므로 모바일용 720p를 쓴다.
+// 이음새 디포커스는 CSS가 currentTime을 보고 거는 효과라 <img>에서는 걸 수 없다 —
+// seam 패널은 그 디포커스를 모바일 기준으로 구워 넣은 `${key}-img.mp4`를 쓴다.
+//
+// <img>로도 안 되는 브라우저(크로뮴 계열)는 정지 화면을 걸어두고 화면 어디든
+// 첫 터치에서 재생을 건다.
 const UNLOCK_EVENTS = ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'];
 const UNLOCK_OPTS = { capture: true, passive: true };
+
+function imageSource({ key, seam }) {
+  return seam ? `/asset/video/${key}-img.mp4` : `/asset/video/${key}-720-hevc.mp4`;
+}
 
 // 가려둔 패널. 블러만 세게 걸면 어두운 인물이 패널 전체로 번지고 래퍼가
 // 네모로 잘라내서 "회색 사각형"이 된다 — 그동안 지켜온 경계 안 보임이 깨진다.
@@ -86,10 +99,12 @@ function pickSource(key, { isMobile, canHevc1080, canHevc720 }) {
 export default function HomePage() {
   // ref 배열을 렌더마다 새로 만들면 훅 의존성이 매번 바뀐다 — 하나의 ref에 모아둔다.
   const videosRef = useRef([]);
+  const imagesRef = useRef([]);
 
   useEffect(() => {
     const videos = videosRef.current.filter(Boolean);
-    if (videos.length !== PANELS.length) return;
+    const images = imagesRef.current.filter(Boolean);
+    if (videos.length !== PANELS.length || images.length !== PANELS.length) return;
 
     // React는 SSR 마크업에 muted "속성"을 찍지 않고 프로퍼티로만 넣는다 —
     // 하이드레이션 전에 브라우저가 소리 있는 영상으로 보고 자동재생을 막는
@@ -105,17 +120,24 @@ export default function HomePage() {
       canHevc1080: videos[0].canPlayType(HEVC_1080) !== '',
       canHevc720: videos[0].canPlayType(HEVC_720) !== '',
     };
+    const sources = PANELS.map((p) => pickSource(p.key, support));
     videos.forEach((v, i) => {
-      v.src = pickSource(PANELS[i].key, support);
+      v.src = sources[i];
     });
+
+    // 패널마다 지금 화면에 보이는 요소. <img>로 넘어가면 바뀐다 — 블러는 여기에 칠한다.
+    const surfaces = [...videos];
+    // 마지막으로 칠한 블러 값. 대부분의 프레임은 값이 그대로라(가림 블러는 고정,
+    // 디포커스는 끝 1.6초만) 바뀐 프레임에만 style을 건드린다.
+    const lastBlur = videos.map(() => -1);
 
     // 길이가 제각각이라 맞춰 출발시킬 이유가 없다 — 준비되는 대로 각자 돈다.
     // play()는 데이터를 기다리지 않고 바로 건다. canplay를 기다렸다 부르면, 터치
     // 전에는 데이터 로딩조차 막는 인앱 브라우저에서 canplay가 영영 오지 않는다.
     let cancelled = false;
 
-    // 막힌 패널은 정지 화면으로 바꿔 걸고 재생 위치를 그 장면으로 옮겨둔다.
-    // 아직 데이터가 없어도 currentTime은 시작 위치로 기억됐다가 적용된다.
+    // <img>로도 못 움직이는 패널은 정지 화면으로 바꿔 걸고 재생 위치를 그 장면으로
+    // 옮겨둔다. 아직 데이터가 없어도 currentTime은 시작 위치로 기억됐다가 적용된다.
     const held = new Set();
     const hold = (v, i) => {
       if (held.has(v)) return;
@@ -128,12 +150,15 @@ export default function HomePage() {
 
     // play()는 반드시 이 핸들러 안에서 바로 불러야 한다 — 한 틱이라도 미루면
     // 사용자 터치로 인정받지 못한다. 허락되면 paused가 즉시 false가 된다.
+    // <img>로 넘어간 패널은 이미 움직이고 있으니 건드리지 않는다.
+    const imaged = new Set();
     let listening = false;
     const unlock = () => {
-      videos.forEach((v, i) => {
-        if (v.paused) start(v, i);
+      const waiting = videos.filter((_, i) => !imaged.has(i));
+      waiting.forEach((v) => {
+        if (v.paused) start(v, videos.indexOf(v));
       });
-      if (videos.every((v) => !v.paused)) unlisten();
+      if (waiting.every((v) => !v.paused)) unlisten();
     };
     const listen = () => {
       if (listening) return;
@@ -146,52 +171,77 @@ export default function HomePage() {
       UNLOCK_EVENTS.forEach((t) => window.removeEventListener(t, unlock, UNLOCK_OPTS));
     };
 
+    // 막히면 영상 다운로드부터 끊고(포스터는 그대로 보인다) <img>를 받는다.
+    // 다 받아서 움직이기 시작하면 그때 영상 자리를 넘겨준다.
+    const toImage = (v, i) => {
+      const img = images[i];
+      if (img.getAttribute('src')) return;
+      v.removeAttribute('src');
+      v.load();
+      img.onload = () => {
+        if (cancelled) return;
+        imaged.add(i);
+        img.hidden = false;
+        v.hidden = true;
+        surfaces[i] = img;
+        lastBlur[i] = -1;
+      };
+      img.onerror = () => {
+        if (cancelled) return;
+        v.src = sources[i];
+        hold(v, i);
+        listen();
+      };
+      img.src = imageSource(PANELS[i]);
+    };
+
     const start = (v, i) =>
       v.play().catch((err) => {
         if (cancelled || err?.name !== 'NotAllowedError') return;
-        hold(v, i);
-        listen();
+        toImage(v, i);
       });
 
     videos.forEach((v, i) => start(v, i));
 
     // 패널 높이는 ResizeObserver로 캐시해둔다 — rAF 안에서 매 프레임 레이아웃을
-    // 조회하면 강제 리플로가 걸린다.
-    const panelHeights = videos.map((v) => v.getBoundingClientRect().height || 1);
+    // 조회하면 강제 리플로가 걸린다. 영상이 <img>에 자리를 넘기며 숨어도 재도록
+    // 래퍼를 잰다(요소는 래퍼를 꽉 채운다).
+    const wrappers = videos.map((v) => v.parentElement);
+    const panelHeights = wrappers.map((w) => w.getBoundingClientRect().height || 1);
     const ro = new ResizeObserver((entries) => {
       for (const e of entries) {
-        const i = videos.indexOf(e.target);
+        const i = wrappers.indexOf(e.target);
         if (i >= 0) panelHeights[i] = e.contentRect.height || panelHeights[i];
       }
     });
-    videos.forEach((v) => ro.observe(v));
+    wrappers.forEach((w) => ro.observe(w));
 
     // 가림 블러 + 이음새 디포커스를 합쳐 한자리에서 적용한다. 이음새 쪽은
     // currentTime에서 직접 계산하므로 루프와 절대 어긋나지 않는다.
-    // 마지막으로 칠한 블러 값. 대부분의 프레임은 값이 그대로라(가림 블러는 고정,
-    // 디포커스는 끝 1.6초만) 바뀐 프레임에만 style을 건드린다.
-    const lastBlur = videos.map(() => -1);
     let raf = 0;
     const paint = () => {
       videos.forEach((v, i) => {
+        const el = surfaces[i];
         const h = panelHeights[i];
+        // <img>로 넘어간 패널은 이음새가 파일에 구워져 있다 — 가림 블러만 남는다
+        const seam = PANELS[i].seam && el === v;
         const left = v.duration - v.currentTime;
-        const t = Number.isFinite(left) ? Math.max(0, 1 - left / DEFOCUS_LEAD) : 0;
+        const t = seam && Number.isFinite(left) ? Math.max(0, 1 - left / DEFOCUS_LEAD) : 0;
         // 뒤로 갈수록 가파르게 — 앞부분에서는 거의 티가 나지 않는다
         const raw =
           (PANELS[i].veiled ? h * VEIL_RATIO : 0) +
-          (PANELS[i].seam ? DEFOCUS_MAX * t * t : 0);
+          DEFOCUS_MAX * t * t;
         const blur = raw < 0.05 ? 0 : Math.round(raw * 100) / 100;
         if (blur === lastBlur[i]) return;
         lastBlur[i] = blur;
         if (blur === 0) {
-          v.style.filter = BASE_FILTER;
-          v.style.scale = '';   // 비워두면 Tailwind의 scale-x-[-1]이 다시 먹는다
+          el.style.filter = BASE_FILTER;
+          el.style.scale = '';   // 비워두면 Tailwind의 scale-x-[-1]이 다시 먹는다
           return;
         }
-        v.style.filter = `${BASE_FILTER} blur(${blur.toFixed(2)}px)`;
+        el.style.filter = `${BASE_FILTER} blur(${blur.toFixed(2)}px)`;
         const k = 1 + (DEFOCUS_BLEED * blur) / h;
-        v.style.scale = PANELS[i].mirrored ? `${-k} ${k}` : `${k} ${k}`;
+        el.style.scale = PANELS[i].mirrored ? `${-k} ${k}` : `${k} ${k}`;
       });
       raf = requestAnimationFrame(paint);
     };
@@ -223,7 +273,7 @@ export default function HomePage() {
           {PANELS.map((panel, i) => (
             <div
               key={panel.key}
-              className="block w-full min-w-0 aspect-video overflow-hidden md:w-auto md:flex-1"
+              className="relative block w-full min-w-0 aspect-video overflow-hidden md:w-auto md:flex-1"
               style={panel.veiled ? VEIL_MASK : undefined}
             >
               {/* src는 위 이펙트가 넣는다 — 화면 크기에 따라 파일이 달라진다.
@@ -247,6 +297,25 @@ export default function HomePage() {
                 preload="auto"
                 disablePictureInPicture
                 aria-hidden="true"
+              />
+              {/* 자동재생이 막혔을 때 영상 대신 띄우는 자리 — src는 이펙트가 그때 넣는다.
+                  영상과 같은 클래스라 이동·미러·밝기가 똑같이 먹는다. next/image는
+                  MP4를 못 다뤄서 일반 img를 쓴다. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                ref={(el) => {
+                  imagesRef.current[i] = el;
+                }}
+                className={[
+                  'absolute inset-0 block h-full w-full object-contain brightness-[1.01]',
+                  panel.shift ?? '',
+                  panel.mirrored ? 'scale-x-[-1]' : '',
+                ].join(' ')}
+                style={panel.veiled ? { opacity: VEIL_OPACITY } : undefined}
+                alt=""
+                aria-hidden="true"
+                draggable={false}
+                hidden
               />
             </div>
           ))}
