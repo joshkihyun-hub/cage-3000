@@ -10,13 +10,17 @@ const HEVC_1080 = 'video/mp4; codecs="hvc1.1.6.L120.B0"';
 const HEVC_720 = 'video/mp4; codecs="hvc1.1.6.L93.B0"';
 const MOBILE_QUERY = '(max-width: 767.98px)';   // Tailwind md 브레이크포인트와 같은 경계
 
-// 길이가 제각각이다(20 / 40.75 / 18초). hero-1과 hero-3은 소재 안에서
-// 첫 프레임과 끝 프레임이 실제로 일치하는 구간을 찾아 잘라낸 것이라 전환 없이
-// 이어 붙는다 — 그래서 셋을 맞춰 출발시키지도, 동기를 유지하지도 않는다.
-// 길이가 다르니 세 패널의 조합은 사실상 반복되지 않는다.
+// 길이가 제각각이다(25 / 36.29 / 18초). hero-1과 hero-2는 빈 흰 화면에서
+// 걸어 들어와 작업 중에 끝나서 흰색 디졸브로 잇고, hero-3은 소재 안에서 첫
+// 프레임과 끝 프레임이 실제로 일치하는 구간을 찾아 잘라내 전환 없이 이어 붙는다.
+// 셋을 맞춰 출발시키지도, 동기를 유지하지도 않는다 — 길이가 다르니 세 패널의
+// 조합은 사실상 반복되지 않는다.
 //
 // veiled: 아직 공개 전이라 가려둔 패널. 공개할 때 false로 바꾸기만 하면 된다.
 // seam:   루프 이음새에 처리가 필요한 패널. 자체 루프가 맞는 소재는 false다.
+// still:  재생이 막혔을 때 걸어둘 장면(초). `${key}-still.jpg`가 인코딩된 영상의
+//         바로 이 시점 프레임이라, 터치로 풀리면 정지 화면에서 그대로 움직인다.
+//         첫 프레임부터 인물이 보이는 소재는 null — 기존 포스터로 충분하다.
 const PANELS = [
   // 맨 위 — test3, 남자. 먼저 공개하는 영상이라 가리지 않는다.
   // 좌우를 뒤집어 걷는 방향을 돌렸다. CSS는 translate를 적용한 뒤 scale을
@@ -24,16 +28,25 @@ const PANELS = [
   // 자리에 -9%가 들어가 있다.
   // 인물이 걸어 들어오는 도입부를 시작점으로 잡았다(원본 6.95s + 25.00s).
   // 빈 흰 화면에서 시작해 작업 중에 끝나므로 자체 루프가 맞지 않는다 —
-  // hero-2와 같이 흰색 디졸브 + 디포커스로 잇는다.
-  { key: 'hero-1', shift: 'translate-x-[-9%]', mirrored: true, veiled: false, seam: true },
-  // 중앙 — test1, 두 사람이 양 끝에서 들어와 가운데서 만난다
-  // 걸어 들어와 작업하는 일방향 서사라 되돌아오는 자세가 없다 — 소재 전체를
-  // 훑어도 맞물리는 지점이 없어서(최선 9.34) 이 패널만 흰색 디졸브를 쓴다.
-  { key: 'hero-2', shift: null, mirrored: false, veiled: true, seam: true },
+  // 흰색 디졸브 + 디포커스로 잇는다.
+  { key: 'hero-1', shift: 'translate-x-[-9%]', mirrored: true, veiled: false, seam: true, still: 8 },
+  // 중앙 — web bed, 두 사람이 양 끝에서 들어와 가운데서 만나 작업한다.
+  // 직접 편집한 최종본을 통째로 쓴다(36.29초). hero-1처럼 빈 흰 화면에서 시작해
+  // 작업 중에 끝나므로 흰색 디졸브 + 디포커스로 잇는다. 중심 오차 -1.9%라 이동 없음.
+  // /asset은 하루 캐시라 같은 이름으로 덮으면 재방문자에게 옛 영상이 남는다 —
+  // 소재를 바꿀 때는 파일명을 바꾼다(순서 번호는 유지).
+  { key: 'hero-2-bed', shift: null, mirrored: false, veiled: false, seam: true, still: 16 },
   // 맨 아래 — test2, 여자. 소재가 중앙에서 5% 오른쪽에 잡혀 있다.
   // 81.25s + 18.00s 구간이 스스로 맞물린다(실측 0.66).
-  { key: 'hero-3', shift: 'translate-x-[-5%]', mirrored: false, veiled: true, seam: false },
+  { key: 'hero-3', shift: 'translate-x-[-5%]', mirrored: false, veiled: true, seam: false, still: null },
 ];
+
+// 자동재생이 막히는 곳이 있다 — 저전력 모드의 iPhone, 그리고 인스타그램 같은
+// 인앱 브라우저(WKWebView 기본값이 음소거 영상에도 터치를 요구한다). 이때는
+// 정지 화면을 걸어두고 화면 어디든 첫 터치에서 재생을 건다. 로고를 눌러 홈을
+// 다시 띄우면 되던 것도 같은 원리다 — 터치 직후 몇 초는 재생이 허락된다.
+const UNLOCK_EVENTS = ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'];
+const UNLOCK_OPTS = { capture: true, passive: true };
 
 // 가려둔 패널. 블러만 세게 걸면 어두운 인물이 패널 전체로 번지고 래퍼가
 // 네모로 잘라내서 "회색 사각형"이 된다 — 그동안 지켜온 경계 안 보임이 깨진다.
@@ -97,17 +110,50 @@ export default function HomePage() {
     });
 
     // 길이가 제각각이라 맞춰 출발시킬 이유가 없다 — 준비되는 대로 각자 돈다.
+    // play()는 데이터를 기다리지 않고 바로 건다. canplay를 기다렸다 부르면, 터치
+    // 전에는 데이터 로딩조차 막는 인앱 브라우저에서 canplay가 영영 오지 않는다.
     let cancelled = false;
-    const ready = (v) =>
-      v.readyState >= 3
-        ? Promise.resolve()
-        : new Promise((resolve) => v.addEventListener('canplay', resolve, { once: true }));
 
-    videos.forEach((v) => {
-      ready(v).then(() => {
-        if (!cancelled) v.play().catch(() => {});
+    // 막힌 패널은 정지 화면으로 바꿔 걸고 재생 위치를 그 장면으로 옮겨둔다.
+    // 아직 데이터가 없어도 currentTime은 시작 위치로 기억됐다가 적용된다.
+    const held = new Set();
+    const hold = (v, i) => {
+      if (held.has(v)) return;
+      held.add(v);
+      const { key, still } = PANELS[i];
+      if (still == null) return;
+      v.poster = `/asset/video/${key}-still.jpg`;
+      v.currentTime = still;
+    };
+
+    // play()는 반드시 이 핸들러 안에서 바로 불러야 한다 — 한 틱이라도 미루면
+    // 사용자 터치로 인정받지 못한다. 허락되면 paused가 즉시 false가 된다.
+    let listening = false;
+    const unlock = () => {
+      videos.forEach((v, i) => {
+        if (v.paused) start(v, i);
       });
-    });
+      if (videos.every((v) => !v.paused)) unlisten();
+    };
+    const listen = () => {
+      if (listening) return;
+      listening = true;
+      UNLOCK_EVENTS.forEach((t) => window.addEventListener(t, unlock, UNLOCK_OPTS));
+    };
+    const unlisten = () => {
+      if (!listening) return;
+      listening = false;
+      UNLOCK_EVENTS.forEach((t) => window.removeEventListener(t, unlock, UNLOCK_OPTS));
+    };
+
+    const start = (v, i) =>
+      v.play().catch((err) => {
+        if (cancelled || err?.name !== 'NotAllowedError') return;
+        hold(v, i);
+        listen();
+      });
+
+    videos.forEach((v, i) => start(v, i));
 
     // 패널 높이는 ResizeObserver로 캐시해둔다 — rAF 안에서 매 프레임 레이아웃을
     // 조회하면 강제 리플로가 걸린다.
@@ -153,6 +199,7 @@ export default function HomePage() {
 
     return () => {
       cancelled = true;
+      unlisten();
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
@@ -179,7 +226,10 @@ export default function HomePage() {
               className="block w-full min-w-0 aspect-video overflow-hidden md:w-auto md:flex-1"
               style={panel.veiled ? VEIL_MASK : undefined}
             >
-              {/* src는 위 이펙트가 넣는다 — 화면 크기에 따라 파일이 달라진다 */}
+              {/* src는 위 이펙트가 넣는다 — 화면 크기에 따라 파일이 달라진다.
+                  autoplay 속성은 일부러 뺐다. iOS는 저전력 모드에서 autoplay가
+                  붙은 영상에 기본 재생 버튼을 강제로 띄우는데, 미러·가림 블러까지
+                  같이 먹어서 깨진 화면처럼 보인다. 재생은 이펙트의 play()가 건다. */}
               <video
                 ref={(el) => {
                   videosRef.current[i] = el;
@@ -191,7 +241,6 @@ export default function HomePage() {
                 ].join(' ')}
                 style={panel.veiled ? { opacity: VEIL_OPACITY } : undefined}
                 poster={`/asset/video/${panel.key}-poster.jpg`}
-                autoPlay
                 muted
                 loop
                 playsInline
