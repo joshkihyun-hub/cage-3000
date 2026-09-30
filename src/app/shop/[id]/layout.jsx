@@ -5,6 +5,16 @@ function findItem(id) {
   return items.find((i) => String(i.id) === String(id));
 }
 
+// 상품은 고정 목록이라 빌드 때 전부 정적 페이지로 만든다. 요청마다 서버에서 그리면
+// 상품을 누를 때마다 서버를 한 번 다녀와서(실측 330ms) 이동이 한 박자 늦는다 —
+// 정적이면 링크가 보일 때 통째로 미리 받아 두어 바로 열린다.
+// 목록에 없는 번호는 렌더링 없이 404(오타 주소가 200으로 열리면 검색엔진이 수집한다).
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return items.map((item) => ({ id: String(item.id) }));
+}
+
 // Per-product metadata. 상품 페이지에는 description을 두지 않는다 — 카카오톡·인스타
 // 공유 카드에 상품 설명문이 딸려 나오는 걸 원치 않아서다. Next는 openGraph.description을
 // 비워도 페이지 description을 그대로 승계하므로, 없애려면 둘 다 없어야 한다.

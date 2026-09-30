@@ -263,3 +263,17 @@ img {
   -webkit-user-drag: none;
   user-select: none;
 }
+
+/* 한 번 나타나고 끝나는 등장 효과 — 이런 것 때문에 애니메이션 라이브러리를 싣지 않는다.
+   쓰는 쪽에서 animation 단축 속성으로 길이·지연을 주고 fill-mode는 both로 둔다. */
+@keyframes rise-in {
+  from { opacity: 0; translate: 0 20px; }
+}
+
+@keyframes fade-in-plain {
+  from { opacity: 0; }
+}
+
+@keyframes draw-x {
+  from { scale: 0 1; }
+}

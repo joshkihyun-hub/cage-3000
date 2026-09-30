@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../shared/context/cart-context';
 import {
   IconBag,
@@ -15,60 +15,41 @@ import {
   IconClose,
   IconChevronDown,
 } from './icons';
-import { motion } from 'framer-motion';
-
-const DURATION = 0.25;
-const STAGGER = 0.025;
+const STAGGER_MS = 25;
 
 // 글자별 "불규칙한" 추가 지연 — Math.random()은 렌더 순수성을 깨고
 // (react-hooks/purity) 위·아래 레이어의 지연이 어긋나므로, 인덱스에서
 // 유도한 결정적 지터를 쓴다. 보기엔 랜덤이고 두 레이어는 정확히 동기화된다.
-const jitter = (i) => (((i + 1) * 9301 + 49297) % 233280) / 233280 * 0.1;
+const jitterMs = (i) => (((i + 1) * 9301 + 49297) % 233280) / 233280 * 100;
+const letterDelay = (i) => ({ transitionDelay: `${(STAGGER_MS * i + jitterMs(i)).toFixed(1)}ms` });
+
+// 글자 하나하나가 위로 빠지고 아래에서 같은 글자가 올라온다. 예전엔 framer-motion으로
+// 글자마다 모션 컴포넌트를 달았는데, 이 효과 하나 때문에 라이브러리(압축 전 112KB)가
+// 모든 페이지에 실렸다 — CSS 트랜지션으로 똑같이 옮겼다(0.25초, easeInOut 곡선 그대로).
+// 트리거는 바깥 래퍼(group/nav)라 예전 whileHover처럼 위아래 여백까지 반응한다.
+const LETTER = 'inline-block transition-[translate] duration-[250ms] ease-[cubic-bezier(0.42,0,0.58,1)]';
 
 const RandomHoverLink = ({ href, text, className }) => {
+  const letters = text.split("");
   return (
     <Link
       href={href}
-      className={`relative block overflow-hidden whitespace-nowrap group ${className}`}
+      className={`relative block overflow-hidden whitespace-nowrap ${className}`}
     >
-      <div className="relative">
-        {text.split("").map((l, i) => (
-          <motion.span
-            key={i}
-            variants={{
-              initial: { y: 0 },
-              hover: { y: "-100%" },
-            }}
-            transition={{
-              duration: DURATION,
-              ease: "easeInOut",
-              delay: STAGGER * i + jitter(i),
-            }}
-            className="inline-block"
-          >
-            {l === " " ? "\u00A0" : l}
-          </motion.span>
+      <span className="relative block">
+        {letters.map((l, i) => (
+          <span key={i} className={`${LETTER} group-hover/nav:-translate-y-full`} style={letterDelay(i)}>
+            {l === " " ? " " : l}
+          </span>
         ))}
-      </div>
-      <div className="absolute inset-0">
-        {text.split("").map((l, i) => (
-          <motion.span
-            key={i}
-            variants={{
-              initial: { y: "100%" },
-              hover: { y: 0 },
-            }}
-            transition={{
-              duration: DURATION,
-              ease: "easeInOut",
-              delay: STAGGER * i + jitter(i),
-            }}
-            className="inline-block"
-          >
-            {l === " " ? "\u00A0" : l}
-          </motion.span>
+      </span>
+      <span className="absolute inset-0 block" aria-hidden="true">
+        {letters.map((l, i) => (
+          <span key={i} className={`${LETTER} translate-y-full group-hover/nav:translate-y-0`} style={letterDelay(i)}>
+            {l === " " ? " " : l}
+          </span>
         ))}
-      </div>
+      </span>
     </Link>
   );
 };
@@ -103,30 +84,39 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState(null);
-  const scrollTimeoutRef = useRef(null);
 
   const toggleSubMenu = (name) => {
     setOpenSubMenu(openSubMenu === name ? null : name);
   };
 
   useEffect(() => {
+    // 스크롤 이벤트는 프레임마다 몰려온다. 매번 setState를 부르면 React가 값이
+    // 같은지 확인하느라 헤더를 다시 훑는다 — 값이 실제로 바뀔 때만 알린다.
+    let wasScrolled = false;
+    let scrolling = false;
+    let timer = null;
+
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-      setIsScrolling(true);
-
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
+      const now = window.scrollY > 20;
+      if (now !== wasScrolled) {
+        wasScrolled = now;
+        setScrolled(now);
       }
-
-      scrollTimeoutRef.current = setTimeout(() => {
+      if (!scrolling) {
+        scrolling = true;
+        setIsScrolling(true);
+      }
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        scrolling = false;
         setIsScrolling(false);
       }, 1000); // 1 second delay before becoming transparent
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      clearTimeout(timer);
     };
   }, []);
 
@@ -137,7 +127,7 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ease-[cubic-bezier(0.32,0.725,0.25,1)] pointer-events-none ${scrolled ? 'py-4' : 'py-6'}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-[padding] duration-700 ease-[cubic-bezier(0.32,0.725,0.25,1)] pointer-events-none ${scrolled ? 'py-4' : 'py-6'}`}
     >
       {/* 유리판은 내용과 분리된 레이어로 두고 아래쪽을 마스크로 흐린다.
           backdrop-blur는 요소 끝에서 칼같이 잘려 경계가 선처럼 드러나므로,
@@ -169,17 +159,13 @@ export default function Header() {
           <div className="hidden md:flex flex-1 justify-end pr-24 items-center gap-x-8 z-40 relative">
             {navItemsLeft.map((item) => (
               <div key={item.name} className="relative group h-full flex items-center">
-                <motion.div
-                  initial="initial"
-                  whileHover="hover"
-                  className="relative py-2"
-                >
+                <div className="relative py-2 group/nav">
                   <RandomHoverLink
                     href={item.href}
                     text={item.name}
                     className="font-serif text-xs uppercase tracking-[0.2em] text-zinc-600 font-medium"
                   />
-                </motion.div>
+                </div>
 
                 {/* Dropdown Menu */}
                 {item.subItems && (
@@ -218,18 +204,13 @@ export default function Header() {
           {/* Desktop Nav - Right Split */}
           <div className="hidden md:flex flex-1 justify-start pl-24 items-center gap-x-8 z-40 relative">
             {navItemsRight.map((item) => (
-              <motion.div
-                key={item.name}
-                initial="initial"
-                whileHover="hover"
-                className="relative py-2"
-              >
+              <div key={item.name} className="relative py-2 group/nav">
                 <RandomHoverLink
                   href={item.href}
                   text={item.name}
                   className="font-serif text-xs uppercase tracking-[0.2em] text-zinc-600 font-medium"
                 />
-              </motion.div>
+              </div>
             ))}
           </div>
 

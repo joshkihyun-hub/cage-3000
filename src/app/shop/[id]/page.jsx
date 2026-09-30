@@ -58,11 +58,13 @@ function DesktopCarousel({ item }) {
           }}
           className="absolute inset-0 w-full h-full"
         >
+          {/* 모바일에선 이 캐러셀이 숨겨지지만 priority라 미리 받는다 — md 미만에선
+              1px로 잡아 가장 작은 파일만 받게 한다. */}
           <Image
             src={images[currentIndex]}
             alt={`${item.name} view ${currentIndex + 1}`}
             fill
-            sizes="50vw"
+            sizes="(min-width: 768px) 50vw, 1px"
             className="object-cover object-center"
             priority
           />
@@ -135,6 +137,8 @@ export default function ShopItemPage({ params }) {
         {/* Image Section */}
         {/* Image Section */}
         {/* Image Slider Section */}
+        {/* 데스크톱에선 이 슬라이더가 숨겨지지만 첫 장은 priority라 미리 받는다. sizes를
+            비워 두면 100vw로 잡혀 숨은 사진을 3840px로 받았다 — md 이상에선 1px로. */}
         <div className="w-full relative aspect-[3/4] bg-white">
           <div className="absolute inset-0 flex overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {item.images && item.images.length > 0 ? (
@@ -144,6 +148,7 @@ export default function ShopItemPage({ params }) {
                     src={imgSrc}
                     alt={`${item.name} detail ${idx + 1}`}
                     fill
+                    sizes="(max-width: 767.98px) 100vw, 1px"
                     className="object-cover object-center"
                     priority={idx < 1}
                   />
@@ -155,6 +160,7 @@ export default function ShopItemPage({ params }) {
                   src={item.imageUrl}
                   alt={item.name}
                   fill
+                  sizes="(max-width: 767.98px) 100vw, 1px"
                   className="object-cover object-top"
                   priority
                 />

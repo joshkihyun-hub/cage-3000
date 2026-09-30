@@ -6,7 +6,6 @@ import { items } from '@/shared/constants/shop-items';
 import { ShopItemCard } from '@/components/shop-item-card';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
-import { motion } from 'framer-motion';
 
 function ProductGrid() {
   return (
@@ -29,30 +28,25 @@ function ShopContent() {
 
 
         {/* Text Container */}
+        {/* 등장 효과는 globals.css의 키프레임 — framer-motion을 이 한 화면 때문에 싣지 않는다. */}
         <div className="text-center z-10 flex flex-col gap-4">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+          <h2
             className="text-2xl md:text-4xl text-black tracking-widest"
+            style={{ animation: 'rise-in 0.8s ease-out 0.5s both' }}
           >
             COMING SOON
-          </motion.h2>
+          </h2>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.0 }}
+          <p
             className="text-[10px] md:text-xs font-light text-zinc-500 uppercase tracking-[0.3em]"
+            style={{ animation: 'fade-in-plain 0.8s ease-out 1s both' }}
           >
             New Collection Launching Soon
-          </motion.p>
+          </p>
 
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 1.5, delay: 1.2, ease: "easeInOut" }}
+          <div
             className="w-16 h-px bg-black mx-auto mt-4"
+            style={{ animation: 'draw-x 1.5s cubic-bezier(0.42, 0, 0.58, 1) 1.2s both' }}
           />
         </div>
       </div>
