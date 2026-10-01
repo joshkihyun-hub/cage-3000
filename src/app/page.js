@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
 
 // 같은 소재의 세 가지 인코딩. `<source media>`는 <video>에서 무시되므로
 // (스펙에서 빠졌다) 어느 파일을 받을지는 JS가 직접 정한다.
@@ -93,6 +93,42 @@ function pickSource({ key, veiled }, { isMobile, canHevc1080, canHevc720 }) {
     return canHevc720 ? `/asset/video/${key}-720-hevc.mp4` : `/asset/video/${key}.mp4`;
   }
   return canHevc1080 ? `/asset/video/${key}-hevc.mp4` : `/asset/video/${key}.mp4`;
+}
+
+// 공개 시각 — 2026.10.12 18:00 KST. 해외에서 봐도 같은 순간을 향해 줄어든다.
+const LAUNCH_AT = Date.parse('2026-10-12T18:00:00+09:00');
+
+// 초가 바뀌는 순간에 맞춰 깨운다 — setInterval(1000)은 조금씩 밀려서 가끔 한 초를 건너뛴다.
+function subscribeSecond(onTick) {
+  let timer;
+  const schedule = () => {
+    timer = setTimeout(() => {
+      onTick();
+      schedule();
+    }, 1000 - (Date.now() % 1000));
+  };
+  schedule();
+  return () => clearTimeout(timer);
+}
+const currentSecond = () => Math.floor(Date.now() / 1000);
+// 페이지는 빌드 때 미리 그려진다 — 그때 시각으로 그리면 며칠 전 숫자가 잠깐 비친다.
+const noSecond = () => null;
+
+const pad = (n) => String(n).padStart(2, '0');
+
+function Countdown() {
+  const now = useSyncExternalStore(subscribeSecond, currentSecond, noSecond);
+  const left = now === null ? null : LAUNCH_AT / 1000 - now;
+
+  if (left !== null && left <= 0) return '2026.10.12';
+
+  // 시각을 모르는 첫 화면에는 같은 폭의 자리만 잡아둔다 — 숫자가 들어올 때 줄이 흔들리지 않게.
+  if (left === null) return <span className="invisible">00D 00:00:00</span>;
+
+  const d = Math.floor(left / 86400);
+  const h = Math.floor((left % 86400) / 3600);
+  const m = Math.floor((left % 3600) / 60);
+  return `${pad(d)}D ${pad(h)}:${pad(m)}:${pad(left % 60)}`;
 }
 
 export default function HomePage() {
@@ -323,11 +359,16 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* 날짜. tracking은 마지막 글자 뒤에도 자간을 붙여 글자 뭉치가 그만큼
-            왼쪽으로 쏠리므로, -0.25em으로 꼬리를 걷어내야 잉크가 중앙에 온다. */}
-        <span className="mr-[-0.25em] font-serif text-[11px] tracking-[0.25em] text-zinc-400">
-          2026.10
-        </span>
+        {/* 공개까지 남은 시간. 지나면 공개 날짜만 남는다. tracking은 마지막 글자
+            뒤에도 자간을 붙여 글자 뭉치가 그만큼 왼쪽으로 쏠리므로, -0.25em으로
+            꼬리를 걷어내야 잉크가 중앙에 온다. tabular-nums — 숫자 폭이 같아야
+            초가 바뀔 때 줄이 좌우로 떨지 않는다. */}
+        <time
+          dateTime="2026-10-12T18:00:00+09:00"
+          className="mr-[-0.25em] font-serif text-[11px] tracking-[0.25em] text-zinc-400 tabular-nums"
+        >
+          <Countdown />
+        </time>
       </section>
     </div>
   );
