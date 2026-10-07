@@ -11,6 +11,47 @@ export const PROJECT_CATEGORIES = [
 
 export const PROJECT1_ITEMS = [
   {
+    id: 4,
+    slug: 'nmixx-heavy-serenade',
+    category: 'custom',
+    featured: true, // 목록에서 한 치수 크게 띄운다 — 인지도가 가장 높아 맨 앞에 둔다
+    description_ko: "엔믹스(NMIXX) — Heavy Serenade 뮤직비디오를 위해 커스텀 메이드로 디자인·제작한 헤드웨어.",
+    title: 'NMIXX HEAVY SERENADE',
+    subtitle: 'MUSIC VIDEO / 2026',
+    image: '/asset/details/heavy-serenade/heavy-serenade2.jpg',
+    image_hover: '/asset/details/heavy-serenade/heavy-serenade1.jpg',
+    subImages: [
+      '/asset/details/heavy-serenade/heavy-serenade2.jpg',
+      '/asset/details/heavy-serenade/heavy-serenade1.jpg',
+      '/asset/details/heavy-serenade/heavy-serenade3.jpg',
+      '/asset/details/heavy-serenade/heavy-serenade4.jpg',
+      '/asset/details/heavy-serenade/heavy-serenade5.jpg',
+      '/asset/details/heavy-serenade/heavy-serenade6.jpg',
+    ],
+    credits: [
+      { role: 'Headwear Design', name: 'CAGE3000 (@cage3k)' },
+    ],
+  },
+  {
+    id: 8,
+    slug: 'aiweo-00ff00-be-my-hug',
+    category: 'sponsored',
+    description_ko: "아이우에오(A I W E O) — \"00FF00\" 뮤직비디오와 1st EP [BE MY HUG] 앨범 재킷에 CAGE3000 헤드웨어 협찬.",
+    title: 'A I W E O "00FF00" & [BE MY HUG]',
+    subtitle: 'MUSIC VIDEO & ALBUM JACKET / 2026',
+    image: '/asset/details/aiweo/aiweo1.jpg',
+    image_hover: '/asset/details/aiweo/aiweo2.jpg',
+    subImages: [
+      '/asset/details/aiweo/aiweo1.jpg',
+      '/asset/details/aiweo/aiweo2.jpg',
+    ],
+    credits: [
+      { role: 'Headwear 00, 02, 06, 07', name: 'CAGE3000 (@cage3k)' },
+      { role: 'Artist', name: '@a.i.w.e.o' },
+      { role: 'Label', name: '@label_authentic' },
+    ],
+  },
+  {
     id: 6,
     slug: 'puma-manchester-city-pov',
     category: 'sponsored',
@@ -27,28 +68,6 @@ export const PROJECT1_ITEMS = [
       { role: 'Headwear', name: 'CAGE3000 (@cage3k)' },
       { role: 'Model', name: '@kidcozyboy' },
       { role: 'Brand', name: 'PUMA × Manchester City × POV' },
-    ],
-  },
-  {
-    id: 4,
-    slug: 'nmixx-heavy-serenade',
-    category: 'custom',
-    featured: true, // 목록에서 한 치수 크게 띄운다
-    description_ko: "엔믹스(NMIXX) — Heavy Serenade 뮤직비디오를 위해 커스텀 메이드로 디자인·제작한 헤드웨어.",
-    title: 'NMIXX HEAVY SERENADE',
-    subtitle: 'MUSIC VIDEO / 2026',
-    image: '/asset/details/heavy-serenade/heavy-serenade2.jpg',
-    image_hover: '/asset/details/heavy-serenade/heavy-serenade1.jpg',
-    subImages: [
-      '/asset/details/heavy-serenade/heavy-serenade2.jpg',
-      '/asset/details/heavy-serenade/heavy-serenade1.jpg',
-      '/asset/details/heavy-serenade/heavy-serenade3.jpg',
-      '/asset/details/heavy-serenade/heavy-serenade4.jpg',
-      '/asset/details/heavy-serenade/heavy-serenade5.jpg',
-      '/asset/details/heavy-serenade/heavy-serenade6.jpg',
-    ],
-    credits: [
-      { role: 'Headwear Design', name: 'CAGE3000 (@cage3k)' },
     ],
   },
   {
