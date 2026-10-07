@@ -15,7 +15,7 @@ export const PROJECT1_ITEMS = [
     slug: 'nmixx-heavy-serenade',
     category: 'custom',
     featured: true, // 목록에서 한 치수 크게 띄운다 — 인지도가 가장 높아 맨 앞에 둔다
-    description_ko: "엔믹스(NMIXX) — Heavy Serenade 뮤직비디오를 위해 커스텀 메이드로 디자인·제작한 헤드웨어.",
+    description_ko: "엔믹스(NMIXX) — Heavy Serenade 뮤직비디오를 위해 커스텀 메이드로 디자인·제작한 윙 부츠와 윙 코르셋.",
     title: 'NMIXX HEAVY SERENADE',
     subtitle: 'MUSIC VIDEO / 2026',
     image: '/asset/details/heavy-serenade/heavy-serenade2.jpg',
@@ -29,7 +29,7 @@ export const PROJECT1_ITEMS = [
       '/asset/details/heavy-serenade/heavy-serenade6.jpg',
     ],
     credits: [
-      { role: 'Headwear Design', name: 'CAGE3000 (@cage3k)' },
+      { role: 'Wing Boots & Wing Corset Design, Making', name: 'CAGE3000 (@cage3k)' },
     ],
   },
   {
