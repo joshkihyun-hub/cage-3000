@@ -25,7 +25,7 @@ function Block({ children, className = '' }) {
 }
 
 export const ProductInfo = ({ item }) => {
-    const { addToCart, clearCart } = useCart();
+    const { addToCart } = useCart();
     const router = useRouter();
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
     const [added, setAdded] = useState(false);
@@ -46,10 +46,9 @@ export const ProductInfo = ({ item }) => {
         .map((slug) => PROJECT1_ITEMS.find((project) => project.slug === slug))
         .filter(Boolean);
 
+    // 이 한 점만 바로 결제 — 장바구니에 담아 둔 다른 상품은 그대로 둔다.
     const handleBuyNow = () => {
-        clearCart();
-        addToCart(item, 1);
-        router.push('/checkout');
+        router.push(`/checkout?buy=${item.id}`);
     };
 
     return (

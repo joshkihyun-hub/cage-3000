@@ -7,6 +7,10 @@ const CartContext = createContext();
 
 const STORAGE_KEY = 'cage3000_cart_v1';
 
+// 상품 상세의 Buy Now로 한 점만 결제할 때 결제 화면이 sessionStorage에 남기는 표시 —
+// 결제 완료 화면은 이게 있으면 장바구니를 비우지 않는다(장바구니엔 그 한 점이 없으니까).
+export const BUY_NOW_FLAG = 'cage3000_buy_now';
+
 function readStoredCart() {
   if (typeof window === 'undefined') return [];
   try {

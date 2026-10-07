@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import * as PortOne from '@portone/browser-sdk/v2';
 import DaumPostcode from 'react-daum-postcode';
-import { useCart } from '../../shared/context/cart-context';
+import { BUY_NOW_FLAG, useCart } from '../../shared/context/cart-context';
+import { items as catalog } from '@/shared/constants/shop-items';
 import { formatKrPhone, isValidEmail, isValidKrPhone } from '@/lib/validation';
 import { Block } from '@/components/block';
 
@@ -21,7 +22,17 @@ const inputClass =
 const CheckoutClientPage = () => {
   const router = useRouter();
   const { data: session, status: authStatus } = useSession();
-  const { cart, clearCart } = useCart();
+  const { cart: bag, clearCart } = useCart();
+  // 상품 상세의 Buy Now는 /checkout?buy=<id>로 온다 — 그 한 점만 결제하고 장바구니는 그대로 둔다.
+  // 이 컴포넌트는 브라우저에서만 그려진다(page.jsx의 ssr: false) — window를 바로 읽어도 된다.
+  const [buyNowItem] = useState(() => {
+    const id = new URLSearchParams(window.location.search).get('buy');
+    return id ? catalog.find((item) => String(item.id) === id) || null : null;
+  });
+  const cart = useMemo(
+    () => (buyNowItem ? [{ ...buyNowItem, quantity: 1 }] : bag),
+    [buyNowItem, bag]
+  );
 
   const isAuthed = authStatus === 'authenticated';
   const isGuest = authStatus === 'unauthenticated';
@@ -107,6 +118,15 @@ const CheckoutClientPage = () => {
     }
 
     setSubmitting(true);
+    // 결제 완료 화면이 장바구니를 비울지 정하는 표시. 모바일 결제는 PG 화면을 거쳐
+    // /checkout/success로 돌아오므로 같은 탭에 남는 sessionStorage로 넘긴다. 지난번
+    // Buy Now 표시가 남아 일반 결제의 장바구니가 안 비워지는 일이 없게 매번 새로 쓴다.
+    try {
+      if (buyNowItem) window.sessionStorage.setItem(BUY_NOW_FLAG, '1');
+      else window.sessionStorage.removeItem(BUY_NOW_FLAG);
+    } catch {
+      // 저장소를 못 쓰면 결제 완료 화면이 장바구니를 비울 뿐 — 결제에는 영향 없음.
+    }
     try {
       // 1) Server-side draft order (authoritative pricing)
       const orderRes = await fetch('/api/orders', {
@@ -173,12 +193,12 @@ const CheckoutClientPage = () => {
       const verifyData = await verifyRes.json();
 
       if (verifyRes.ok && verifyData.status === 'success') {
-        clearCart();
+        if (!buyNowItem) clearCart();
         window.location.href = `/checkout/success?order=${encodeURIComponent(orderNumber)}`;
       } else if (verifyData.status === 'processing') {
         // PG가 아직 승인을 마무리 중 — 웹훅이 서버에서 정산하므로 실패가 아니다.
         // 소프트 접수 화면으로 보낸다.
-        clearCart();
+        if (!buyNowItem) clearCart();
         window.location.href = `/checkout/success?order=${encodeURIComponent(orderNumber)}&soft=1`;
       } else {
         setError(verifyData.message || '결제 검증에 실패했습니다.');
@@ -212,7 +232,9 @@ const CheckoutClientPage = () => {
             <p className="text-sm text-zinc-700 mt-1">
               이미 회원이신가요?{' '}
               <Link
-                href="/auth/signin?callbackUrl=/checkout"
+                href={`/auth/signin?callbackUrl=${encodeURIComponent(
+                  buyNowItem ? `/checkout?buy=${buyNowItem.id}` : '/checkout'
+                )}`}
                 className="underline hover:text-zinc-500"
               >
                 로그인

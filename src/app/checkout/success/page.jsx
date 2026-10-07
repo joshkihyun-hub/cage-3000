@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCart } from '@/shared/context/cart-context';
+import { BUY_NOW_FLAG, useCart } from '@/shared/context/cart-context';
 import { Block } from '@/components/block';
 
 // Reached by two distinct paths:
@@ -20,7 +20,18 @@ import { Block } from '@/components/block';
 function SuccessBody() {
   const router = useRouter();
   const params = useSearchParams();
-  const { clearCart } = useCart();
+  const { clearCart: clearBag } = useCart();
+  // Buy Now로 한 점만 결제했다면 장바구니는 결제와 무관하니 비우지 않는다. 표시는 한 번 읽고 지운다.
+  const clearCart = () => {
+    let buyNow = false;
+    try {
+      buyNow = window.sessionStorage.getItem(BUY_NOW_FLAG) === '1';
+      window.sessionStorage.removeItem(BUY_NOW_FLAG);
+    } catch {
+      // 저장소를 못 읽으면 예전처럼 비운다.
+    }
+    if (!buyNow) clearBag();
+  };
 
   const orderParam = params.get('order'); // inline flow
   const paymentId = params.get('paymentId'); // redirect flow
