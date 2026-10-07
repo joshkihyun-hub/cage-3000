@@ -19,9 +19,9 @@ const MOBILE_QUERY = '(max-width: 767.98px)';   // Tailwind md 브레이크포�
 // shift: 인물이 프레임 중앙에서 벗어난 만큼 미는 값. hero-3-stool은 크롭 창 자체를
 //        오른쪽으로 146px 옮겨 구웠다(292,165) — 그래서 이동이 없다.
 //
-// STILL_AT: <img>로도 못 움직이는 브라우저에서 걸어둘 장면(초). `${key}-still.jpg`가
-//           인코딩된 영상의 바로 이 시점 프레임이라, 터치로 풀리면 정지 화면에서
-//           그대로 움직인다. 셋이 같은 시점이어야 풀릴 때도 맞춰서 움직인다.
+// STILL_AT: 영상을 받는 동안(STILL_AFTER 이후)이나 터치를 기다리는 동안 걸어둘 장면(초).
+//           `${key}-still.jpg`가 인코딩된 영상의 바로 이 시점 프레임이라, 출발하면
+//           정지 화면에서 그대로 움직인다. 셋이 같은 시점이어야 같이 움직인다.
 //
 // /asset은 하루 캐시라 같은 이름으로 덮으면 재방문자에게 옛 영상이 남는다 —
 // 소재나 구간을 바꿀 때는 파일명을 바꾼다(순서 번호는 유지하고 소재명을 붙인다).
@@ -46,9 +46,11 @@ const SYNC_EVERY = 250;       // ms
 const SYNC_TOLERANCE = 1 / 24; // 한 프레임 안쪽이면 그대로 둔다
 const SYNC_NUDGE = 0.05;      // 속도 보정은 ±5%까지
 const SYNC_SNAP = 0.3;        // 이보다 벌어지면 바로 옮긴다
-// 먼저 준비된 패널은 첫 프레임(흰 화면)에서 나머지를 기다린다. 한 패널의 네트워크가
-// 유난히 느리면 이만큼만 기다리고 출발한다 — 늦은 패널은 따라붙는다.
-const START_WAIT = 4000;
+// 세 파일은 통째로 받은 뒤에 재생한다(아래 load). 그 사이 빈 흰 화면이 이보다
+// 오래 가면 정지 장면(STILL_AT)을 걸어두고, 다 받으면 그 장면에서 그대로 출발한다.
+const STILL_AFTER = 2000;
+// 한 파일이 끝내 안 오면 이만큼 기다린 뒤 받은 패널끼리 출발한다 — 늦은 패널은 따라붙는다.
+const START_GIVE_UP = 20000;
 
 // 자동재생이 막히는 곳이 있다 — 저전력 모드의 iPhone, 그리고 인스타그램 같은
 // 인앱 브라우저(WKWebView 기본값이 음소거 영상에도 터치를 요구하고, 앱 설정이라
@@ -148,57 +150,100 @@ export default function HomePage() {
       canHevc720: videos[0].canPlayType(HEVC_720) !== '',
     };
     const sources = PANELS.map((p) => pickSource(p, support));
-    videos.forEach((v, i) => {
-      v.src = sources[i];
-    });
+    const stillOf = (i) => `/asset/video/${PANELS[i].key}-still.jpg`;
 
-    // play()는 데이터를 기다리지 않고 바로 건다. canplay를 기다렸다 부르면, 터치
-    // 전에는 데이터 로딩조차 막는 인앱 브라우저에서 canplay가 영영 오지 않는다.
-    // play()가 통과했다는 건 그 패널이 재생할 준비가 됐다는 뜻이기도 하다 — 먼저
-    // 통과한 패널은 첫 프레임(빈 흰 화면)에 세워두고 나머지를 기다렸다가, 다 모이면
-    // 같은 위치에서 한꺼번에 출발시킨다.
     let cancelled = false;
     let started = false;
-    let startAt = 0;            // 출발 위치 — 정지 화면에서 풀리면 그 장면부터
-    let waitTimer = 0;
-    const ready = new Set();    // play()가 통과한 패널
+    let startAt = 0;            // 출발 위치 — 정지 장면을 걸어둔 뒤면 그 장면부터
+    let needsTouch = false;     // 터치해야만 재생되는 브라우저 — 출발은 터치가 건다
+    const blobUrls = [];
+    const loading = new Set();
+    const ready = new Set();    // 파일을 다 받아 끊김 없이 재생할 수 있는 패널
     const diverted = new Set(); // 막혀서 <img>로 넘긴 패널
     const imaged = new Set();   // <img>가 자리를 넘겨받아 움직이고 있는 패널
 
     const launch = () => {
       if (started || cancelled) return;
       started = true;
-      clearTimeout(waitTimer);
+      clearTimeout(stillTimer);
+      clearTimeout(giveUpTimer);
       ready.forEach((i) => {
         videos[i].currentTime = startAt;
         videos[i].play().catch(() => {});
       });
     };
-
-    // <img>로도 못 움직이는 패널은 정지 화면으로 바꿔 걸고 재생 위치를 그 장면으로
-    // 옮겨둔다. 아직 데이터가 없어도 currentTime은 시작 위치로 기억됐다가 적용된다.
-    const held = new Set();
-    const hold = (v, i) => {
-      if (held.has(v)) return;
-      held.add(v);
-      v.poster = `/asset/video/${PANELS[i].key}-still.jpg`;
-      v.currentTime = STILL_AT;
+    const maybeLaunch = () => {
+      if (needsTouch || ready.size === 0) return;
+      if (PANELS.every((_, i) => ready.has(i) || diverted.has(i))) launch();
+    };
+    // 무리가 먼저 출발한 뒤에 준비된 패널은 그 시각으로 끼어든다.
+    const join = (i) => {
+      const lead = videos.find((v, j) => j !== i && ready.has(j) && !v.paused);
+      if (lead) videos[i].currentTime = lead.currentTime;
+      videos[i].play().catch(() => {});
     };
 
-    // play()는 반드시 이 핸들러 안에서 바로 불러야 한다 — 한 틱이라도 미루면
-    // 사용자 터치로 인정받지 못한다. 허락되면 paused가 즉시 false가 된다.
-    // 셋이 같은 정지 장면에서 같이 풀리므로 기다리지 않고 바로 출발한다(어긋나는
-    // 만큼은 아래 동기화가 맞춘다). <img>로 넘어간 패널은 이미 움직이고 있으니 건드리지 않는다.
+    // 파일을 통째로 받아 메모리(blob)에서 재생한다. 스트리밍으로 틀면 받는 속도가
+    // 재생을 못 따라가는 순간(인앱 브라우저, 약한 모바일 망) 패널마다 다른 자리에서
+    // 멈춘다 — 다 받은 뒤에 틀면 재생 중에 끊길 일이 없고, 동기화의 위치 이동도 즉시 끝난다.
+    // /asset은 하루 캐시라 다시 들어오면 받는 시간도 거의 없다.
+    const load = async (i) => {
+      if (loading.has(i)) return;
+      loading.add(i);
+      const v = videos[i];
+      let src = sources[i];
+      try {
+        const res = await fetch(src);
+        if (!res.ok) throw new Error(`${res.status}`);
+        const blob = await res.blob();
+        if (cancelled) return;
+        src = blobUrls[i] = URL.createObjectURL(blob);
+      } catch {
+        if (cancelled) return; // 못 받았으면 스트리밍으로라도 튼다
+      }
+      // 터치로 이미 재생이 시작됐으면 갈아끼우지 않는다.
+      if (!v.paused) return;
+      // 준비 완료는 "파일이 메모리에 있다"로 본다. canplay를 기다리지 않는 이유 —
+      // iOS는 재생을 걸기 전에는 데이터를 디코딩하지 않아 canplay가 안 올 수 있다.
+      // 데이터가 이미 메모리에 있으니 셋이 같이 play()하면 거의 같이 출발한다.
+      v.preload = 'auto';
+      v.src = src;
+      v.currentTime = needsTouch ? STILL_AT : startAt;
+      ready.add(i);
+      if (needsTouch) return;
+      if (started) join(i);
+      else maybeLaunch();
+    };
+
+    // 다 받기까지 오래 걸리면 빈 흰 화면 대신 정지 장면을 걸어두고 그 장면에서 출발한다.
+    // 이미 받아둔 패널은 포스터 대신 영상 프레임이 보이므로 위치를 옮겨 같은 장면을 띄운다.
+    const showStill = () => {
+      if (started || cancelled) return;
+      startAt = STILL_AT;
+      videos.forEach((v, i) => {
+        if (imaged.has(i)) return;
+        v.poster = stillOf(i);
+        if (v.readyState >= 1) v.currentTime = STILL_AT;
+      });
+    };
+    const stillTimer = setTimeout(showStill, STILL_AFTER);
+    const giveUpTimer = setTimeout(launch, START_GIVE_UP);
+
+    // 터치 직후에만 재생되는 브라우저. play()는 반드시 이 핸들러 안에서 바로 불러야
+    // 한다 — 한 틱이라도 미루면 사용자 터치로 인정받지 못한다. 셋이 같은 정지 장면에서
+    // 같이 풀리므로 기다리지 않고 바로 출발한다(어긋나는 만큼은 아래 동기화가 맞춘다).
+    // 미리 받아둔 패널은 메모리에서, 아직이면 스트리밍으로 돈다.
+    // <img>로 넘어간 패널은 이미 움직이고 있으니 건드리지 않는다.
     let listening = false;
     const unlock = () => {
       if (!started) {
-        startAt = STILL_AT;
         started = true;
-        clearTimeout(waitTimer);
+        clearTimeout(stillTimer);
+        clearTimeout(giveUpTimer);
       }
       const waiting = videos.filter((_, i) => !imaged.has(i));
       waiting.forEach((v) => {
-        if (v.paused) start(v, videos.indexOf(v));
+        if (v.paused) v.play().catch(() => {});
       });
       if (waiting.every((v) => !v.paused)) unlisten();
     };
@@ -213,9 +258,10 @@ export default function HomePage() {
       UNLOCK_EVENTS.forEach((t) => window.removeEventListener(t, unlock, UNLOCK_OPTS));
     };
 
-    // 막히면 영상 다운로드부터 끊고(포스터는 그대로 보인다) <img>를 받는다.
-    // <img>는 처음 그려지는 순간 움직이기 시작하므로, 넘긴 패널이 전부 다 받을
-    // 때까지 숨겨뒀다가 한꺼번에 드러낸다.
+    // 막히면 같은 영상을 <img>로 받는다. <img>는 처음 그려지는 순간 움직이기
+    // 시작하므로, 넘긴 패널이 전부 다 받을 때까지 숨겨뒀다가 한꺼번에 드러낸다.
+    // <img>로도 안 되는 브라우저(크로뮴 계열)는 정지 장면을 걸어두고 터치를 기다리며,
+    // 그동안 영상을 미리 받아둔다.
     const loaded = new Set();
     const settled = new Set();
     const reveal = () => {
@@ -230,8 +276,6 @@ export default function HomePage() {
       const img = images[i];
       if (img.getAttribute('src')) return;
       diverted.add(i);
-      v.removeAttribute('src');
-      v.load();
       img.onload = () => {
         if (cancelled) return;
         loaded.add(i);
@@ -241,40 +285,66 @@ export default function HomePage() {
       img.onerror = () => {
         if (cancelled) return;
         settled.add(i);
+        needsTouch = true;
+        startAt = STILL_AT;
+        v.poster = stillOf(i);
         v.src = sources[i];
-        hold(v, i);
+        v.currentTime = STILL_AT;
         listen();
+        load(i);
         reveal();
       };
       img.src = imageSource(PANELS[i]);
     };
 
-    const start = (v, i) =>
-      v
-        .play()
+    // 재생이 허락되는지만 먼저 본다. 허락되면 play()를 부르는 순간 paused가 false가
+    // 되므로, 데이터를 받기 전에 바로 알 수 있다(preload="none"이라 아직 아무것도 안
+    // 받았다). 허락되면 곧바로 멈추고 소스를 걷어 스트리밍을 끊은 뒤 파일을 통째로
+    // 받는다. 막히면 <img>로 넘긴다.
+    const probe = (v, i) => {
+      v.src = sources[i];
+      const attempt = v.play();
+      if (!v.paused) {
+        attempt.catch(() => {});
+        v.pause();
+        v.removeAttribute('src');
+        v.load();
+        load(i);
+        return;
+      }
+      attempt
         .then(() => {
           if (cancelled) return;
-          ready.add(i);
-          // 무리가 이미 출발했으면 그대로 둔다 — 늦게 온 만큼은 동기화가 따라붙인다.
-          if (started) return;
           v.pause();
-          v.currentTime = startAt;
-          if (ready.size + diverted.size === PANELS.length) launch();
-          else if (!waitTimer) waitTimer = setTimeout(launch, START_WAIT);
+          load(i);
         })
         .catch((err) => {
-          if (cancelled || err?.name !== 'NotAllowedError') return;
-          toImage(v, i);
-          // 막힌 패널 때문에 나머지가 계속 기다리지 않게 한다.
-          if (!started && ready.size > 0 && ready.size + diverted.size === PANELS.length) launch();
+          if (cancelled) return;
+          if (err?.name === 'NotAllowedError') {
+            v.removeAttribute('src');
+            v.load();
+            toImage(v, i);
+            maybeLaunch(); // 막힌 패널 때문에 나머지가 계속 기다리지 않게
+          } else {
+            load(i);
+          }
         });
+    };
 
-    videos.forEach((v, i) => start(v, i));
+    videos.forEach((v, i) => probe(v, i));
 
     // 가운데 패널을 기준으로 나머지를 맞춘다. 가운데가 멈춰 있거나 <img>로
     // 넘어갔으면 움직이고 있는 첫 패널이 기준이 된다.
     const sync = () => {
       if (!started) return;
+      // 화면이 보이는데 멈춰 있는 패널은 다시 건다 — 인앱 브라우저에서 앱을 잠깐 나갔다
+      // 오거나 OS가 재생을 끊었을 때 그대로 서 있지 않게. 터치를 기다리는 중이면 두고,
+      // 다시 건 패널은 다음 차례에 아래 보정이 위치를 맞춘다.
+      if (document.visibilityState === 'visible' && !listening) {
+        videos.forEach((v, i) => {
+          if (ready.has(i) && !imaged.has(i) && v.paused) v.play().catch(() => {});
+        });
+      }
       const live = videos.filter((v, i) => !imaged.has(i) && !v.paused && v.readyState >= 3);
       if (live.length < 2) return;
       const lead = live.includes(videos[1]) ? videos[1] : live[0];
@@ -355,8 +425,10 @@ export default function HomePage() {
 
     return () => {
       cancelled = true;
-      clearTimeout(waitTimer);
+      clearTimeout(stillTimer);
+      clearTimeout(giveUpTimer);
       clearInterval(syncTimer);
+      blobUrls.forEach((url) => url && URL.revokeObjectURL(url));
       unlisten();
       stops.forEach((stop) => stop());
       ro.disconnect();
@@ -397,7 +469,7 @@ export default function HomePage() {
                 muted
                 loop
                 playsInline
-                preload="auto"
+                preload="none"
                 disablePictureInPicture
                 aria-hidden="true"
               />
