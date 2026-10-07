@@ -20,7 +20,7 @@ import H1 from '../../../public/asset/details/lookbook/9hat/H1.jpg';
 import H2 from '../../../public/asset/details/lookbook/9hat/H2.jpg';
 import H3 from '../../../public/asset/details/lookbook/9hat/H3.jpg';
 
-// 룩북 컬렉션 — /lookbook 목록에 이 순서대로 쌓인다(위가 최신).
+// 룩북 컬렉션 — /collections 목록에 이 순서대로 쌓인다(위가 최신).
 // upcoming은 아직 공개 전: 링크 없이 흐린 티저 이미지만 보인다.
 // 티저 파일은 피사체만 누끼를 따 순백 위에 올리고 블러를 입혀 미리 저장한 것 — 원본은 사이트에 올리지 않는다.
 // images가 있는 컬렉션은 목록에서 누르면 그 아래로 사진 격자가 펼쳐진다.

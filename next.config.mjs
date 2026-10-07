@@ -23,6 +23,15 @@ const nextConfig = {
       process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
   poweredByHeader: false,
+  async redirects() {
+    return [
+      // 룩북은 2026-10에 Collections로 이름과 주소를 바꿨다 — 예전 링크·검색 결과·공유된 주소가
+      // 새 주소로 넘어오게 영구 이동. permanent(308) 대신 301을 쓰는 건 네이버 등 모든
+      // 검색엔진이 확실히 "주소 변경"으로 읽게 하려는 것.
+      { source: '/lookbook', destination: '/collections', statusCode: 301 },
+      { source: '/lookbook/:path*', destination: '/collections/:path*', statusCode: 301 },
+    ];
+  },
   async headers() {
     return [
       {

@@ -1,6 +1,6 @@
 import { OG_CONTENT_TYPE, OG_SIZE, renderOgImage } from '@/lib/og-image';
 
-export const alt = 'CAGE3000 Lookbook';
+export const alt = 'CAGE3000 Collections';
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

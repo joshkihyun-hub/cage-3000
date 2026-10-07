@@ -33,7 +33,7 @@ export function GET() {
 
 ## Pages
 - [Shop](${SITE_URL}/shop): 컬렉션 전체 (${items.length} pieces)
-- [Lookbook](${SITE_URL}/lookbook): 시즌 컬렉션 비주얼
+- [Collections](${SITE_URL}/collections): 시즌 컬렉션 룩북
 - [Projects](${SITE_URL}/projects): 커스텀 메이드·협찬·개인 작업 아카이브
 - [About](${SITE_URL}/about): 브랜드와 디자이너
 - [FAQ](${SITE_URL}/faq): 주문 제작·소재·배송 관련 질문
