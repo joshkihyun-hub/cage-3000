@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -137,7 +137,8 @@ export default function MyPage() {
                     const res = await fetch('/api/user/delete', { method: 'DELETE' });
                     if (res.ok) {
                       alert('탈퇴가 완료되었습니다.');
-                      window.location.href = '/';
+                      // 로그인 쿠키까지 지워야 헤더가 로그아웃 상태로 돌아온다.
+                      await signOut({ callbackUrl: '/' });
                     } else {
                       alert('탈퇴 처리에 실패했습니다.');
                     }

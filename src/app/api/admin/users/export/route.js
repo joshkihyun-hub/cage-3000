@@ -3,7 +3,10 @@ import { requireAdmin } from '@/lib/auth-guards';
 
 function csvEscape(value) {
   if (value === null || value === undefined) return '';
-  const s = String(value);
+  let s = String(value);
+  // 회원이 직접 적은 값(이름 등)이 =, +, -, @로 시작하면 엑셀이 수식으로 실행한다 —
+  // 앞에 '를 붙여 글자로만 보이게 한다.
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
   if (/[",\n\r]/.test(s)) {
     return `"${s.replace(/"/g, '""')}"`;
   }
