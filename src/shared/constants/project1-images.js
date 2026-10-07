@@ -44,6 +44,11 @@ export const PROJECT1_ITEMS = [
     subImages: [
       '/asset/details/aiweo/aiweo1.jpg',
       '/asset/details/aiweo/aiweo2.jpg',
+      '/asset/details/aiweo/aiweo3.jpg',
+    ],
+    // 상세 페이지 사진 아래에 작게 붙는 바깥 링크
+    links: [
+      { label: '"00FF00" MV', href: 'https://youtu.be/9fHMMdeubd0' },
     ],
     credits: [
       { role: 'Headwear 00, 02, 06, 07', name: 'CAGE3000 (@cage3k)' },

@@ -127,6 +127,23 @@ export default async function ProjectPage({ params }) {
           ))}
         </div>
 
+        {/* 뮤직비디오 같은 바깥 링크 — 사진 바로 아래, 크레딧과 같은 크기로 작게. */}
+        {project.links?.length > 0 && (
+          <div className="mt-6 md:mt-8 flex flex-wrap gap-x-6 gap-y-1">
+            {project.links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] md:text-xs text-zinc-400 hover:text-black transition-colors"
+              >
+                {link.label} ↗
+              </a>
+            ))}
+          </div>
+        )}
+
         <div className="mt-20 md:mt-28 flex flex-wrap gap-x-8 gap-y-3">
           <Link href="/projects" className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-zinc-400 hover:text-black transition-colors">
             ← All Projects
