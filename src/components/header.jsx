@@ -56,7 +56,7 @@ const RandomHoverLink = ({ href, text, className }) => {
 
 const navItemsLeft = [
   { name: 'Shop', href: '/shop' },
-  { name: 'Lookbook', href: '/lookbook' },
+  { name: 'Collections', href: '/lookbook' },
 ];
 
 const navItemsRight = [
