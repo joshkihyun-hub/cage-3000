@@ -8,7 +8,9 @@ import { grotesk } from '@/shared/fonts';
 // `priority` should only be true for above-the-fold cards (e.g. the first grid
 // row on /shop). Marking every card priority forces the browser to preload all
 // nine primary images at once, starving the actual LCP image.
-export const ShopItemCard = ({ item, priority = false }) => {
+// `label` replaces the name under the card — /shop shows just the number inside
+// its collection section ("01" under GREEN) while alt text keeps the full name.
+export const ShopItemCard = ({ item, label = item.name, priority = false }) => {
     // Default to displaying the first image (index 0)
     const [currentIndex, setCurrentIndex] = useState(0);
     const containerRef = useRef(null);
@@ -102,7 +104,7 @@ export const ShopItemCard = ({ item, priority = false }) => {
                     번호는 옅게, 가격은 또렷하게. 숫자 폭을 고르게(tabular-nums) 맞추고
                     모바일은 한 단계 작게, 자간은 살짝 벌려 숫자가 붙어 보이지 않게. */}
                 <div className={`${grotesk.className} select-none text-[11px] md:text-[12px] font-medium leading-[1.4] tracking-[0.02em] md:tracking-[0.01em] tabular-nums`}>
-                    <h3 className="text-zinc-400">{item.name}</h3>
+                    <h3 className="text-zinc-400">{label}</h3>
                     <p className="text-black">{item.price}</p>
                 </div>
                 <div className="w-2 h-2 bg-black rounded-full mb-1 shrink-0"></div>

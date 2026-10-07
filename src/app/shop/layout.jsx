@@ -1,7 +1,6 @@
 import { pageMetadata } from '@/lib/seo';
 
-// Server layout that supplies metadata for the /shop listing. The page itself
-// is a client component (can't export metadata), so this wraps it.
+// Server layout that supplies metadata for the /shop listing.
 // Product pages (/shop/[id]) override this via their own generateMetadata.
 export const metadata = pageMetadata({
   title: 'Shop',
