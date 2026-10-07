@@ -49,13 +49,17 @@ export async function POST(req) {
 
   const recipientName = String(shipping.recipientName || '').trim();
   const recipientPhone = String(shipping.recipientPhone || '').trim();
-  const shippingAddress = String(shipping.address || '').trim();
-  const shippingDetail = String(shipping.detailAddress || '').trim();
-  const shippingZipCode = String(shipping.zipCode || '').trim();
+  // 주소는 우편번호 검색 결과가 들어오지만 서버는 아무 문자열이나 받을 수 있으니 길이를 묶어 둔다.
+  const shippingAddress = String(shipping.address || '').trim().slice(0, 200);
+  const shippingDetail = String(shipping.detailAddress || '').trim().slice(0, 200);
+  const shippingZipCode = String(shipping.zipCode || '').trim().slice(0, 10);
   const customerNote = String(shipping.customerNote || '').trim().slice(0, 500);
 
   if (recipientName.length < 2) {
     return NextResponse.json({ error: '수령인 이름을 입력해 주세요.' }, { status: 400 });
+  }
+  if (recipientName.length > 50) {
+    return NextResponse.json({ error: '수령인 이름은 50자 이하로 입력해 주세요.' }, { status: 400 });
   }
   if (!isValidKrPhone(recipientPhone)) {
     return NextResponse.json({ error: '올바른 수령인 휴대폰을 입력해 주세요.' }, { status: 400 });

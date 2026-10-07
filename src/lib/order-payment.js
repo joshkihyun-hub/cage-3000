@@ -192,6 +192,7 @@ export async function sendOrderEmails(orderId) {
         totalAmount: order.totalAmount,
         items: order.items,
         shipping,
+        isGuest: !order.userId,
       });
     } catch (err) {
       console.error('[settle] buyer receipt failed', { orderId, message: err?.message });

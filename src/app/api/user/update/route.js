@@ -21,6 +21,9 @@ export async function POST(req) {
     if (trimmed.length < 2) {
       return NextResponse.json({ error: '이름은 2자 이상이어야 합니다.' }, { status: 400 });
     }
+    if (trimmed.length > 50) {
+      return NextResponse.json({ error: '이름은 50자 이하로 입력해 주세요.' }, { status: 400 });
+    }
     data.name = trimmed;
   }
 

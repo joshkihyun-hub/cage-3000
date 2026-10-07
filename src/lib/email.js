@@ -24,6 +24,17 @@ const SITE_URL =
   process.env.NEXTAUTH_URL ||
   'https://cage3000.com';
 
+// 사용자가 입력한 문자열(이름·주소·메모 등)은 HTML 메일에 넣기 전에 반드시 이스케이프한다.
+// 안 하면 가입 이름에 링크를 넣고 남의 주소를 적는 식으로, CAGE3000 명의 메일에
+// 아무 내용이나 실어 보낼 수 있다.
+const escapeHtml = (s) =>
+  String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
 export async function sendEmail({ to, subject, html, text, replyTo }) {
   const client = getClient();
   const payload = {
@@ -113,23 +124,23 @@ function shellTemplate({ headline, body, ctaLabel, ctaUrl, footnote }) {
 
 export async function sendVerificationEmail({ to, name, token }) {
   const url = `${SITE_URL}/auth/verify-email?token=${encodeURIComponent(token)}`;
-  const greeting = name ? `${name}님,` : '안녕하세요,';
+  const greeting = name ? `${escapeHtml(name)}님,` : '안녕하세요,';
   const html = shellTemplate({
     headline: 'Welcome to CAGE3000',
     body: `
       <p style="margin:0 0 20px 0;">${greeting}</p>
       <p style="margin:0 0 20px 0;">CAGE3000 가족이 되어 주셔서 진심으로 감사드립니다. 서울에서 한 점 한 점 손으로 다듬어 만든 모자를, 이제 가장 먼저 만나보실 수 있어요.</p>
-      <p style="margin:0 0 20px 0;">계정을 활성화하려면 아래 버튼으로 이메일을 인증해 주세요. 링크는 <strong>24시간</strong> 동안 유효합니다.</p>
+      <p style="margin:0 0 20px 0;">가입하신 이메일 주소가 맞는지 아래 버튼으로 인증해 주세요. 링크는 <strong>24시간</strong> 동안 유효합니다.</p>
     `,
     ctaLabel: 'Verify Email',
     ctaUrl: url,
-    footnote: '본인이 가입하지 않으셨다면 이 메일은 무시해 주세요. 계정은 활성화되지 않습니다. 문의는 contact@cage3000.com 으로 부탁드립니다.',
+    footnote: '본인이 가입하지 않으셨다면 다른 분이 이 주소로 가입한 것일 수 있습니다. 이 메일은 무시하시고 contact@cage3000.com 으로 알려 주세요.',
   });
   return sendEmail({
     to,
     subject: '[CAGE3000] 가입을 환영합니다 — 이메일 인증을 완료해 주세요',
     html,
-    text: `${greeting}\n\nCAGE3000에 가입해 주셔서 감사합니다.\n계정 활성화를 위해 아래 링크로 이메일을 인증해 주세요. (24시간 유효)\n\n${url}`,
+    text: `${name ? `${name}님,` : '안녕하세요,'}\n\nCAGE3000에 가입해 주셔서 감사합니다.\n가입하신 이메일 주소가 맞는지 아래 링크로 인증해 주세요. (24시간 유효)\n\n${url}`,
   });
 }
 
@@ -151,28 +162,30 @@ export async function sendOrderConfirmationEmail({
   totalAmount,
   items = [],
   shipping = null, // { recipientName, recipientPhone, zipCode, address, detail, customerNote }
+  isGuest = false,
 }) {
-  const greeting = name ? `${name}님,` : '안녕하세요,';
+  const greeting = name ? `${escapeHtml(name)}님,` : '안녕하세요,';
 
   const itemsRows = items
     .map(
       (it) => `
         <tr>
-          <td style="padding:10px 0;border-bottom:1px solid #f4f4f5;font-size:13px;color:#27272a;">${it.productName} <span style="color:#a1a1aa;">× ${it.quantity}</span></td>
+          <td style="padding:10px 0;border-bottom:1px solid #f4f4f5;font-size:13px;color:#27272a;">${escapeHtml(it.productName)} <span style="color:#a1a1aa;">× ${escapeHtml(it.quantity)}</span></td>
           <td style="padding:10px 0;border-bottom:1px solid #f4f4f5;font-size:13px;color:#27272a;text-align:right;">${formatKRW(it.subtotal)}</td>
         </tr>`
     )
     .join('');
 
-  const lookupUrl = `${SITE_URL}/my-page`;
+  // 비회원은 계정이 없으니 마이페이지가 아니라 주문 조회(이메일+주문번호)로 보낸다.
+  const lookupUrl = `${SITE_URL}${isGuest ? '/order-lookup' : '/my-page'}`;
 
   const shippingBlock = shipping
     ? `
     <p style="margin:24px 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">Shipping To</p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;color:#27272a;line-height:1.7;">
-      <tr><td>${shipping.recipientName || ''} · ${shipping.recipientPhone || ''}</td></tr>
-      <tr><td style="color:#52525b;">${joinAddress({ zipCode: shipping.zipCode, address: shipping.address, detail: shipping.detail })}</td></tr>
-      ${shipping.customerNote ? `<tr><td style="padding-top:6px;color:#71717a;font-size:12px;">메모: ${shipping.customerNote}</td></tr>` : ''}
+      <tr><td>${escapeHtml(shipping.recipientName || '')} · ${escapeHtml(shipping.recipientPhone || '')}</td></tr>
+      <tr><td style="color:#52525b;">${escapeHtml(joinAddress({ zipCode: shipping.zipCode, address: shipping.address, detail: shipping.detail }))}</td></tr>
+      ${shipping.customerNote ? `<tr><td style="padding-top:6px;color:#71717a;font-size:12px;">메모: ${escapeHtml(shipping.customerNote)}</td></tr>` : ''}
     </table>
   `
     : '';
@@ -180,7 +193,7 @@ export async function sendOrderConfirmationEmail({
   const body = `
     <p style="margin:0 0 20px 0;">${greeting}</p>
     <p style="margin:0 0 20px 0;">CAGE3000에서 주문을 접수했습니다. 결제가 정상적으로 완료되었음을 확인했어요.</p>
-    <p style="margin:0 0 24px 0;font-size:13px;color:#71717a;">주문번호 <strong style="color:#000;letter-spacing:0.05em;">${orderNumber}</strong></p>
+    <p style="margin:0 0 24px 0;font-size:13px;color:#71717a;">주문번호 <strong style="color:#000;letter-spacing:0.05em;">${escapeHtml(orderNumber)}</strong></p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e4e4e7;margin:0 0 8px 0;">
       ${itemsRows}
       <tr>
@@ -205,7 +218,7 @@ export async function sendOrderConfirmationEmail({
     to,
     subject: `[CAGE3000] 주문이 접수되었습니다 — ${orderNumber}`,
     html,
-    text: `${greeting}\n주문이 접수되었습니다.\n주문번호: ${orderNumber}\n합계: ${formatKRW(totalAmount)}\n\n주문 상세는 ${lookupUrl} 에서 확인하실 수 있습니다.`,
+    text: `${name ? `${name}님,` : '안녕하세요,'}\n주문이 접수되었습니다.\n주문번호: ${orderNumber}\n합계: ${formatKRW(totalAmount)}\n\n주문 상세는 ${lookupUrl} 에서 확인하실 수 있습니다.${isGuest ? ' (주문하신 이메일과 주문번호로 조회)' : ''}`,
   });
 }
 
@@ -238,7 +251,7 @@ export async function sendOrderNotificationToSeller({
     .map(
       (it) => `
         <tr>
-          <td style="padding:10px 0;border-bottom:1px solid #f4f4f5;font-size:13px;color:#27272a;">${it.productName} <span style="color:#a1a1aa;">× ${it.quantity}</span></td>
+          <td style="padding:10px 0;border-bottom:1px solid #f4f4f5;font-size:13px;color:#27272a;">${escapeHtml(it.productName)} <span style="color:#a1a1aa;">× ${escapeHtml(it.quantity)}</span></td>
           <td style="padding:10px 0;border-bottom:1px solid #f4f4f5;font-size:13px;color:#27272a;text-align:right;">${formatKRW(it.subtotal)}</td>
         </tr>`
     )
@@ -255,11 +268,11 @@ export async function sendOrderNotificationToSeller({
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e4e4e7;border-bottom:1px solid #e4e4e7;margin:0 0 24px 0;">
       <tr>
         <td style="padding:10px 0;font-size:12px;color:#71717a;width:90px;">주문번호</td>
-        <td style="padding:10px 0;font-size:13px;color:#000;font-weight:600;letter-spacing:0.05em;">${orderNumber}</td>
+        <td style="padding:10px 0;font-size:13px;color:#000;font-weight:600;letter-spacing:0.05em;">${escapeHtml(orderNumber)}</td>
       </tr>
       <tr>
         <td style="padding:10px 0;font-size:12px;color:#71717a;">결제수단</td>
-        <td style="padding:10px 0;font-size:13px;color:#27272a;">${paymentMethod || '-'}</td>
+        <td style="padding:10px 0;font-size:13px;color:#27272a;">${escapeHtml(paymentMethod || '-')}</td>
       </tr>
       <tr>
         <td style="padding:10px 0;font-size:12px;color:#71717a;">결제시각</td>
@@ -273,16 +286,16 @@ export async function sendOrderNotificationToSeller({
 
     <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">Customer ${guestBadge}</p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;">
-      <tr><td style="padding:4px 0;font-size:13px;color:#27272a;">${buyer?.name || '-'}</td></tr>
-      <tr><td style="padding:4px 0;font-size:13px;color:#52525b;">${buyer?.email || '-'}</td></tr>
-      <tr><td style="padding:4px 0;font-size:13px;color:#52525b;">${buyer?.phone || '-'}</td></tr>
+      <tr><td style="padding:4px 0;font-size:13px;color:#27272a;">${escapeHtml(buyer?.name || '-')}</td></tr>
+      <tr><td style="padding:4px 0;font-size:13px;color:#52525b;">${escapeHtml(buyer?.email || '-')}</td></tr>
+      <tr><td style="padding:4px 0;font-size:13px;color:#52525b;">${escapeHtml(buyer?.phone || '-')}</td></tr>
     </table>
 
     <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">Shipping</p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;font-size:13px;color:#27272a;line-height:1.7;">
-      <tr><td>${shipping?.recipientName || '-'} · ${shipping?.recipientPhone || '-'}</td></tr>
-      <tr><td style="color:#52525b;">${joinAddress({ zipCode: shipping?.zipCode, address: shipping?.address, detail: shipping?.detail })}</td></tr>
-      ${shipping?.customerNote ? `<tr><td style="padding-top:6px;color:#71717a;font-size:12px;">메모: ${shipping.customerNote}</td></tr>` : ''}
+      <tr><td>${escapeHtml(shipping?.recipientName || '-')} · ${escapeHtml(shipping?.recipientPhone || '-')}</td></tr>
+      <tr><td style="color:#52525b;">${escapeHtml(joinAddress({ zipCode: shipping?.zipCode, address: shipping?.address, detail: shipping?.detail }))}</td></tr>
+      ${shipping?.customerNote ? `<tr><td style="padding-top:6px;color:#71717a;font-size:12px;">메모: ${escapeHtml(shipping.customerNote)}</td></tr>` : ''}
     </table>
 
     <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">Items</p>
@@ -317,7 +330,7 @@ export async function sendPasswordResetEmail({ to, name, token }) {
   const html = shellTemplate({
     headline: 'Reset your password',
     body: `
-      <p style="margin:0 0 16px 0;">${name ? `${name}님, ` : ''}비밀번호 재설정 요청이 접수되었습니다.</p>
+      <p style="margin:0 0 16px 0;">${name ? `${escapeHtml(name)}님, ` : ''}비밀번호 재설정 요청이 접수되었습니다.</p>
       <p style="margin:0 0 16px 0;">아래 버튼을 눌러 새 비밀번호를 설정해 주세요. 이 링크는 <strong>1시간</strong> 동안만 유효하며 한 번만 사용할 수 있습니다.</p>
     `,
     ctaLabel: 'Reset Password',
@@ -331,15 +344,6 @@ export async function sendPasswordResetEmail({ to, name, token }) {
     text: `비밀번호 재설정 링크: ${url}\n링크는 1시간 동안 유효합니다.`,
   });
 }
-
-// 사용자가 입력한 문자열을 HTML 메일에 넣기 전에 이스케이프.
-const escapeHtml = (s) =>
-  String(s ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 
 // 프로젝트 페이지의 커미션(커스텀 메이드) 문의 → 운영자에게 전달.
 // 회신 주소를 문의자 이메일로 두어 메일함에서 바로 답장할 수 있게 한다.

@@ -44,6 +44,10 @@ export async function POST(req) {
   if (typeof name !== 'string' || name.trim().length < 2) {
     return NextResponse.json({ error: '이름은 2자 이상이어야 합니다.' }, { status: 400 });
   }
+  // 이름은 메일 인사말·주문서에 그대로 쓰인다 — 문장을 통째로 실어 보내지 못하게 길이를 묶는다.
+  if (name.trim().length > 50) {
+    return NextResponse.json({ error: '이름은 50자 이하로 입력해 주세요.' }, { status: 400 });
+  }
   if (!isValidEmail(email)) {
     return NextResponse.json({ error: '올바른 이메일을 입력해 주세요.' }, { status: 400 });
   }
