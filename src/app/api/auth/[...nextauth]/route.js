@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import NextAuth from 'next-auth';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { prisma } from '@/lib/prisma';
@@ -5,6 +6,17 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+
+// 비밀번호 지문 — 토큰에 비밀번호 해시 자체는 넣지 않고 짧은 지문만 담는다. 비밀번호가
+// 바뀌거나(재설정) 지워지면(아래 Google 연결) 지문이 달라져 예전 토큰이 무효가 된다.
+// JWT 세션은 서버에 지울 기록이 없어서, 다른 기기를 로그아웃시키는 수단이 이것뿐이다.
+function passwordFingerprint(hashedPassword) {
+  if (!hashedPassword) return 'none';
+  return crypto.createHash('sha256').update(hashedPassword).digest('hex').slice(0, 16);
+}
+
+// 토큰을 DB와 다시 맞춰 보는 간격. 그 사이에는 토큰 값을 그대로 믿는다.
+const RECHECK_MS = 60_000;
 
 const providers = [];
 
@@ -102,30 +114,41 @@ export const authOptions = {
     // OAuth 로그인도 credentials와 동일하게 계정 상태를 검사한다 —
     // authorize()는 credentials 전용이라 여기서 막지 않으면 정지/탈퇴
     // 계정이 Google 버튼으로 우회 로그인할 수 있다.
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (!account || account.provider === 'credentials') return true;
+      // 이메일 소유가 확인된 Google 계정만 받는다 — 아래 자동 연결이 그 확인에 기대고 있다.
+      if (account.provider === 'google' && profile?.email_verified !== true) return false;
       if (!user?.email) return true;
       const dbUser = await prisma.user.findUnique({
         where: { email: user.email.toLowerCase() },
-        select: { id: true, status: true },
+        select: { id: true, status: true, emailVerified: true, hashedPassword: true },
       });
       // 신규 가입(아직 DB에 없음)은 통과 — adapter가 이 콜백 뒤에 생성한다.
       if (!dbUser) return true;
       if (dbUser.status === 'suspended') return '/auth/signin?error=SUSPENDED';
       if (dbUser.status === 'withdrawn') return '/auth/signin?error=WITHDRAWN';
-      await prisma.user.update({
-        where: { id: dbUser.id },
-        data: { lastLoginAt: new Date(), loginCount: { increment: 1 } },
-      });
+
+      const data = { lastLoginAt: new Date(), loginCount: { increment: 1 } };
+      // 같은 이메일의 기존 계정이 메일 인증을 한 번도 안 했다면, 그 비밀번호는 이메일 주인이
+      // 만든 것이라는 보장이 없다(남의 주소로 먼저 가입해 두는 계정 선점). Google이 주인임을
+      // 확인해 준 지금 그 비밀번호를 지우고 인증된 계정으로 바꾼다 — 비밀번호 지문이 달라져
+      // 그 비밀번호로 들어와 있던 다른 기기도 로그아웃된다. 진짜 주인은 Google로 계속
+      // 들어오거나 비밀번호 찾기로 새로 정하면 된다.
+      if (!dbUser.emailVerified) {
+        data.emailVerified = new Date();
+        if (dbUser.hashedPassword) data.hashedPassword = null;
+      }
+      await prisma.user.update({ where: { id: dbUser.id }, data });
       return true;
     },
     async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
       }
-      // On every JWT regeneration (including session refresh), re-fetch user from DB
-      // so that profile edits and status changes propagate without re-login.
-      if (token.id && (user || trigger === 'update' || !token.role)) {
+      // 로그인·프로필 수정 때, 그리고 그 밖에는 RECHECK_MS마다 DB와 다시 맞춘다 —
+      // 프로필·권한·상태 변경이 재로그인 없이 반영되고, 무효가 된 토큰은 여기서 걸러진다.
+      const stale = Date.now() - (token.checkedAt || 0) > RECHECK_MS;
+      if (token.id && (user || trigger === 'update' || !token.role || stale)) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id },
           select: {
@@ -138,18 +161,26 @@ export const authOptions = {
             address: true,
             detailAddress: true,
             zipCode: true,
+            hashedPassword: true,
           },
         });
-        if (dbUser) {
-          token.name = dbUser.name;
-          token.email = dbUser.email;
-          token.role = dbUser.role;
-          token.status = dbUser.status;
-          token.phoneNumber = dbUser.phoneNumber;
-          token.address = dbUser.address;
-          token.detailAddress = dbUser.detailAddress;
-          token.zipCode = dbUser.zipCode;
+        const fingerprint = passwordFingerprint(dbUser?.hashedPassword);
+        // 여기서 던지면 NextAuth가 세션 쿠키를 지운다(= 그 기기 로그아웃). 계정이 없어졌거나
+        // 탈퇴했거나, 토큰을 받은 뒤 비밀번호가 바뀐 경우. 이 장치 이전에 발급된 토큰(pwv 없음)은
+        // 한 번만 현재 지문을 받아들여, 배포했다고 모두가 로그아웃되지는 않게 한다.
+        if (!dbUser || dbUser.status === 'withdrawn' || (token.pwv && token.pwv !== fingerprint)) {
+          throw new Error('SESSION_REVOKED');
         }
+        token.pwv = fingerprint;
+        token.checkedAt = Date.now();
+        token.name = dbUser.name;
+        token.email = dbUser.email;
+        token.role = dbUser.role;
+        token.status = dbUser.status;
+        token.phoneNumber = dbUser.phoneNumber;
+        token.address = dbUser.address;
+        token.detailAddress = dbUser.detailAddress;
+        token.zipCode = dbUser.zipCode;
       }
       return token;
     },

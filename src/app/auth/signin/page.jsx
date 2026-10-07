@@ -17,13 +17,33 @@ const URL_ERROR_MESSAGES = {
   Default: '로그인 중 오류가 발생했습니다. 다시 시도해 주세요.',
 };
 
+// 로그인 뒤 돌아갈 곳은 이 사이트 안의 경로만 — "https://…"나 "//다른도메인"을 받으면
+// 진짜 로그인 화면을 거쳐 남의 사이트로 보내는 통로가 된다(router.push는 외부 주소면 그대로 이동한다).
+// 글자 모양만 보면 "/\t/evil.com"(브라우저가 탭을 지워 //evil.com이 됨) 같은 변형을 놓치므로,
+// 브라우저와 같은 규칙으로 주소를 해석해 보고 출처가 그대로인 경우만 받는다. 정리된 경로가
+// 다시 "//"로 시작할 수도 있어서("/x/..//evil.com") 돌려줄 값도 한 번 더 해석해 확인한다.
+const SAME_ORIGIN_BASE = 'https://same-origin.invalid';
+function safeCallbackUrl(raw) {
+  if (typeof raw !== 'string' || !raw.startsWith('/')) return '/';
+  try {
+    const url = new URL(raw, SAME_ORIGIN_BASE);
+    const path = `${url.pathname}${url.search}${url.hash}`;
+    if (url.origin !== SAME_ORIGIN_BASE || new URL(path, SAME_ORIGIN_BASE).origin !== SAME_ORIGIN_BASE) {
+      return '/';
+    }
+    return path;
+  } catch {
+    return '/';
+  }
+}
+
 function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl'));
   const registered = searchParams.get('registered') === '1';
   const urlError = searchParams.get('error');
-  const fromCheckout = callbackUrl === '/checkout';
+  const fromCheckout = callbackUrl === '/checkout' || callbackUrl.startsWith('/checkout?');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -95,7 +115,7 @@ function SignInForm() {
           <Block className="mt-3">
             <p className="text-[13px] leading-relaxed">
               계정 없이 구매하실 수 있어요.{' '}
-              <Link href="/checkout" className="underline hover:text-zinc-600">
+              <Link href={callbackUrl} className="underline hover:text-zinc-600">
                 비회원으로 주문하기
               </Link>
             </p>

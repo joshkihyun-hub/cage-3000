@@ -11,10 +11,16 @@ export async function requireSession() {
   return { session };
 }
 
+// 권한은 토큰이 아니라 DB에서 확인한다 — 토큰의 role은 최대 1분 늦게 따라오므로,
+// 권한을 해제하거나 계정을 정지하면 관리자 API는 그 즉시 막혀야 한다.
 export async function requireAdmin() {
   const { session, error } = await requireSession();
   if (error) return { error };
-  if (session.user.role !== 'admin') {
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true, status: true },
+  });
+  if (user?.role !== 'admin' || user.status !== 'active') {
     return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
   }
   return { session };

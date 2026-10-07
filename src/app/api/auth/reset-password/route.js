@@ -24,15 +24,15 @@ export async function POST(req) {
     await prisma.$transaction([
       prisma.user.update({
         where: { id: user.id },
-        data: { hashedPassword },
+        // 메일로 온 링크를 눌렀다는 건 그 주소의 주인이라는 뜻 — 이메일 인증도 함께 끝낸다.
+        // 비밀번호가 바뀌면 지문이 달라져, 다른 기기의 로그인은 1분 안에 풀린다(auth 라우트 jwt 콜백).
+        data: { hashedPassword, emailVerified: user.emailVerified ?? new Date() },
       }),
       // 보안: 다른 모든 활성 비밀번호 재설정 토큰도 무효화
       prisma.emailToken.updateMany({
         where: { userId: user.id, purpose: 'password_reset', consumedAt: null },
         data: { consumedAt: new Date() },
       }),
-      // 보안: 기존 세션 모두 종료
-      prisma.session.deleteMany({ where: { userId: user.id } }),
     ]);
     return NextResponse.json({ status: 'ok' });
   } catch (err) {
