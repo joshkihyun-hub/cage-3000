@@ -74,13 +74,6 @@ providers.push(
           return null;
         }
 
-        if (user.status === 'suspended') {
-          throw new Error('SUSPENDED');
-        }
-        if (user.status === 'withdrawn') {
-          throw new Error('WITHDRAWN');
-        }
-
         const isPasswordCorrect = await bcrypt.compare(
           credentials.password,
           user.hashedPassword
@@ -88,6 +81,15 @@ providers.push(
 
         if (!isPasswordCorrect) {
           return null;
+        }
+
+        // 계정 상태는 비밀번호가 맞은 뒤에 알린다 — 먼저 알리면 비밀번호 없이도
+        // 아무 이메일이나 넣어 정지·탈퇴 여부를 캐낼 수 있다.
+        if (user.status === 'suspended') {
+          throw new Error('SUSPENDED');
+        }
+        if (user.status === 'withdrawn') {
+          throw new Error('WITHDRAWN');
         }
 
         await prisma.user.update({

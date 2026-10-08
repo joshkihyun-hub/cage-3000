@@ -3,8 +3,18 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { consumeEmailToken } from '@/lib/email-tokens';
 import { checkPasswordStrength } from '@/lib/validation';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(req) {
+  // 링크 하나에 몇 번이면 충분하다 — bcrypt 해시가 무거워 무한 호출을 막아 둔다.
+  const limited = await rateLimit(`pwreset-submit:${getClientIp(req)}`, { limit: 10, windowMs: 10 * 60_000 });
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.' },
+      { status: 429, headers: { 'Retry-After': String(limited.retryAfter) } }
+    );
+  }
+
   let body;
   try { body = await req.json(); }
   catch { return NextResponse.json({ error: '잘못된 요청 형식입니다.' }, { status: 400 }); }

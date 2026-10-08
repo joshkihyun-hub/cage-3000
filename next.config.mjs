@@ -42,7 +42,9 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'Content-Security-Policy', value: "frame-ancestors 'none'" },
+          // base-uri: 주입된 <base> 태그로 상대 경로 스크립트·폼을 남의 서버로 돌리지 못하게.
+          // object-src: 플러그인(<object>/<embed>) 실행 차단. 둘 다 결제창·우편번호 검색과 무관하다.
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'none'; base-uri 'self'; object-src 'none'" },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },

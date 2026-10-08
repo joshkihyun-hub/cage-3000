@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { consumeEmailToken } from '@/lib/email-tokens';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(req) {
+  // 링크를 마구 대입해 보는 요청을 묶어 둔다.
+  const limited = await rateLimit(`verify-submit:${getClientIp(req)}`, { limit: 10, windowMs: 10 * 60_000 });
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.' },
+      { status: 429, headers: { 'Retry-After': String(limited.retryAfter) } }
+    );
+  }
+
   let body;
   try {
     body = await req.json();

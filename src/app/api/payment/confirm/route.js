@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import { settleOrderPayment } from '@/lib/order-payment';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 const GUEST_COOKIE = 'cage_guest_order';
 
@@ -22,6 +23,15 @@ function parseGuestCookie(req) {
 // path and the webhook can never disagree. The webhook is the safety net for
 // when this call never runs (redirect flows, browser closed mid-payment).
 export async function POST(request) {
+  // 호출마다 PortOne API를 부르므로, 한 곳에서 쏟아지는 요청이 결제 연동 한도를 쓰지 못하게 묶는다.
+  const limited = await rateLimit(`confirm:${getClientIp(request)}`, { limit: 20, windowMs: 60_000 });
+  if (!limited.ok) {
+    return NextResponse.json(
+      { message: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.' },
+      { status: 429, headers: { 'Retry-After': String(limited.retryAfter) } }
+    );
+  }
+
   const session = await getServerSession(authOptions);
   const sessionUserId = session?.user?.id || null;
 

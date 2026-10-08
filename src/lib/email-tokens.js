@@ -11,6 +11,12 @@ function generateRawToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
+// DB에는 링크에 든 토큰 원문이 아니라 해시만 둔다 — DB가 새어 나가도 그 안의
+// 값으로는 비밀번호 재설정·인증 링크를 만들 수 없다.
+function hashToken(token) {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
 export async function issueEmailToken({ userId, purpose }) {
   if (!TTL_MS[purpose]) {
     throw new Error(`Unknown email token purpose: ${purpose}`);
@@ -27,7 +33,7 @@ export async function issueEmailToken({ userId, purpose }) {
   const expiresAt = new Date(Date.now() + TTL_MS[purpose]);
 
   await prisma.emailToken.create({
-    data: { userId, purpose, token, expiresAt },
+    data: { userId, purpose, token: hashToken(token), expiresAt },
   });
 
   return token;
@@ -40,7 +46,7 @@ export async function consumeEmailToken({ token, purpose }) {
     throw new Error('TOKEN_INVALID');
   }
   const record = await prisma.emailToken.findUnique({
-    where: { token },
+    where: { token: hashToken(token) },
     include: { user: true },
   });
   if (!record || record.purpose !== purpose) {
@@ -52,9 +58,13 @@ export async function consumeEmailToken({ token, purpose }) {
   if (record.expiresAt < new Date()) {
     throw new Error('TOKEN_EXPIRED');
   }
-  await prisma.emailToken.update({
-    where: { id: record.id },
+  // 아직 안 쓴 경우에만 쓴 것으로 표시한다 — 같은 링크로 동시에 두 번 요청해도 한 번만 통과.
+  const { count } = await prisma.emailToken.updateMany({
+    where: { id: record.id, consumedAt: null },
     data: { consumedAt: new Date() },
   });
+  if (count === 0) {
+    throw new Error('TOKEN_USED');
+  }
   return record.user;
 }
