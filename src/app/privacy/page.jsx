@@ -1,5 +1,6 @@
 export const metadata = {
-  title: '개인정보처리방침 | CAGE3000',
+  title: '개인정보처리방침',
+  alternates: { canonical: '/privacy' },
   description: 'CAGE3000 개인정보처리방침',
 };
 
@@ -46,6 +47,11 @@ export default function PrivacyPage() {
                     <td className="py-2 align-top">결제 시</td>
                   </tr>
                   <tr>
+                    <td className="py-2 pr-4 align-top">선택 (작업 소식 구독)</td>
+                    <td className="py-2 pr-4 align-top">이메일</td>
+                    <td className="py-2 align-top">사이트 하단 Field Notes 구독 신청</td>
+                  </tr>
+                  <tr>
                     <td className="py-2 pr-4 align-top">자동 수집</td>
                     <td className="py-2 pr-4 align-top">IP 주소, 쿠키, 방문 기록, 기기 정보</td>
                     <td className="py-2 align-top">서비스 이용</td>
@@ -62,6 +68,7 @@ export default function PrivacyPage() {
               <li>주문·결제 기록: 전자상거래법에 따라 5년 보관</li>
               <li>소비자 불만 및 분쟁 기록: 전자상거래법에 따라 3년 보관</li>
               <li>접속 로그: 통신비밀보호법에 따라 3개월 보관</li>
+              <li>작업 소식 구독 이메일: 구독 해지 시까지 (메일 하단 링크로 언제든 해지)</li>
             </ul>
           </section>
 
@@ -117,7 +124,7 @@ export default function PrivacyPage() {
                   <tr>
                     <td className="py-2 pr-4 align-top">Resend, Inc. (미국)</td>
                     <td className="py-2 pr-4 align-top">이메일 주소, 이름, 주문 정보</td>
-                    <td className="py-2 pr-4 align-top">주문확인·인증 메일 발송</td>
+                    <td className="py-2 pr-4 align-top">주문확인·인증 메일 발송, 작업 소식 구독자 관리·발송</td>
                     <td className="py-2 align-top">위탁계약 종료 또는 회원 탈퇴 시까지</td>
                   </tr>
                   <tr>

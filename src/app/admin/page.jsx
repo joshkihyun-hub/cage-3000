@@ -97,6 +97,9 @@ export default function AdminDashboard() {
               <Link href="/admin/users" className="text-[11px] uppercase tracking-[0.2em] px-5 py-3 border border-zinc-200 hover:border-black hover:bg-black hover:text-white transition-colors">
                 Users
               </Link>
+              <Link href="/admin/subscribers" className="text-[11px] uppercase tracking-[0.2em] px-5 py-3 border border-zinc-200 hover:border-black hover:bg-black hover:text-white transition-colors">
+                Field Notes
+              </Link>
             </nav>
           </div>
 
