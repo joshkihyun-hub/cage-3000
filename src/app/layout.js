@@ -93,6 +93,8 @@ export const metadata = {
       // Bing 웹마스터 도구 사이트 소유확인 — ChatGPT·Copilot의 웹 검색이 쓰는 인덱스라
       // 여기에 들어가는 것이 AI 답변 노출로 가는 길이다.
       'msvalidate.01': '5FC00D794F28B21B3CC76EF29C0F2DBF',
+      // 핀터레스트 웹사이트 소유권 — 사이트의 RSS로 핀이 자동 게시된다.
+      'p:domain_verify': '038d02d0a6f4664edc0fbdeb6ca37d85',
     },
   },
 };
