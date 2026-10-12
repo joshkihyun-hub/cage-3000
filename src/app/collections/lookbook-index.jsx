@@ -6,7 +6,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { grotesk } from '@/shared/fonts';
 import LookbookLightbox from './lightbox';
 
-const label = 'absolute top-1/2 -translate-y-1/2 text-[11px] md:text-[13px] font-medium tracking-[0.01em] tabular-nums';
+// 한 줄 = [이름 | 대표 이미지 | 날짜] 세 칸. 양옆 칸은 같은 최소 폭(--side: 가장 긴 이름·날짜만큼)을
+// 똑같이 나눠 가져 이미지는 늘 정가운데에 서고, 좁은 폰에선 이미지가 조금 줄어들 뿐 글자에 닿지 않는다.
+// 글자 크기를 줄에 걸어 두어 --side의 em이 글자 크기를 따른다.
+const row =
+  'grid grid-cols-[minmax(var(--side),1fr)_minmax(0,max-content)_minmax(var(--side),1fr)] items-center gap-x-3 md:gap-x-6 w-full text-[11px] md:text-[13px] font-medium tracking-[0.01em] tabular-nums';
+// 글자 한 자의 폭(em) — Inter Tight 대문자·숫자 평균보다 약간 넉넉하게.
+const CHAR_EM = 0.66;
 const pad = (n) => String(n).padStart(2, '0');
 
 // 공개 전 티저의 가장자리 — 사진 모양은 그대로 두고 테두리만 부드럽게 흰 바탕으로 풀어 준다.
@@ -123,18 +129,20 @@ export default function LookbookIndex({ collections }) {
   };
 
   const active = collections.find((c) => c.slug === openSlug);
+  // 모든 줄이 같은 폭을 비워 두어야 이미지 크기·위치가 줄마다 같다.
+  const longest = Math.max(...collections.flatMap((c) => [c.title.length, c.date.length]));
 
   return (
     <div className={`${grotesk.className} bg-white text-black min-h-screen pt-32 md:pt-40 pb-32`}>
       <h1 className="sr-only">CAGE3000 Collections</h1>
-      <ul className="px-6 md:px-12 space-y-6 md:space-y-8">
+      <ul className="px-6 md:px-12 space-y-6 md:space-y-8" style={{ '--side': `${longest * CHAR_EM}em` }}>
         {collections.map((c, idx) => {
           const landscape = c.size.width > c.size.height;
           const isOpen = openSlug === c.slug;
           const inner = (
             <>
-              <span className={`${label} left-0 underline-offset-2 ${isOpen ? 'underline' : c.images ? 'group-hover:underline' : ''}`}>{c.title}</span>
-              <div className={`group/cover relative ${landscape ? 'w-[56vw] md:w-[40vw] md:max-w-[640px]' : 'w-[48vw] md:w-[26vw] md:max-w-[420px]'}`}>
+              <span className={`justify-self-start text-left underline-offset-2 ${isOpen ? 'underline' : c.images ? 'group-hover:underline' : ''}`}>{c.title}</span>
+              <div className={`group/cover relative max-w-full ${landscape ? 'w-[56vw] md:w-[40vw] md:max-w-[min(640px,100%)]' : 'w-[48vw] md:w-[26vw] md:max-w-[min(420px,100%)]'}`}>
                 <Image
                   src={c.cover}
                   alt={c.upcoming ? `${c.title} — ${c.date} 공개 예정` : `${c.title} lookbook`}
@@ -161,7 +169,7 @@ export default function LookbookIndex({ collections }) {
                   />
                 )}
               </div>
-              <span className={`${label} right-0`}>{c.date}</span>
+              <span className="justify-self-end text-right">{c.date}</span>
             </>
           );
           return (
@@ -171,12 +179,12 @@ export default function LookbookIndex({ collections }) {
                   type="button"
                   onClick={() => toggle(c.slug)}
                   aria-expanded={isOpen}
-                  className="group relative flex justify-center w-full"
+                  className={`group ${row}`}
                 >
                   {inner}
                 </button>
               ) : (
-                <div className="relative flex justify-center">{inner}</div>
+                <div className={row}>{inner}</div>
               )}
               <AnimatePresence initial={false}>
                 {isOpen && <CollectionGrid key={c.slug} collection={c} onOpen={setLightbox} />}
