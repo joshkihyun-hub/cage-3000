@@ -9,6 +9,9 @@ import { SITE_NAME, SITE_URL } from '@/lib/seo';
 // 핀터레스트는 사진이 없는 항목을 건너뛰므로 항목마다 대표 사진(첫 장)을 붙인다.
 export const dynamic = 'force-static';
 
+// 핀 설명 끝에 붙는 경로 — 핀터레스트에서 사이트와 인스타그램(브랜드·디자이너)으로 찾아오게.
+const PATHS = 'cage3000.com · Instagram @cage3k @choppycocky';
+
 const XML_ESCAPES = { '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' };
 const escapeXml = (value) => String(value ?? '').replace(/[<>&'"]/g, (c) => XML_ESCAPES[c]);
 
@@ -45,14 +48,14 @@ export function GET() {
       link: `${SITE_URL}/shop/${item.id}`,
       guid: `${SITE_URL}/shop/${item.id}`,
       // 상품 설명문은 두지 않는다 — 사실만 적는다.
-      description: `CAGE3000 ${item.name} — ${item.collection.toUpperCase()}. ${item.price ?? ''}`.trim(),
+      description: `CAGE3000 ${item.name} — ${item.collection.toUpperCase()}. ${item.price ?? ''}`.trim() + `\n${PATHS}`,
       image: imageOf(item.images?.[0] ?? item.imageUrl),
     })),
     ...PROJECT1_ITEMS.map((project) => ({
       title: `${project.title} — CAGE3000`,
       link: `${SITE_URL}/projects/${project.slug}`,
       guid: `${SITE_URL}/projects/${project.slug}`,
-      description: project.description_ko,
+      description: `${project.description_ko}\n${PATHS}`,
       image: imageOf(project.image),
     })),
   ];
