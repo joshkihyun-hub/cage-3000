@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { ShareButton } from '@/components/share-button';
 import { PROJECT1_ITEMS } from '@/shared/constants/project1-images';
 import { grotesk } from '@/shared/fonts';
+import { isPurchasable, priceLabel } from '@/shared/constants/shop-items';
 
 // 사이트 공통 글자 체계 — 라벨 11px(대문자·회색) · 본문 13px · 제목 하나만 16/20px.
 const LABEL = 'text-[11px] uppercase tracking-[0.04em] text-zinc-500';
@@ -51,12 +52,21 @@ export const ProductInfo = ({ item }) => {
         router.push(`/checkout?buy=${item.id}`);
     };
 
+    // 판매하지 않는 작품(가구 등) — 사이즈도 두지 않는다. 가격이 아직 없는 피스는
+    // "Not yet available"만 적고 제작 기간·구매 버튼을 숨긴다.
+    const forSale = item.forSale !== false;
+    const purchasable = isPurchasable(item);
+
     return (
         <div className={`${grotesk.className} w-full md:max-w-md text-zinc-900 p-6 md:p-0`}>
             <div className="space-y-3">
                 <Block>
                     <h1 className="text-[16px] md:text-[20px] font-medium tracking-[-0.01em] leading-tight">{item.name}</h1>
-                    <p className="mt-1.5 text-[13px] text-black tabular-nums">{item.price}</p>
+                    <p className={`mt-1.5 text-[13px] tabular-nums ${purchasable ? 'text-black' : 'text-zinc-400'}`}>{priceLabel(item)}</p>
+                    {/* 협업 표기(예: 가구 프레임 설계) — 이름·가격 아래 작게. */}
+                    {item.credit && (
+                        <p className="mt-3 text-[11px] leading-snug text-zinc-400">{item.credit}</p>
+                    )}
                 </Block>
 
                 {wornIn.length > 0 && (
@@ -78,12 +88,14 @@ export const ProductInfo = ({ item }) => {
                 )}
 
                 {/* Made-to-order lead time — 설명을 열기 전에 제작 기간부터 보이게. */}
-                <Block>
-                    <p className={`${LABEL} mb-2`}>Made to Order</p>
-                    <p className={BODY}>
-                        결제 후 영업일 기준 4–6일 내에 제작이 완료되며 순차 배송됩니다.
-                    </p>
-                </Block>
+                {purchasable && (
+                    <Block>
+                        <p className={`${LABEL} mb-2`}>Made to Order</p>
+                        <p className={BODY}>
+                            결제 후 영업일 기준 4–6일 내에 제작이 완료되며 순차 배송됩니다.
+                        </p>
+                    </Block>
+                )}
 
                 {item.material && (
                     <Block>
@@ -109,32 +121,39 @@ export const ProductInfo = ({ item }) => {
                     </Block>
                 )}
 
-                <Block>
-                    <p className={`${LABEL} mb-2`}>Size</p>
-                    <p className={BODY}>One Size</p>
-                </Block>
+                {forSale && (
+                    <Block>
+                        <p className={`${LABEL} mb-2`}>Size</p>
+                        <p className={BODY}>One Size</p>
+                    </Block>
+                )}
 
-                <Block>
-                    <button
-                        type="button"
-                        data-sound="firm"
-                        onClick={handleAddToBag}
-                        className={ACTION}
-                    >
-                        {added ? 'Added to Bag ✓' : 'Add to Bag →'}
-                    </button>
-                </Block>
+                {purchasable && (
+                    <>
 
-                <Block>
-                    <button
-                        type="button"
-                        data-sound="firm"
-                        onClick={handleBuyNow}
-                        className={ACTION}
-                    >
-                        Buy Now →
-                    </button>
-                </Block>
+                        <Block>
+                            <button
+                                type="button"
+                                data-sound="firm"
+                                onClick={handleAddToBag}
+                                className={ACTION}
+                            >
+                                {added ? 'Added to Bag ✓' : 'Add to Bag →'}
+                            </button>
+                        </Block>
+
+                        <Block>
+                            <button
+                                type="button"
+                                data-sound="firm"
+                                onClick={handleBuyNow}
+                                className={ACTION}
+                            >
+                                Buy Now →
+                            </button>
+                        </Block>
+                    </>
+                )}
 
                 <Block>
                     <ShareButton

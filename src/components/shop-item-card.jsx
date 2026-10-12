@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useRef } from 'react';
 import { grotesk } from '@/shared/fonts';
+import { priceLabel } from '@/shared/constants/shop-items';
 
 // `priority` should only be true for above-the-fold cards (e.g. the first grid
 // row on /shop). Marking every card priority forces the browser to preload all
@@ -38,11 +39,11 @@ export const ShopItemCard = ({ item, label = item.name, priority = false }) => {
         const x = e.clientX - left;
         const percentage = Math.max(0, Math.min(1, x / width));
 
-        // Calculate index based on percentage
-        const index = Math.min(
-            imagesToRender.length - 1,
-            Math.floor(percentage * imagesToRender.length)
-        );
+        // 폭을 사진 수만큼 나눠 위치마다 한 장. 가구는 사진이 적어 한 칸이 넓다 —
+        // 칸을 잘게(최소 6칸) 나누고 사진을 반복해, 커서를 조금만 움직여도 바뀌게 한다.
+        const n = imagesToRender.length;
+        const steps = item.category === 'furniture' ? Math.max(6, n * 2) : n;
+        const index = Math.min(steps - 1, Math.floor(percentage * steps)) % n;
 
         setCurrentIndex(index);
     };
@@ -50,6 +51,13 @@ export const ShopItemCard = ({ item, label = item.name, priority = false }) => {
     const handleMouseLeave = () => {
         setCurrentIndex(0);
     };
+
+    // 카드 폭에 맞는 크기로 받는다 — 세로 카드는 모바일 2열·데스크톱 3열, 가로로 긴 작품(가구)은
+    // 모바일 1열·데스크톱 2열이라 두 배 넓다(세로 카드 값을 쓰면 반 해상도로 받아 흐려진다).
+    // 목록 폭은 1536px에서 멈추므로 그보다 넓은 화면에선 카드 폭이 더 늘지 않는다.
+    const sizes = item.aspect
+        ? '(max-width: 768px) 100vw, (min-width: 1536px) 704px, 50vw'
+        : '(max-width: 768px) 50vw, (min-width: 1536px) 460px, 33vw';
 
     return (
         <Link href={`/shop/${item.id}`} className="group cursor-pointer flex flex-col h-full">
@@ -59,6 +67,8 @@ export const ShopItemCard = ({ item, label = item.name, priority = false }) => {
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 className="relative aspect-[3/4] bg-white mb-4 overflow-hidden"
+                // 가로로 긴 작품(가구)은 원본 비율 그대로 — item.aspect가 없으면 3:4.
+                style={item.aspect ? { aspectRatio: item.aspect } : undefined}
             >
                 {/* Always render the primary image (index 0) */}
                 <div
@@ -67,9 +77,9 @@ export const ShopItemCard = ({ item, label = item.name, priority = false }) => {
                 >
                     <Image
                         src={imagesToRender[0]}
-                        alt={`${item.name} - view 1`}
+                        alt={`CAGE3000 ${item.name} — view 1`}
                         fill
-                        sizes="(max-width: 768px) 50vw, 33vw"
+                        sizes={sizes}
                         className="object-cover object-center"
                         priority={priority}
                     />
@@ -84,9 +94,9 @@ export const ShopItemCard = ({ item, label = item.name, priority = false }) => {
                     >
                         <Image
                             src={imgSrc}
-                            alt={`${item.name} - view ${idx + 2}`}
+                            alt={`CAGE3000 ${item.name} — view ${idx + 2}`}
                             fill
-                            sizes="(max-width: 768px) 50vw, 33vw"
+                            sizes={sizes}
                             className="object-cover object-center"
                             priority={false}
                         />
@@ -105,9 +115,13 @@ export const ShopItemCard = ({ item, label = item.name, priority = false }) => {
                     모바일은 한 단계 작게, 자간은 살짝 벌려 숫자가 붙어 보이지 않게. */}
                 <div className={`${grotesk.className} select-none text-[11px] md:text-[12px] font-medium leading-[1.4] tracking-[0.02em] md:tracking-[0.01em] tabular-nums`}>
                     <h3 className="text-zinc-400">{label}</h3>
-                    <p className="text-black">{item.price}</p>
+                    <p className={item.priceNum ? 'text-black' : 'text-zinc-400'}>{priceLabel(item)}</p>
                 </div>
-                <div className="w-2 h-2 bg-black rounded-full mb-1 shrink-0"></div>
+                {/* 점은 그 피스의 색(item.color) — 없으면 검정. */}
+                <div
+                    className="w-2 h-2 bg-black rounded-full mb-1 shrink-0"
+                    style={item.color ? { backgroundColor: item.color } : undefined}
+                ></div>
             </div>
         </Link>
     );

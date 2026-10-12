@@ -1,5 +1,6 @@
 import { items } from '@/shared/constants/shop-items';
 import { PROJECT1_ITEMS } from '@/shared/constants/project1-images';
+import { LOOKBOOK_COLLECTIONS } from '@/shared/constants/lookbook';
 import { SITE_URL, absoluteUrl } from '@/lib/seo';
 
 // Auto-generated sitemap (Next App Router serves this at /sitemap.xml).
@@ -10,7 +11,13 @@ export default function sitemap() {
   const staticRoutes = [
     { path: '', priority: 1.0, changeFrequency: 'weekly', images: ['/asset/og/hero-still.jpg'] },
     { path: '/shop', priority: 0.9, changeFrequency: 'weekly' },
-    { path: '/collections', priority: 0.7, changeFrequency: 'monthly' },
+    {
+      // 룩북 사진(대표 + 펼친 격자)도 이미지 검색에 걸리게 — 정적 import라 .src가 실제 주소다.
+      path: '/collections',
+      priority: 0.7,
+      changeFrequency: 'monthly',
+      images: LOOKBOOK_COLLECTIONS.flatMap((c) => [c.cover, ...(c.images ?? []).map((img) => img.src)]),
+    },
     { path: '/collections/green', priority: 0.6, changeFrequency: 'monthly', images: ['/asset/details/lookbook/9hat/A3.jpeg'] },
     {
       path: '/projects',

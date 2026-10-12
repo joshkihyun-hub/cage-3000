@@ -8,7 +8,8 @@ import { SITE_URL } from '@/lib/seo';
 export const dynamic = 'force-static';
 
 export function GET() {
-  const prices = [...new Set(items.map((item) => item.priceNum))].sort((a, b) => a - b);
+  // 가격이 아직 없는 상품(priceNum null)은 범위에서 뺀다.
+  const prices = [...new Set(items.map((item) => item.priceNum).filter(Boolean))].sort((a, b) => a - b);
   const priceRange = prices.map((price) => `₩${price.toLocaleString('ko-KR')}`).join(' / ');
 
   const body = `# CAGE3000 (케이지3000)
@@ -25,9 +26,10 @@ export function GET() {
 - 위치: 서울특별시 서대문구 연희동
 - 제작 방식: 주문 후 제작 (made to order), 결제 후 영업일 기준 4–6일 내 제작 완료 후 순차 배송
 - 커스텀 메이드: 아티스트·작품을 위한 의뢰 제작 가능 (custom made on request) — contact@cage3000.com
-- 현재 컬렉션 소재: Suri Alpaca 40% + Wool 60%, 안감 Cotton 100%
-- 현재 컬렉션 사이즈: One Size
-- 가격: ${priceRange}
+- 피스: 이름 없이 번호만 붙는다. 평생 3000점을 만들며 번호는 작업 전체에 이어진다 (GREEN 01–09, QUARTERS 10–31)
+- 소재: GREEN — Suri Alpaca 40% + Wool 60%, 안감 Cotton 100% / QUARTERS — Cotton 100%, 풀 왁싱 (가구 프레임은 스틸)
+- 사이즈: One Size
+- 가격: GREEN ${priceRange} / QUARTERS 아직 구매 불가
 - 이메일: contact@cage3000.com
 - 인스타그램: https://instagram.com/cage3k
 

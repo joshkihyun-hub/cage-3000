@@ -27,7 +27,7 @@ export function GET() {
       link: `${SITE_URL}/shop/${item.id}`,
       guid: `${SITE_URL}/shop/${item.id}`,
       // 상품 설명문은 두지 않는다 — 사실만 적는다.
-      description: `CAGE3000 ${item.name} — Handmade millinery, made to order. ${item.price}`,
+      description: `CAGE3000 ${item.name} — ${item.collection.toUpperCase()}. ${item.price ?? ''}`.trim(),
     })),
     ...PROJECT1_ITEMS.map((project) => ({
       title: `${project.title} — CAGE3000`,

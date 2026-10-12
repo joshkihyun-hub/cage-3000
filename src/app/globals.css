@@ -270,10 +270,20 @@ img {
   from { opacity: 0; translate: 0 20px; }
 }
 
+/* 접어 둔 목록을 펼칠 때 — 옅게 나타나며 6px만 떠오른다. */
+@keyframes rise-in-short {
+  from { opacity: 0; translate: 0 6px; }
+}
+
 @keyframes fade-in-plain {
   from { opacity: 0; }
 }
 
 @keyframes draw-x {
   from { scale: 0 1; }
+}
+
+/* /shop?category=… 로 들어올 때 미리 그린 전체 목록이 비치지 않게(src/app/shop/page.jsx). */
+[data-shop-fallback][data-query] {
+  visibility: hidden;
 }

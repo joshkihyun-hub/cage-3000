@@ -105,6 +105,13 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+    // 판매하지 않는 작품(가구 등)은 주소를 직접 넣어도 주문되지 않게.
+    if (product.forSale === false) {
+      return NextResponse.json(
+        { error: `판매하지 않는 작품입니다. (${product.name})` },
+        { status: 400 }
+      );
+    }
     const unitPrice = getProductUnitPrice(product);
     if (!unitPrice || unitPrice <= 0) {
       return NextResponse.json(

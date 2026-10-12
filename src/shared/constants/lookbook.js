@@ -20,6 +20,16 @@ import H1 from '../../../public/asset/details/lookbook/9hat/H1.jpg';
 import H2 from '../../../public/asset/details/lookbook/9hat/H2.jpg';
 import H3 from '../../../public/asset/details/lookbook/9hat/H3.jpg';
 
+// QUARTERS 룩북 사진 — 대부분 가로 3:2, 06만 세로 3:4.
+import Q1 from '../../../public/asset/details/lookbook/quarters/look-01.jpg';
+import Q2 from '../../../public/asset/details/lookbook/quarters/look-02.jpg';
+import Q3 from '../../../public/asset/details/lookbook/quarters/look-03.jpg';
+import Q4 from '../../../public/asset/details/lookbook/quarters/look-04.jpg';
+import Q5 from '../../../public/asset/details/lookbook/quarters/look-05.jpg';
+import Q6 from '../../../public/asset/details/lookbook/quarters/look-06.jpg';
+import Q7 from '../../../public/asset/details/lookbook/quarters/look-07.jpg';
+import Q8 from '../../../public/asset/details/lookbook/quarters/look-08.jpg';
+
 // 룩북 컬렉션 — /collections 목록에 이 순서대로 쌓인다(위가 최신).
 // upcoming은 아직 공개 전: 링크 없이 흐린 티저 이미지만 보인다.
 // 티저 파일은 피사체만 누끼를 따 순백 위에 올리고 블러를 입혀 미리 저장한 것 — 원본은 사이트에 올리지 않는다.
@@ -29,10 +39,10 @@ export const LOOKBOOK_COLLECTIONS = [
     slug: 'quarters',
     title: 'QUARTERS',
     date: '2026.10',
-    cover: '/asset/details/lookbook/quarters/quarters-cover-v3.jpg',
-    // 마우스를 올리면 이 덜 흐린 버전으로 천천히 바뀐다 — 여전히 디테일은 가려질 만큼만.
-    coverHover: '/asset/details/lookbook/quarters/quarters-cover-v3-hover.jpg',
-    upcoming: true,
+    cover: '/asset/details/lookbook/quarters/quarters-cover-duo.jpg',
+    images: [Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8],
+    // 펼친 격자에서 혼자 한 줄을 차지하며 가장 크게(줄 높이의 두 배) 놓이는 사진(0부터 센 번호) — 06, 위에서 내려다본 침대.
+    feature: 5,
   },
   {
     slug: 'green',

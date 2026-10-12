@@ -13,7 +13,8 @@ export const metadata = pageMetadata({
 // 고객에게도, 검색·AI 답변에도 잘못된 정보가 나간다.
 // 같은 배열이 화면과 구조화 데이터를 모두 채운다.
 function buildFaqs() {
-  const prices = [...new Set(items.map((item) => item.priceNum))].sort((a, b) => a - b);
+  // 가격이 아직 없는 상품(priceNum null)은 범위에서 뺀다.
+  const prices = [...new Set(items.map((item) => item.priceNum).filter(Boolean))].sort((a, b) => a - b);
   const priceRange = prices.map((price) => `₩${price.toLocaleString('ko-KR')}`).join(', ');
 
   return [
@@ -29,8 +30,8 @@ function buildFaqs() {
     },
     {
       q: '소재는 무엇인가요?',
-      a: '현재 컬렉션의 겉감은 수리 알파카 40%와 울 60%, 안감은 면 100%입니다.',
-      en: 'In the current collection the outer fabric is 40% Suri Alpaca and 60% wool, with a 100% cotton lining.',
+      a: 'QUARTERS는 면 100%에 풀 왁싱 처리했습니다. GREEN의 겉감은 수리 알파카 40%와 울 60%, 안감은 면 100%입니다.',
+      en: 'QUARTERS is 100% cotton, fully waxed. GREEN has an outer fabric of 40% Suri Alpaca and 60% wool, with a 100% cotton lining.',
     },
     {
       q: '사이즈는 어떻게 되나요?',
@@ -39,8 +40,8 @@ function buildFaqs() {
     },
     {
       q: '가격은 얼마인가요?',
-      a: `현재 컬렉션의 가격은 ${priceRange}입니다. 상품별 가격은 각 제품 페이지에서 확인하실 수 있습니다.`,
-      en: `Current collection prices are ${priceRange}.`,
+      a: `GREEN 피스의 가격은 ${priceRange}입니다. QUARTERS 피스는 아직 구매할 수 없으며, 가격은 판매를 시작할 때 각 제품 페이지에 안내합니다.`,
+      en: `GREEN pieces are ${priceRange}. QUARTERS pieces are not yet available; prices will appear on each product page when they go on sale.`,
     },
     {
       q: '주문을 취소할 수 있나요?',

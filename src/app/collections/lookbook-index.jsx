@@ -34,40 +34,66 @@ const fogStyle = {
 // 격자 쪽으로 내려가는 스크롤을 끊어 버린다.
 const SOFT = [0.33, 1, 0.68, 1];
 
+// 사진은 원본 비율 그대로(자르지 않음) — 한 줄의 사진들이 같은 높이로 서고 가로 폭은 각자 비율대로
+// 늘어나 줄을 채운다(기준의 1.15배까지만, 남으면 가운데로 모은다). 읽는 순서도 그대로.
+// 기준 높이(--h)는 모든 컬렉션이 같다(GREEN과 같은 크기).
 function CollectionGrid({ collection, onOpen }) {
   return (
     <motion.div
       exit={{ height: 0, opacity: 0, transition: { duration: 0.4, ease: SOFT } }}
       className="overflow-hidden"
     >
-      <div className="grid grid-cols-3 min-[480px]:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-x-2 gap-y-4 md:gap-x-3 md:gap-y-5 pt-10 md:pt-14 pb-16 md:pb-24">
-        {collection.images.map((img, i) => (
-          <motion.div
-            key={img.src}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: SOFT, delay: 0.1 + i * 0.03 }}
-          >
-            <button
-              type="button"
-              onClick={() => onOpen(i)}
-              aria-label={`${collection.title} ${pad(i + 1)} 크게 보기`}
-              className="group/thumb relative block w-full aspect-[3/4] overflow-hidden bg-zinc-100 cursor-zoom-in"
+      <div
+        className="flex flex-wrap justify-center gap-x-2 gap-y-4 md:gap-x-3 md:gap-y-5 pt-10 md:pt-14 pb-16 md:pb-24 [--h:120px] md:[--h:220px]"
+      >
+        {collection.images.map((img, i) => {
+          const ratio = img.width / img.height;
+          // feature 사진은 혼자 한 줄을 차지하고, 높이를 크게 잡아 격자에서 가장 크게 보인다(가운데).
+          const featured = collection.feature === i;
+          return (
+            <motion.div
+              key={img.src}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: SOFT, delay: 0.1 + i * 0.03 }}
+              style={
+                featured
+                  ? { flexBasis: '100%' }
+                  // 줄을 채우려고 늘어나되 기준의 1.15배까지만 — 가로 사진이 많은 컬렉션도 GREEN과 같은 크기로.
+                  : { flexGrow: ratio, flexBasis: `calc(var(--h) * ${ratio})`, maxWidth: `calc(var(--h) * ${ratio * 1.15})` }
+              }
+              className={featured ? 'flex flex-col items-center py-4 md:py-8' : undefined}
             >
-              <Image
-                src={img}
-                alt={`${collection.title} lookbook ${i + 1}`}
-                fill
-                placeholder="blur"
-                sizes="(min-width: 1024px) 14vw, (min-width: 768px) 20vw, (min-width: 480px) 25vw, 33vw"
-                className="object-cover transition-transform duration-700 ease-out group-hover/thumb:scale-[1.03]"
-              />
-            </button>
-            <span className="block mt-1.5 text-[10px] md:text-[11px] font-medium tabular-nums text-zinc-400">
-              {pad(i + 1)}
-            </span>
-          </motion.div>
-        ))}
+              <button
+                type="button"
+                onClick={() => onOpen(i)}
+                aria-label={`${collection.title} ${pad(i + 1)} 크게 보기`}
+                className={`group/thumb relative block overflow-hidden bg-zinc-100 cursor-zoom-in ${
+                  featured ? 'h-[calc(var(--h)*2)] max-w-full' : 'w-full'
+                }`}
+                style={{ aspectRatio: `${img.width} / ${img.height}` }}
+              >
+                <Image
+                  src={img}
+                  alt={`${collection.title} lookbook ${i + 1}`}
+                  fill
+                  placeholder="blur"
+                  // 칸 폭은 기준 높이(--h: 모바일 120px·데스크톱 220px)로 정해진다 — 화면 폭 비율(vw)로
+                  // 적으면 넓은 화면에선 너무 큰 파일을, 가로 사진은 모바일에서 덜 선명한 파일을 받는다.
+                  sizes={
+                    featured
+                      ? `(min-width: 768px) ${Math.ceil(440 * ratio)}px, ${Math.ceil(240 * ratio)}px`
+                      : `(min-width: 768px) ${Math.ceil(220 * ratio * 1.15)}px, ${Math.ceil(120 * ratio * 1.15)}px`
+                  }
+                  className="object-cover transition-transform duration-700 ease-out group-hover/thumb:scale-[1.03]"
+                />
+              </button>
+              <span className={`block mt-1.5 text-[10px] md:text-[11px] font-medium tabular-nums text-zinc-400 ${featured ? 'self-stretch text-center' : ''}`}>
+                {pad(i + 1)}
+              </span>
+            </motion.div>
+          );
+        })}
       </div>
     </motion.div>
   );

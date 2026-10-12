@@ -28,6 +28,15 @@ export default function LookbookLightbox({ images, index, onIndexChange, title }
     if (open && shown !== index) setShown(index);
     const current = shown !== null ? images[shown] : null;
 
+    // 화면에 그려지는 폭 — 폭(92vw)과 높이(84vh × 사진 비율) 중 작은 쪽. 92vw로만 적으면
+    // 세로 사진은 높이에 막혀 그보다 훨씬 작게 그려지는데도 원본 크기 파일을 받는다.
+    const sizesFor = (img) => {
+        const r = img.width / img.height;
+        return `(max-aspect-ratio: ${Math.round((r * 84 / 92) * 1000)}/1000) 92vw, ${(r * 84).toFixed(1)}vh`;
+    };
+    // 양옆 사진은 미리 받아 둔다 — 넘기는 순간 흐린 자리표시 없이 바로 또렷하게.
+    const neighbors = open && total > 1 ? [...new Set([(index + 1) % total, (index - 1 + total) % total])] : [];
+
     return (
         <Dialog.Root open={open} onOpenChange={(next) => !next && onIndexChange(null)}>
             <Dialog.Portal>
@@ -72,7 +81,7 @@ export default function LookbookLightbox({ images, index, onIndexChange, title }
                                     src={current}
                                     alt={`${title} lookbook ${shown + 1}`}
                                     placeholder="blur"
-                                    sizes="92vw"
+                                    sizes={sizesFor(current)}
                                     priority
                                     draggable={false}
                                     className="block w-auto h-auto max-w-[92vw] max-h-[80vh] md:max-h-[84vh] select-none"
@@ -80,6 +89,10 @@ export default function LookbookLightbox({ images, index, onIndexChange, title }
                             </motion.div>
                         )}
                     </AnimatePresence>
+
+                    {neighbors.map((i) => (
+                        <Image key={i} src={images[i]} alt="" aria-hidden sizes={sizesFor(images[i])} loading="eager" className="hidden" />
+                    ))}
 
                     <Dialog.Close className="absolute top-5 right-5 md:top-8 md:right-10 text-[11px] md:text-[12px] font-medium uppercase tracking-[0.08em] text-zinc-500 hover:text-black transition-colors">
                         Close

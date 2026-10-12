@@ -65,14 +65,17 @@ function productJsonLd(item) {
         url,
         image: (item.images?.length ? item.images : [item.imageUrl]).map(absoluteUrl),
         brand: { '@type': 'Brand', name: SITE_NAME },
-        offers: {
-          '@type': 'Offer',
-          url,
-          price: item.priceNum,
-          priceCurrency: 'KRW',
-          availability: 'https://schema.org/MadeToOrder',
-          seller: { '@id': `${SITE_URL}/#organization` },
-        },
+        // 가격이 아직 없는 상품은 Offer를 빼야 검색엔진이 빈 가격으로 읽지 않는다.
+        ...(item.priceNum && {
+          offers: {
+            '@type': 'Offer',
+            url,
+            price: item.priceNum,
+            priceCurrency: 'KRW',
+            availability: 'https://schema.org/MadeToOrder',
+            seller: { '@id': `${SITE_URL}/#organization` },
+          },
+        }),
       },
     ],
   };
