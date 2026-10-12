@@ -222,6 +222,9 @@ export const items = [
     color: '#6b6a30',
     imageUrl: '/asset/details/shop/quarters/f01/f01v2_01.jpg',
     aspect: '3 / 2',
+    // 링크 공유 이미지(1200×630)로 자를 때 남길 높이(0=위, 1=아래). 침대가 사진 아래쪽에 있어
+    // 기본값(0.3, 모자용)이면 다리 끝이 잘린다 — 맨 아래를 남겨야 침대가 가운데 가까이 온다.
+    ogFocusY: 1,
     forSale: false,
     price: null,
     priceNum: null,
@@ -245,6 +248,7 @@ export const items = [
     color: '#665a49',
     imageUrl: '/asset/details/shop/quarters/f02/f02v2_01.jpg',
     aspect: '3 / 2',
+    ogFocusY: 0.73, // 스툴이 공유 이미지 가운데 오게
     forSale: false,
     price: null,
     priceNum: null,
@@ -500,6 +504,7 @@ export const items = [
     category: 'upper',
     color: '#1b271d',
     imageUrl: '/asset/details/shop/quarters/q04/q04v3_01.jpg',
+    ogFocusY: 0, // 모자가 다른 표지보다 높이 올라가 있어 공유 이미지는 맨 위부터
     price: null,
     priceNum: null,
     material: 'Material : 100% Cotton, Fully Waxed',

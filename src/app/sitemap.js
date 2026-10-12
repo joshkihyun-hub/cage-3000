@@ -9,7 +9,7 @@ export default function sitemap() {
   const now = new Date();
 
   const staticRoutes = [
-    { path: '', priority: 1.0, changeFrequency: 'weekly', images: ['/asset/og/hero-still.jpg'] },
+    { path: '', priority: 1.0, changeFrequency: 'weekly', images: ['/asset/details/shop/quarters/f01/f01v2_01.jpg'] },
     { path: '/shop', priority: 0.9, changeFrequency: 'weekly' },
     {
       // 룩북 사진(대표 + 펼친 격자)도 이미지 검색에 걸리게 — 정적 import라 .src가 실제 주소다.
