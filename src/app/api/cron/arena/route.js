@@ -12,6 +12,8 @@ export const maxDuration = 60;
 const API = 'https://api.are.na/v3';
 const CHANNEL = 'cage3000';
 const LINK_KEY = 'cage3000_link';
+const MAX_PER_RUN = 25;
+const TIME_BUDGET_MS = 45_000;
 
 async function arena(path, token, init = {}) {
   const res = await fetch(`${API}${path}`, {
@@ -20,7 +22,11 @@ async function arena(path, token, init = {}) {
     cache: 'no-store',
   });
   const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(`Are.na ${init.method ?? 'GET'} ${path} → ${res.status} ${JSON.stringify(body).slice(0, 200)}`);
+  if (!res.ok) {
+    const err = new Error(`Are.na ${init.method ?? 'GET'} ${path} → ${res.status} ${JSON.stringify(body).slice(0, 200)}`);
+    err.status = res.status;
+    throw err;
+  }
   return body;
 }
 
@@ -63,21 +69,35 @@ export async function GET(req) {
 
     if (missing.length === 0) return NextResponse.json({ added: 0 });
 
-    const blocks = missing.slice(0, 50).map((e) => ({
-      value: imageUrl(e.imageSrc),
-      title: e.title,
-      description: `${e.summary}\n\n${paths(e.link)}`,
-      alt_text: e.title,
-      original_source_url: e.link,
-      original_source_title: e.title,
-      metadata: { [LINK_KEY]: e.link },
-    }));
-    const batch = await arena('/blocks/batch', token, {
-      method: 'POST',
-      body: JSON.stringify({ channel_ids: [channel.id], blocks }),
-    });
+    // 한 장씩 올린다 — 여러 장을 한 번에 올리는 batch는 Are.na 유료(Premium) 전용이다.
+    // 무료 계정의 쓰기 한도와 함수 실행 시간(60초) 안에서 멈추고, 남은 것은 다음 실행이 이어 올린다.
+    const started = Date.now();
+    let added = 0;
+    for (const e of missing) {
+      if (added >= MAX_PER_RUN || Date.now() - started > TIME_BUDGET_MS) break;
+      try {
+        await arena('/blocks', token, {
+          method: 'POST',
+          body: JSON.stringify({
+            value: imageUrl(e.imageSrc),
+            title: e.title,
+            description: `${e.summary}\n\n${paths(e.link)}`,
+            alt_text: e.title,
+            original_source_url: e.link,
+            original_source_title: e.title,
+            metadata: { [LINK_KEY]: e.link },
+            channel_ids: [channel.id],
+          }),
+        });
+        added += 1;
+      } catch (err) {
+        if (err.status === 429) break; // 한도에 닿으면 오늘은 여기까지
+        if (err.status === 401 || err.status === 403) throw err; // 토큰 문제 — 나머지도 다 실패한다
+        console.error('[cron/arena] skipped', e.link, err.message); // 그 한 장만 건너뛰고 다음 실행에 다시 시도
+      }
+    }
 
-    return NextResponse.json({ added: blocks.length, remaining: missing.length - blocks.length, batch: batch.batch_id });
+    return NextResponse.json({ added, remaining: missing.length - added });
   } catch (err) {
     console.error('[cron/arena]', err.message);
     return NextResponse.json({ error: 'Are.na sync failed' }, { status: 502 });
