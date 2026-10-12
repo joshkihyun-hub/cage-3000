@@ -1,18 +1,23 @@
 "use client";
 
+import Link from 'next/link';
 import { useEffect, useRef, useSyncExternalStore } from 'react';
 
 // 같은 소재의 세 가지 인코딩. `<source media>`는 <video>에서 무시되므로
 // (스펙에서 빠졌다) 어느 파일을 받을지는 JS가 직접 정한다.
-//   데스크톱 HEVC 1080p / 모바일 HEVC 720p / H.264 720p 폴백
-// 모바일 패널이 345px라 720p면 DPR 3에서도 충분하다.
+//   HEVC 1080p / HEVC 720p / H.264 720p 폴백
+// 1080p는 패널이 실제 픽셀로 1300px을 넘는 큰 화면에서만 받는다 — 노트북(패널 432px × DPR 2
+// = 864px)에선 720p로 충분하고, 세 편을 동시에 디코딩하는 일이 2.25배 가벼워져 끊김이 준다.
 const HEVC_1080 = 'video/mp4; codecs="hvc1.1.6.L120.B0"';
 const HEVC_720 = 'video/mp4; codecs="hvc1.1.6.L93.B0"';
-const MOBILE_QUERY = '(max-width: 767.98px)';   // Tailwind md 브레이크포인트와 같은 경계
+const FULL_HD_FROM = 1300; // 패널의 실제 픽셀 폭이 이보다 크면 1080p
 
 // 세 편 모두 871프레임(36.29초)으로 길이가 같다. 빈 흰 화면에서 시작해 0.7초쯤
-// 인물이 들어오고, 끝 0.8초에 흰색으로 디졸브된다 — 셋이 같이 출발해 같이 들어오고
-// 같이 흰 공간에 녹아든 뒤 같이 다시 시작한다(아래 동기화).
+// 인물이 들어오고, 끝 2.4초 동안 노출이 서서히 오르며(smootherstep) 초점이 그보다 늦게
+// 풀리고 아주 살짝 다가가 흰 공간에 녹아든다 — 이 효과는 파일에 구워져 있어 재생 중
+// 브라우저가 따로 계산하지 않는다(예전엔 CSS 블러를 매 프레임 걸어 루프 직전에 끊겼다).
+// 셋이 같이 출발해 같이 들어오고 같이 녹아든 뒤 같이 다시 시작한다(아래 동기화).
+// 키프레임이 1초마다라 동기화가 위치를 옮겨도 디코딩이 짧다.
 // 등장 프레임은 인코딩된 결과물에서 재서 맞췄다(hero-2-bed 기준 0.71~0.79초):
 //   hero-1-stool = final stool 원본 161프레임(6.71초)부터, hero-3-stool = women stool 처음부터.
 //
@@ -24,18 +29,18 @@ const MOBILE_QUERY = '(max-width: 767.98px)';   // Tailwind md 브레이크포�
 //           정지 화면에서 그대로 움직인다. 셋이 같은 시점이어야 같이 움직인다.
 //
 // /asset은 하루 캐시라 같은 이름으로 덮으면 재방문자에게 옛 영상이 남는다 —
-// 소재나 구간을 바꿀 때는 파일명을 바꾼다(순서 번호는 유지하고 소재명을 붙인다).
+// 소재나 구간을 바꿀 때는 파일명을 바꾼다(순서 번호는 유지하고 소재명·판 번호(-r2)를 붙인다).
 const STILL_AT = 16;
 const PANELS = [
   // 맨 위 — 남자. 좌우를 뒤집어 오른쪽에서 걸어 들어온다. CSS는 translate를 적용한
   // 뒤 scale을 걸어서(p -> T - p) 미러가 이동까지 뒤집는다 — 뒤집지 않았다면
   // +9%였을 자리에 -9%가 들어가 있다.
-  { key: 'hero-1-stool', shift: 'translate-x-[-9%]', mirrored: true },
+  { key: 'hero-1-stool-r2', shift: 'translate-x-[-9%]', mirrored: true, href: '/shop/32', label: '11 — stool' },
   // 중앙 — web bed, 두 사람이 양 끝에서 들어와 가운데서 만나 작업한다.
   // 직접 편집한 최종본을 통째로 쓴다. 이 길이가 셋의 기준이다.
-  { key: 'hero-2-bed', shift: null, mirrored: false },
+  { key: 'hero-2-bed-r2', shift: null, mirrored: false, href: '/shop/31', label: '10 — bed' },
   // 맨 아래 — 여자. 왼쪽에서 걸어 들어와 무릎을 꿇고 작업한다.
-  { key: 'hero-3-stool', shift: null, mirrored: false },
+  { key: 'hero-3-stool-r2', shift: null, mirrored: false, href: '/shop/32', label: '11 — stool' },
 ];
 
 // 동기화. 한 번 같이 출발시켜도 디코딩이 밀리거나 루프를 도는 순간의 지연이
@@ -59,9 +64,7 @@ const START_GIVE_UP = 20000;
 //
 // 그래서 막히면 같은 영상을 <img>로 띄운다. WebKit은 <img>에 넣은 MP4를 GIF처럼
 // 움직이는 이미지로 디코딩하는데, 미디어가 아니라서 자동재생 정책이 닿지 않는다.
-// 다만 파일을 다 받은 뒤에야 움직이므로 모바일용 720p를 쓴다.
-// 이음새 디포커스는 CSS가 currentTime을 보고 거는 효과라 <img>에서는 걸 수 없다 —
-// 그 디포커스를 모바일 기준으로 구워 넣은 `${key}-img.mp4`를 쓴다.
+// 다만 파일을 다 받은 뒤에야 움직이므로 720p를 쓴다(끝의 페이드는 파일에 구워져 있다).
 // <img>는 처음 화면에 그려지는 순간부터 움직이므로, 셋 다 받은 뒤 한꺼번에 드러내면
 // 같이 출발한다(길이가 같으니 루프도 같이 돈다).
 //
@@ -70,23 +73,11 @@ const START_GIVE_UP = 20000;
 const UNLOCK_EVENTS = ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'];
 const UNLOCK_OPTS = { capture: true, passive: true };
 
-const imageSource = ({ key }) => `/asset/video/${key}-img.mp4`;
+const imageSource = ({ key }) => `/asset/video/${key}-720-hevc.mp4`;
 
-// 루프 이음새. 인코딩에 구워둔 0.8초 흰색 디졸브 위에 그보다 먼저 시작하는
-// 디포커스를 얹어, 편집 전환이 아니라 초점이 풀려 흰 공간에 녹아드는 것처럼
-// 읽히게 한다.
-const DEFOCUS_LEAD = 1.6;
-const DEFOCUS_MAX = 14;
-// 블러는 요소 경계 바깥까지 번져서, 그냥 두면 지금까지 안 보이던 패널 테두리가
-// 흐릿하게 드러난다. 번지는 만큼 살짝 확대해 래퍼(overflow-hidden)가 잘라내게
-// 한다. 블러는 절대 px인데 확대는 비율이라 짧은 변(높이) 기준으로 잡아야 한다.
-const DEFOCUS_BLEED = 2.2;
-
-function pickSource({ key }, { isMobile, canHevc1080, canHevc720 }) {
-  if (isMobile) {
-    return canHevc720 ? `/asset/video/${key}-720-hevc.mp4` : `/asset/video/${key}.mp4`;
-  }
-  return canHevc1080 ? `/asset/video/${key}-hevc.mp4` : `/asset/video/${key}.mp4`;
+function pickSource({ key }, { fullHd, canHevc1080, canHevc720 }) {
+  if (fullHd && canHevc1080) return `/asset/video/${key}-hevc.mp4`;
+  return canHevc720 ? `/asset/video/${key}-720-hevc.mp4` : `/asset/video/${key}.mp4`;
 }
 
 // 공개 시각 — 2026.10.12 18:00 KST. 해외에서 봐도 같은 순간을 향해 줄어든다.
@@ -94,6 +85,8 @@ const LAUNCH_AT = Date.parse('2026-10-12T18:00:00+09:00');
 
 // 초가 바뀌는 순간에 맞춰 깨운다 — setInterval(1000)은 조금씩 밀려서 가끔 한 초를 건너뛴다.
 function subscribeSecond(onTick) {
+  // 공개가 지나면 숫자가 더 바뀌지 않으니 깨우지 않는다.
+  if (Date.now() >= LAUNCH_AT) return () => {};
   let timer;
   const schedule = () => {
     timer = setTimeout(() => {
@@ -142,10 +135,11 @@ export default function HomePage() {
       v.muted = true;
     });
 
-    // 화면 크기와 코덱 지원을 보고 받을 파일을 고른다. 마크업에 <source>를
+    // 패널 크기와 코덱 지원을 보고 받을 파일을 고른다. 마크업에 <source>를
     // 두지 않는 이유는, 두면 브라우저가 판단 전에 이미 받기 시작하기 때문이다.
+    const panelPx = videos[0].parentElement.getBoundingClientRect().width * (window.devicePixelRatio || 1);
     const support = {
-      isMobile: window.matchMedia(MOBILE_QUERY).matches,
+      fullHd: panelPx > FULL_HD_FROM,
       canHevc1080: videos[0].canPlayType(HEVC_1080) !== '',
       canHevc720: videos[0].canPlayType(HEVC_720) !== '',
     };
@@ -367,62 +361,6 @@ export default function HomePage() {
     };
     const syncTimer = setInterval(sync, SYNC_EVERY);
 
-    // 패널 높이는 ResizeObserver로 캐시해둔다 — 프레임마다 레이아웃을 조회하면
-    // 강제 리플로가 걸린다. 영상이 <img>에 자리를 넘기며 숨어도 재도록 래퍼를 잰다.
-    const wrappers = videos.map((v) => v.parentElement);
-    const panelHeights = wrappers.map((w) => w.getBoundingClientRect().height || 1);
-    const ro = new ResizeObserver((entries) => {
-      for (const e of entries) {
-        const i = wrappers.indexOf(e.target);
-        if (i >= 0) panelHeights[i] = e.contentRect.height || panelHeights[i];
-      }
-    });
-    wrappers.forEach((w) => ro.observe(w));
-
-    // 이음새 디포커스 — 새 영상 프레임이 화면에 나올 때만 계산한다
-    // (requestVideoFrameCallback, 24fps). 예전엔 rAF로 화면 주사율마다(60~120Hz)
-    // 패널을 전부 훑었다. 재생 시각에서 직접 계산하므로 루프와 어긋나지 않는다.
-    // <img>로 넘어간 패널은 영상 프레임이 더 안 나오니 저절로 멈춘다(디포커스는 파일에 구워져 있다).
-    const stops = [];
-    videos.forEach((v, i) => {
-      const { mirrored } = PANELS[i];
-      let last = 0;
-      const apply = (time) => {
-        const left = v.duration - time;
-        const t = Number.isFinite(left) ? Math.max(0, 1 - left / DEFOCUS_LEAD) : 0;
-        // 뒤로 갈수록 가파르게 — 앞부분에서는 거의 티가 나지 않는다
-        const raw = DEFOCUS_MAX * t * t;
-        const blur = raw < 0.05 ? 0 : Math.round(raw * 100) / 100;
-        if (blur === last) return;
-        last = blur;
-        if (blur === 0) {
-          v.style.filter = '';
-          v.style.scale = '';    // 비워두면 Tailwind의 scale-x-[-1]이 다시 먹는다
-          return;
-        }
-        v.style.filter = `blur(${blur.toFixed(2)}px)`;
-        const k = 1 + (DEFOCUS_BLEED * blur) / panelHeights[i];
-        v.style.scale = mirrored ? `${-k} ${k}` : `${k} ${k}`;
-      };
-      if ('requestVideoFrameCallback' in v) {
-        let handle = 0;
-        const onFrame = (_, meta) => {
-          apply(meta.mediaTime);
-          handle = v.requestVideoFrameCallback(onFrame);
-        };
-        handle = v.requestVideoFrameCallback(onFrame);
-        stops.push(() => v.cancelVideoFrameCallback(handle));
-      } else {
-        let raf = 0;
-        const loop = () => {
-          apply(v.currentTime);
-          raf = requestAnimationFrame(loop);
-        };
-        raf = requestAnimationFrame(loop);
-        stops.push(() => cancelAnimationFrame(raf));
-      }
-    });
-
     return () => {
       cancelled = true;
       clearTimeout(stillTimer);
@@ -430,8 +368,6 @@ export default function HomePage() {
       clearInterval(syncTimer);
       blobUrls.forEach((url) => url && URL.revokeObjectURL(url));
       unlisten();
-      stops.forEach((stop) => stop());
-      ro.disconnect();
     };
   }, []);
 
@@ -444,12 +380,15 @@ export default function HomePage() {
           경계가 보이지 않는다. 세로 화면에서는 위아래로 쌓고, 가로가 넉넉한
           md+에서만 나란히 놓는다. */}
       <section className="relative flex min-h-[100dvh] w-full flex-col items-center justify-center gap-4 bg-white px-6 py-10 md:gap-6 md:px-12 md:py-16">
-        {/* 링크가 아니다 — 영상은 보여주기만 하고 아무 반응도 하지 않는다.
-            pointer-events-none이어야 커서 모양·우클릭 메뉴·탭 반응까지 안 생긴다. */}
-        <div className="flex w-full flex-col items-center gap-4 pointer-events-none select-none md:flex-row md:gap-6">
+        {/* 영상을 누르면 그 장면의 가구로 간다 — 가운데(침대)는 10, 위·아래(스툴)는 11.
+            영상 안의 사람·가구를 끌어 선택하지 않게 select-none, 우클릭 저장 메뉴 대신 링크 메뉴가 뜬다. */}
+        <div className="flex w-full flex-col items-center gap-4 select-none md:flex-row md:gap-6">
           {PANELS.map((panel, i) => (
-            <div
+            <Link
               key={panel.key}
+              href={panel.href}
+              aria-label={panel.label}
+              draggable={false}
               className="relative block w-full min-w-0 aspect-video overflow-hidden md:w-auto md:flex-1"
             >
               {/* src는 위 이펙트가 넣는다 — 화면 크기에 따라 파일이 달라진다.
@@ -474,9 +413,7 @@ export default function HomePage() {
                 aria-hidden="true"
               />
               {/* 자동재생이 막혔을 때 영상 대신 띄우는 자리 — src는 이펙트가 그때 넣는다.
-                  영상과 같은 이동·미러가 먹는다. 디포커스를 구운 -img.mp4는 흰색이 254라
-                  밝기를 올린다. next/image는 MP4를 못
-                  다뤄서 일반 img를 쓴다. */}
+                  영상과 같은 이동·미러가 먹는다. next/image는 MP4를 못 다뤄서 일반 img를 쓴다. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 ref={(el) => {
@@ -484,7 +421,6 @@ export default function HomePage() {
                 }}
                 className={[
                   'absolute inset-0 block h-full w-full object-contain',
-                  'brightness-[1.01]',
                   panel.shift ?? '',
                   panel.mirrored ? 'scale-x-[-1]' : '',
                 ].join(' ')}
@@ -493,20 +429,19 @@ export default function HomePage() {
                 draggable={false}
                 hidden
               />
-            </div>
+            </Link>
           ))}
         </div>
 
-        {/* 공개까지 남은 시간. 지나면 공개 날짜만 남는다. tracking은 마지막 글자
-            뒤에도 자간을 붙여 글자 뭉치가 그만큼 왼쪽으로 쏠리므로, -0.25em으로
+        {/* 공개까지 남은 시간. 지나면 공개 날짜만 남는다. tracking은
+            마지막 글자 뒤에도 자간을 붙여 글자 뭉치가 그만큼 왼쪽으로 쏠리므로, -0.25em으로
             꼬리를 걷어내야 잉크가 중앙에 온다. tabular-nums — 숫자 폭이 같아야
             초가 바뀔 때 줄이 좌우로 떨지 않는다. */}
-        <time
-          dateTime="2026-10-12T18:00:00+09:00"
+        <p
           className="mr-[-0.25em] font-serif text-[11px] tracking-[0.25em] text-zinc-400 tabular-nums"
         >
           <Countdown />
-        </time>
+        </p>
       </section>
     </div>
   );
