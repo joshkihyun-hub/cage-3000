@@ -1,8 +1,7 @@
 import { statSync } from 'node:fs';
 import path from 'node:path';
-import { items } from '@/shared/constants/shop-items';
-import { PROJECT1_ITEMS } from '@/shared/constants/project1-images';
 import { SITE_NAME, SITE_URL } from '@/lib/seo';
+import { feedEntries, imageUrl, INSTAGRAM } from '@/lib/feed';
 
 // RSS 피드 (/rss.xml) — 네이버 서치어드바이저 "RSS 제출"과 핀터레스트 자동 게시용. 상품·프로젝트가
 // 추가되면 자동으로 반영되어 네이버는 새 페이지를 더 빨리 수집하고, 핀터레스트는 새 핀을 만든다.
@@ -10,7 +9,7 @@ import { SITE_NAME, SITE_URL } from '@/lib/seo';
 export const dynamic = 'force-static';
 
 // 핀 설명 끝에 붙는 경로 — 핀터레스트에서 사이트와 인스타그램(브랜드·디자이너)으로 찾아오게.
-const PATHS = 'cage3000.com · Instagram @cage3k @choppycocky';
+const PATHS = `cage3000.com · Instagram ${INSTAGRAM.map((h) => `@${h}`).join(' ')}`;
 
 const XML_ESCAPES = { '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' };
 const escapeXml = (value) => String(value ?? '').replace(/[<>&'"]/g, (c) => XML_ESCAPES[c]);
@@ -22,7 +21,7 @@ function imageOf(src) {
   if (!src) return null;
   try {
     const { size } = statSync(path.join(process.cwd(), 'public', src));
-    return { url: `${SITE_URL}${encodeURI(src)}`, type: IMAGE_TYPES[path.extname(src).toLowerCase()] ?? 'image/jpeg', size };
+    return { url: imageUrl(src), type: IMAGE_TYPES[path.extname(src).toLowerCase()] ?? 'image/jpeg', size };
   } catch {
     return null;
   }
@@ -42,23 +41,13 @@ function renderItem({ title, link, guid, description, image }) {
 }
 
 export function GET() {
-  const entries = [
-    ...items.map((item) => ({
-      title: `CAGE3000 ${item.name}`,
-      link: `${SITE_URL}/shop/${item.id}`,
-      guid: `${SITE_URL}/shop/${item.id}`,
-      // 상품 설명문은 두지 않는다 — 사실만 적는다.
-      description: `CAGE3000 ${item.name} — ${item.collection.toUpperCase()}. ${item.price ?? ''}`.trim() + `\n${PATHS}`,
-      image: imageOf(item.images?.[0] ?? item.imageUrl),
-    })),
-    ...PROJECT1_ITEMS.map((project) => ({
-      title: `${project.title} — CAGE3000`,
-      link: `${SITE_URL}/projects/${project.slug}`,
-      guid: `${SITE_URL}/projects/${project.slug}`,
-      description: `${project.description_ko}\n${PATHS}`,
-      image: imageOf(project.image),
-    })),
-  ];
+  const entries = feedEntries().map((entry) => ({
+    title: entry.title,
+    link: entry.link,
+    guid: entry.link,
+    description: `${entry.summary}\n${PATHS}`,
+    image: imageOf(entry.imageSrc),
+  }));
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
