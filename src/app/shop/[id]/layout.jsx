@@ -59,24 +59,27 @@ function productJsonLd(item) {
           { '@type': 'ListItem', position: 3, name, item: url },
         ],
       },
-      {
-        '@type': 'Product',
-        name,
-        url,
-        image: (item.images?.length ? item.images : [item.imageUrl]).map(absoluteUrl),
-        brand: { '@type': 'Brand', name: SITE_NAME },
-        // 가격이 아직 없는 상품은 Offer를 빼야 검색엔진이 빈 가격으로 읽지 않는다.
-        ...(item.priceNum && {
-          offers: {
-            '@type': 'Offer',
-            url,
-            price: item.priceNum,
-            priceCurrency: 'KRW',
-            availability: 'https://schema.org/MadeToOrder',
-            seller: { '@id': `${SITE_URL}/#organization` },
-          },
-        }),
-      },
+      // 가격이 아직 없는 상품은 Product를 통째로 뺀다 — 구글은 가격(offers) 없는 Product를
+      // 오류로 잡고, 빈 가격으로 읽힐 수도 있다. 가격이 정해지면 자동으로 다시 들어간다.
+      ...(item.priceNum
+        ? [
+            {
+              '@type': 'Product',
+              name,
+              url,
+              image: (item.images?.length ? item.images : [item.imageUrl]).map(absoluteUrl),
+              brand: { '@type': 'Brand', name: SITE_NAME },
+              offers: {
+                '@type': 'Offer',
+                url,
+                price: item.priceNum,
+                priceCurrency: 'KRW',
+                availability: 'https://schema.org/MadeToOrder',
+                seller: { '@id': `${SITE_URL}/#organization` },
+              },
+            },
+          ]
+        : []),
     ],
   };
 }

@@ -126,10 +126,11 @@ const organizationJsonLd = {
     '@type': 'Place',
     name: 'Seoul, Republic of Korea',
   },
+  // 주문 제작은 Service로 적는다 — Product로 적으면 구글이 가격(offers) 없는 상품으로 보고 오류를 띄운다.
   makesOffer: {
     '@type': 'Offer',
     itemOffered: {
-      '@type': 'Product',
+      '@type': 'Service',
       name: 'Made-to-order pieces — garments and headwear',
       category: 'Fashion',
     },
