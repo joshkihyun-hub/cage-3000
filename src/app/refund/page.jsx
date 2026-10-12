@@ -1,5 +1,6 @@
 export const metadata = {
-  title: '환불 및 취소 정책 | CAGE3000',
+  title: '환불 및 취소 정책',
+  alternates: { canonical: '/refund' },
   description: 'CAGE3000 환불 및 취소 정책',
 };
 

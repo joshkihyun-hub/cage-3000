@@ -1,5 +1,6 @@
 export const metadata = {
-  title: '이용약관 | CAGE3000',
+  title: '이용약관',
+  alternates: { canonical: '/terms' },
   description: 'CAGE3000 이용약관',
 };
 
