@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { feedEntries, imageUrl, INSTAGRAM } from '@/lib/feed';
+import { arenaExtras } from '@/lib/arena-extras';
 
-// Are.na 채널 동기화 — 사이트의 피스·프로젝트 중 채널에 아직 없는 것만 사진 블록으로 올린다.
-// Vercel Cron이 하루 한 번 부른다(vercel.json). 이미 올린 것은 metadata의 사이트 주소로 알아보고
+// Are.na 채널 동기화 — 사이트의 피스·프로젝트 표지와 룩북·제작 과정·프로젝트 컷(arena-extras.js) 중
+// 채널에 아직 없는 것만 사진 블록으로 올린다.
+// Vercel Cron이 하루 한 번 부른다(vercel.json). 이미 올린 것은 metadata의 key(표지는 사이트 주소)로 알아보고
 // 건너뛰므로 몇 번을 불러도 중복되지 않는다. 블록 설명의 링크는 Are.na에서 눌러지는 마크다운 링크다.
 //   채널: https://www.are.na/kim-kihyun/cage3000
 //   환경변수: ARENA_TOKEN(Are.na 개인 접근 토큰), CRON_SECRET(Vercel Cron이 Authorization 헤더로 보냄)
@@ -12,6 +14,7 @@ export const maxDuration = 60;
 const API = 'https://api.are.na/v3';
 const CHANNEL = 'cage3000';
 const LINK_KEY = 'cage3000_link';
+const KEY = 'cage3000_key';
 const MAX_PER_RUN = 25;
 const TIME_BUDGET_MS = 45_000;
 
@@ -36,6 +39,8 @@ async function existingKeys(token) {
   for (let page = 1; page; ) {
     const { data, meta } = await arena(`/channels/${CHANNEL}/contents?per=100&page=${page}`, token);
     for (const block of data ?? []) {
+      // key가 있으면 그것만(룩북·과정 컷은 같은 상품 주소를 출처로 공유한다), 없으면 예전 표지 블록 — 사이트 주소
+      if (block.metadata?.[KEY]) { keys.add(block.metadata[KEY]); continue; }
       if (block.metadata?.[LINK_KEY]) keys.add(block.metadata[LINK_KEY]);
       if (block.source?.url) keys.add(block.source.url);
     }
@@ -58,14 +63,15 @@ export async function GET(req) {
   try {
     const [channel, have] = await Promise.all([arena(`/channels/${CHANNEL}`, token), existingKeys(token)]);
 
-    // 채널은 새로 올린 블록이 맨 위에 쌓인다 — 보여 줄 순서(최신 피스 → 오래된 피스 → 프로젝트)의
-    // 거꾸로 올려야 가장 최근 번호가 맨 위에 선다.
+    // 채널은 새로 올린 블록이 맨 위에 쌓인다 — 보여 줄 순서(최신 피스 → 오래된 피스 → 프로젝트 → 룩북 →
+    // 제작 과정 → 프로젝트 컷)의 거꾸로 올려야 가장 최근 번호가 맨 위에 선다. 표지의 key는 사이트 주소.
     const entries = feedEntries().filter((e) => e.imageSrc);
     const pieces = entries.filter((e) => e.number).sort((a, b) => b.number - a.number);
     const projects = entries.filter((e) => !e.number);
-    const missing = [...pieces, ...projects]
+    const covers = [...pieces, ...projects].map((e) => ({ key: e.link, title: e.title, link: e.link, summary: e.summary, image: imageUrl(e.imageSrc) }));
+    const missing = [...covers, ...arenaExtras()]
       .reverse()
-      .filter((e) => !have.has(e.link) && !have.has(imageUrl(e.imageSrc)));
+      .filter((e) => !have.has(e.key) && !have.has(e.image));
 
     if (missing.length === 0) return NextResponse.json({ added: 0 });
 
@@ -79,13 +85,13 @@ export async function GET(req) {
         await arena('/blocks', token, {
           method: 'POST',
           body: JSON.stringify({
-            value: imageUrl(e.imageSrc),
+            value: e.image,
             title: e.title,
             description: `${e.summary}\n\n${paths(e.link)}`,
             alt_text: e.title,
             original_source_url: e.link,
             original_source_title: e.title,
-            metadata: { [LINK_KEY]: e.link },
+            metadata: { [LINK_KEY]: e.link, [KEY]: e.key },
             channel_ids: [channel.id],
           }),
         });
