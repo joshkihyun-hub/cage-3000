@@ -15,7 +15,7 @@ const API = 'https://api.are.na/v3';
 const CHANNEL = 'cage3000';
 const LINK_KEY = 'cage3000_link';
 const KEY = 'cage3000_key';
-const MAX_PER_RUN = 25;
+const MAX_PER_RUN = 50;
 const TIME_BUDGET_MS = 45_000;
 
 async function arena(path, token, init = {}) {
