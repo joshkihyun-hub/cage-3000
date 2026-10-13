@@ -278,10 +278,10 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/h01/h01v4_01.jpg',
-      '/asset/details/shop/quarters/h01/h01v3_02.jpg',
-      '/asset/details/shop/quarters/h01/h01v3_03.jpg',
-      '/asset/details/shop/quarters/h01/h01v3_04.jpg',
-      '/asset/details/shop/quarters/h01/h01v3_05.jpg',
+      '/asset/details/shop/quarters/h01/h01v4_02.jpg',
+      '/asset/details/shop/quarters/h01/h01v4_03.jpg',
+      '/asset/details/shop/quarters/h01/h01v4_04.jpg',
+      '/asset/details/shop/quarters/h01/h01v4_05.jpg',
     ]
   },
   {
@@ -296,12 +296,12 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/h02/h02v4_01.jpg',
-      '/asset/details/shop/quarters/h02/h02v3_02.jpg',
-      '/asset/details/shop/quarters/h02/h02v3_03.jpg',
-      '/asset/details/shop/quarters/h02/h02v3_04.jpg',
-      '/asset/details/shop/quarters/h02/h02v3_05.jpg',
-      '/asset/details/shop/quarters/h02/h02v3_06.jpg',
-      '/asset/details/shop/quarters/h02/h02v3_07.jpg',
+      '/asset/details/shop/quarters/h02/h02v4_02.jpg',
+      '/asset/details/shop/quarters/h02/h02v4_03.jpg',
+      '/asset/details/shop/quarters/h02/h02v4_04.jpg',
+      '/asset/details/shop/quarters/h02/h02v4_05.jpg',
+      '/asset/details/shop/quarters/h02/h02v4_06.jpg',
+      '/asset/details/shop/quarters/h02/h02v4_07.jpg',
     ]
   },
   {
@@ -316,11 +316,11 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/h05/h05v4_01.jpg',
-      '/asset/details/shop/quarters/h05/h05v3_02.jpg',
-      '/asset/details/shop/quarters/h05/h05v3_03.jpg',
-      '/asset/details/shop/quarters/h05/h05v3_04.jpg',
-      '/asset/details/shop/quarters/h05/h05v3_05.jpg',
-      '/asset/details/shop/quarters/h05/h05v3_06.jpg',
+      '/asset/details/shop/quarters/h05/h05v4_02.jpg',
+      '/asset/details/shop/quarters/h05/h05v4_03.jpg',
+      '/asset/details/shop/quarters/h05/h05v4_04.jpg',
+      '/asset/details/shop/quarters/h05/h05v4_05.jpg',
+      '/asset/details/shop/quarters/h05/h05v4_06.jpg',
     ]
   },
   {
@@ -335,12 +335,12 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/h04/h04v4_01.jpg',
-      '/asset/details/shop/quarters/h04/h04v3_02.jpg',
-      '/asset/details/shop/quarters/h04/h04v3_03.jpg',
-      '/asset/details/shop/quarters/h04/h04v3_04.jpg',
-      '/asset/details/shop/quarters/h04/h04v3_05.jpg',
-      '/asset/details/shop/quarters/h04/h04v3_06.jpg',
-      '/asset/details/shop/quarters/h04/h04v3_07.jpg',
+      '/asset/details/shop/quarters/h04/h04v4_02.jpg',
+      '/asset/details/shop/quarters/h04/h04v4_03.jpg',
+      '/asset/details/shop/quarters/h04/h04v4_04.jpg',
+      '/asset/details/shop/quarters/h04/h04v4_05.jpg',
+      '/asset/details/shop/quarters/h04/h04v4_06.jpg',
+      '/asset/details/shop/quarters/h04/h04v4_07.jpg',
     ]
   },
   {
@@ -355,12 +355,12 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/h03/h03v4_01.jpg',
-      '/asset/details/shop/quarters/h03/h03v3_02.jpg',
-      '/asset/details/shop/quarters/h03/h03v3_03.jpg',
-      '/asset/details/shop/quarters/h03/h03v3_04.jpg',
-      '/asset/details/shop/quarters/h03/h03v3_05.jpg',
-      '/asset/details/shop/quarters/h03/h03v3_06.jpg',
-      '/asset/details/shop/quarters/h03/h03v3_07.jpg',
+      '/asset/details/shop/quarters/h03/h03v4_02.jpg',
+      '/asset/details/shop/quarters/h03/h03v4_03.jpg',
+      '/asset/details/shop/quarters/h03/h03v4_04.jpg',
+      '/asset/details/shop/quarters/h03/h03v4_05.jpg',
+      '/asset/details/shop/quarters/h03/h03v4_06.jpg',
+      '/asset/details/shop/quarters/h03/h03v4_07.jpg',
     ]
   },
   {
@@ -375,12 +375,12 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/h06/h06v4_01.jpg',
-      '/asset/details/shop/quarters/h06/h06v3_02.jpg',
-      '/asset/details/shop/quarters/h06/h06v3_03.jpg',
-      '/asset/details/shop/quarters/h06/h06v3_04.jpg',
-      '/asset/details/shop/quarters/h06/h06v3_05.jpg',
-      '/asset/details/shop/quarters/h06/h06v3_06.jpg',
-      '/asset/details/shop/quarters/h06/h06v3_07.jpg',
+      '/asset/details/shop/quarters/h06/h06v4_02.jpg',
+      '/asset/details/shop/quarters/h06/h06v4_03.jpg',
+      '/asset/details/shop/quarters/h06/h06v4_04.jpg',
+      '/asset/details/shop/quarters/h06/h06v4_05.jpg',
+      '/asset/details/shop/quarters/h06/h06v4_06.jpg',
+      '/asset/details/shop/quarters/h06/h06v4_07.jpg',
     ]
   },
   {
@@ -395,11 +395,11 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/h07/h07v4_01.jpg',
-      '/asset/details/shop/quarters/h07/h07v3_02.jpg',
-      '/asset/details/shop/quarters/h07/h07v3_03.jpg',
-      '/asset/details/shop/quarters/h07/h07v3_04.jpg',
-      '/asset/details/shop/quarters/h07/h07v3_05.jpg',
-      '/asset/details/shop/quarters/h07/h07v3_06.jpg',
+      '/asset/details/shop/quarters/h07/h07v4_02.jpg',
+      '/asset/details/shop/quarters/h07/h07v4_03.jpg',
+      '/asset/details/shop/quarters/h07/h07v4_04.jpg',
+      '/asset/details/shop/quarters/h07/h07v4_05.jpg',
+      '/asset/details/shop/quarters/h07/h07v4_06.jpg',
     ]
   },
   {
@@ -414,11 +414,11 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/h08/h08v4_01.jpg',
-      '/asset/details/shop/quarters/h08/h08v3_02.jpg',
-      '/asset/details/shop/quarters/h08/h08v3_03.jpg',
-      '/asset/details/shop/quarters/h08/h08v3_04.jpg',
-      '/asset/details/shop/quarters/h08/h08v3_05.jpg',
-      '/asset/details/shop/quarters/h08/h08v3_06.jpg',
+      '/asset/details/shop/quarters/h08/h08v4_02.jpg',
+      '/asset/details/shop/quarters/h08/h08v4_03.jpg',
+      '/asset/details/shop/quarters/h08/h08v4_04.jpg',
+      '/asset/details/shop/quarters/h08/h08v4_05.jpg',
+      '/asset/details/shop/quarters/h08/h08v4_06.jpg',
     ]
   },
   {
@@ -433,13 +433,13 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/h09/h09v4_01.jpg',
-      '/asset/details/shop/quarters/h09/h09v3_02.jpg',
-      '/asset/details/shop/quarters/h09/h09v3_03.jpg',
-      '/asset/details/shop/quarters/h09/h09v3_04.jpg',
-      '/asset/details/shop/quarters/h09/h09v3_05.jpg',
-      '/asset/details/shop/quarters/h09/h09v3_06.jpg',
-      '/asset/details/shop/quarters/h09/h09v3_07.jpg',
-      '/asset/details/shop/quarters/h09/h09v3_08.jpg',
+      '/asset/details/shop/quarters/h09/h09v4_02.jpg',
+      '/asset/details/shop/quarters/h09/h09v4_03.jpg',
+      '/asset/details/shop/quarters/h09/h09v4_04.jpg',
+      '/asset/details/shop/quarters/h09/h09v4_05.jpg',
+      '/asset/details/shop/quarters/h09/h09v4_06.jpg',
+      '/asset/details/shop/quarters/h09/h09v4_07.jpg',
+      '/asset/details/shop/quarters/h09/h09v4_08.jpg',
     ]
   },
   {
@@ -454,11 +454,11 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/q01/q01v3_01.jpg',
-      '/asset/details/shop/quarters/q01/q01v3_02.jpg',
-      '/asset/details/shop/quarters/q01/q01v3_03.jpg',
-      '/asset/details/shop/quarters/q01/q01v3_04.jpg',
-      '/asset/details/shop/quarters/q01/q01v3_05.jpg',
-      '/asset/details/shop/quarters/q01/q01v3_06.jpg',
+      '/asset/details/shop/quarters/q01/q01v4_02.jpg',
+      '/asset/details/shop/quarters/q01/q01v4_03.jpg',
+      '/asset/details/shop/quarters/q01/q01v4_04.jpg',
+      '/asset/details/shop/quarters/q01/q01v4_05.jpg',
+      '/asset/details/shop/quarters/q01/q01v4_06.jpg',
     ]
   },
   {
@@ -473,10 +473,10 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/q02/q02v3_01.jpg',
-      '/asset/details/shop/quarters/q02/q02v3_02.jpg',
-      '/asset/details/shop/quarters/q02/q02v3_03.jpg',
-      '/asset/details/shop/quarters/q02/q02v3_05.jpg',
-      '/asset/details/shop/quarters/q02/q02v3_06.jpg',
+      '/asset/details/shop/quarters/q02/q02v4_02.jpg',
+      '/asset/details/shop/quarters/q02/q02v4_03.jpg',
+      '/asset/details/shop/quarters/q02/q02v4_05.jpg',
+      '/asset/details/shop/quarters/q02/q02v4_06.jpg',
     ]
   },
   {
@@ -491,10 +491,10 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/q03/q03v3_01.jpg',
-      '/asset/details/shop/quarters/q03/q03v3_02.jpg',
-      '/asset/details/shop/quarters/q03/q03v3_03.jpg',
-      '/asset/details/shop/quarters/q03/q03v3_04.jpg',
-      '/asset/details/shop/quarters/q03/q03v3_05.jpg',
+      '/asset/details/shop/quarters/q03/q03v4_02.jpg',
+      '/asset/details/shop/quarters/q03/q03v4_03.jpg',
+      '/asset/details/shop/quarters/q03/q03v4_04.jpg',
+      '/asset/details/shop/quarters/q03/q03v4_05.jpg',
     ]
   },
   {
@@ -510,13 +510,13 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/q04/q04v3_01.jpg',
-      '/asset/details/shop/quarters/q04/q04v3_02.jpg',
+      '/asset/details/shop/quarters/q04/q04v4_02.jpg',
       '/asset/details/shop/quarters/q04/q04v3_03.jpg',
-      '/asset/details/shop/quarters/q04/q04v3_04.jpg',
-      '/asset/details/shop/quarters/q04/q04v3_05.jpg',
-      '/asset/details/shop/quarters/q04/q04v3_06.jpg',
-      '/asset/details/shop/quarters/q04/q04v3_07.jpg',
-      '/asset/details/shop/quarters/q04/q04v3_08.jpg',
+      '/asset/details/shop/quarters/q04/q04v4_04.jpg',
+      '/asset/details/shop/quarters/q04/q04v4_05.jpg',
+      '/asset/details/shop/quarters/q04/q04v4_06.jpg',
+      '/asset/details/shop/quarters/q04/q04v4_07.jpg',
+      '/asset/details/shop/quarters/q04/q04v4_08.jpg',
     ]
   },
   {
@@ -531,9 +531,9 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/q05/q05v3_01.jpg',
-      '/asset/details/shop/quarters/q05/q05v3_02.jpg',
-      '/asset/details/shop/quarters/q05/q05v3_03.jpg',
-      '/asset/details/shop/quarters/q05/q05v3_04.jpg',
+      '/asset/details/shop/quarters/q05/q05v4_02.jpg',
+      '/asset/details/shop/quarters/q05/q05v4_03.jpg',
+      '/asset/details/shop/quarters/q05/q05v4_04.jpg',
     ]
   },
   {
@@ -548,11 +548,11 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/q06/q06v3_01.jpg',
-      '/asset/details/shop/quarters/q06/q06v3_02.jpg',
-      '/asset/details/shop/quarters/q06/q06v3_03.jpg',
-      '/asset/details/shop/quarters/q06/q06v3_04.jpg',
-      '/asset/details/shop/quarters/q06/q06v3_05.jpg',
-      '/asset/details/shop/quarters/q06/q06v3_06.jpg',
+      '/asset/details/shop/quarters/q06/q06v4_02.jpg',
+      '/asset/details/shop/quarters/q06/q06v4_03.jpg',
+      '/asset/details/shop/quarters/q06/q06v4_04.jpg',
+      '/asset/details/shop/quarters/q06/q06v4_05.jpg',
+      '/asset/details/shop/quarters/q06/q06v4_06.jpg',
     ]
   },
   {
@@ -567,11 +567,11 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/q07/q07v3_01.jpg',
-      '/asset/details/shop/quarters/q07/q07v3_02.jpg',
+      '/asset/details/shop/quarters/q07/q07v4_02.jpg',
       '/asset/details/shop/quarters/q07/q07v3_03.jpg',
-      '/asset/details/shop/quarters/q07/q07v3_04.jpg',
-      '/asset/details/shop/quarters/q07/q07v3_05.jpg',
-      '/asset/details/shop/quarters/q07/q07v3_06.jpg',
+      '/asset/details/shop/quarters/q07/q07v4_04.jpg',
+      '/asset/details/shop/quarters/q07/q07v4_05.jpg',
+      '/asset/details/shop/quarters/q07/q07v4_06.jpg',
     ]
   },
   {
@@ -586,10 +586,10 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/q08/q08v3_01.jpg',
-      '/asset/details/shop/quarters/q08/q08v3_02.jpg',
-      '/asset/details/shop/quarters/q08/q08v3_03.jpg',
-      '/asset/details/shop/quarters/q08/q08v3_04.jpg',
-      '/asset/details/shop/quarters/q08/q08v3_05.jpg',
+      '/asset/details/shop/quarters/q08/q08v4_02.jpg',
+      '/asset/details/shop/quarters/q08/q08v4_03.jpg',
+      '/asset/details/shop/quarters/q08/q08v4_04.jpg',
+      '/asset/details/shop/quarters/q08/q08v4_05.jpg',
     ]
   },
   {
@@ -604,9 +604,9 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/q10/q10v3_01.jpg',
-      '/asset/details/shop/quarters/q10/q10v3_02.jpg',
-      '/asset/details/shop/quarters/q10/q10v3_03.jpg',
-      '/asset/details/shop/quarters/q10/q10v3_04.jpg',
+      '/asset/details/shop/quarters/q10/q10v4_02.jpg',
+      '/asset/details/shop/quarters/q10/q10v4_03.jpg',
+      '/asset/details/shop/quarters/q10/q10v4_04.jpg',
     ]
   },
   {
@@ -621,10 +621,10 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/q11/q11v3_01.jpg',
-      '/asset/details/shop/quarters/q11/q11v3_02.jpg',
-      '/asset/details/shop/quarters/q11/q11v3_03.jpg',
-      '/asset/details/shop/quarters/q11/q11v3_04.jpg',
-      '/asset/details/shop/quarters/q11/q11v3_05.jpg',
+      '/asset/details/shop/quarters/q11/q11v4_02.jpg',
+      '/asset/details/shop/quarters/q11/q11v4_03.jpg',
+      '/asset/details/shop/quarters/q11/q11v4_04.jpg',
+      '/asset/details/shop/quarters/q11/q11v4_05.jpg',
     ]
   },
   {
@@ -639,9 +639,9 @@ export const items = [
     material: 'Material : 100% Cotton, Fully Waxed',
     images: [
       '/asset/details/shop/quarters/q12/q12v3_01.jpg',
-      '/asset/details/shop/quarters/q12/q12v3_02.jpg',
-      '/asset/details/shop/quarters/q12/q12v3_03.jpg',
-      '/asset/details/shop/quarters/q12/q12v3_04.jpg',
+      '/asset/details/shop/quarters/q12/q12v4_02.jpg',
+      '/asset/details/shop/quarters/q12/q12v4_03.jpg',
+      '/asset/details/shop/quarters/q12/q12v4_04.jpg',
     ]
   }
 ];
