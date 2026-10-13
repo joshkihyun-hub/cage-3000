@@ -386,58 +386,23 @@ export async function sendCommissionInquiry({ name, email, organization, message
   });
 }
 
-// 작업 소식(Field Notes) 구독 — Resend 연락처(Contacts)에 저장한다. 세그먼트 ID가 있으면 그
-// 세그먼트에 넣어 나중에 Resend 브로드캐스트로 바로 보낼 수 있다. 연락처 저장이 안 되면(키 권한·
-// 설정 누락) 운영자 메일함으로 주소를 보내 놓쳐지지 않게 한다. 이미 있는 주소면 그대로 성공.
-export async function addSubscriber(email) {
-  const client = getClient();
-  const segmentId = process.env.RESEND_SEGMENT_ID;
-  const { error } = await client.contacts.create({
-    email,
-    unsubscribed: false,
-    ...(segmentId ? { segments: [{ id: segmentId }] } : {}),
-  });
-  if (!error) return { stored: 'contacts' };
-  if (/exist/i.test(error.message || '')) return { stored: 'contacts' };
-  console.error('[subscribe] contacts.create failed, falling back to email', { message: error.message, name: error.name });
-
-  const rawRecipients =
-    process.env.INQUIRY_NOTIFY_EMAIL || process.env.ORDER_NOTIFY_EMAIL || 'contact@cage3000.com';
-  const recipients = rawRecipients.split(',').map((s) => s.trim()).filter(Boolean);
-  await sendEmail({
-    to: recipients,
-    subject: `[CAGE3000] Field Notes 구독 — ${email}`,
-    html: shellTemplate({
-      headline: 'New Subscriber',
-      body: `<p style="margin:0;font-size:14px;color:#27272a;">작업 소식 구독 신청이 들어왔습니다. Resend 연락처에 저장하지 못해 메일로 보냅니다 — 직접 목록에 추가해 주세요.</p><p style="margin:16px 0 0 0;font-size:14px;color:#000;">${escapeHtml(email)}</p>`,
-      footnote: '본 메일은 cage3000.com 구독 양식에서 자동 발송됩니다.',
-    }),
-    text: `Field Notes 구독 신청: ${email}`,
-  });
-  return { stored: 'email' };
-}
-
-// 관리자 페이지용 구독자 목록 — Resend 연락처를 100개씩 끝까지 넘겨 받는다(최대 5,000명).
-// 세그먼트 ID가 있으면 그 세그먼트만. 최근 신청이 위로 오게 정렬한다.
-export async function listSubscribers() {
-  const client = getClient();
-  const segmentId = process.env.RESEND_SEGMENT_ID;
-  const all = [];
-  let after;
-  for (let page = 0; page < 50; page += 1) {
-    const { data, error } = await client.contacts.list({
-      limit: 100,
-      ...(segmentId ? { segmentId } : {}),
-      ...(after ? { after } : {}),
+// 작업 소식(Field Notes) 구독자를 Resend 연락처에도 넣는다 — 나중에 Resend 브로드캐스트로 보낼 때 쓴다.
+// 목록의 기준은 우리 DB(src/lib/subscribers.js)라서 여기서 실패해도(키 권한·설정 누락) 신청은 그대로 성공.
+// 세그먼트 ID가 있으면 그 세그먼트에 넣는다. 이미 있는 주소는 성공으로 본다.
+export async function addResendContact(email) {
+  try {
+    const segmentId = process.env.RESEND_SEGMENT_ID;
+    const { error } = await getClient().contacts.create({
+      email,
+      unsubscribed: false,
+      ...(segmentId ? { segments: [{ id: segmentId }] } : {}),
     });
-    if (error) throw new Error(error.message || 'contacts.list failed');
-    all.push(...data.data);
-    if (!data.has_more || data.data.length === 0) break;
-    after = data.data[data.data.length - 1].id;
+    if (!error || /exist/i.test(error.message || '')) return true;
+    console.warn('[subscribe] Resend contacts.create skipped', { message: error.message, name: error.name });
+  } catch (err) {
+    console.warn('[subscribe] Resend contacts.create skipped', { message: err?.message });
   }
-  return all
-    .map((c) => ({ email: c.email, createdAt: c.created_at, unsubscribed: Boolean(c.unsubscribed) }))
-    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  return false;
 }
 
 // 주문 진행 알림 — 관리자가 주문 상태를 '제작 중' 또는 '배송 중'으로 바꾸는 순간 고객에게 간다.

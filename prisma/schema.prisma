@@ -196,3 +196,14 @@ model Post {
   image     String?
   author    User?    @relation(fields: [authorId], references: [id])
 }
+
+// 작업 소식(Field Notes) 구독자 — 신청하면 여기에 바로 저장되고 관리자 화면이 이걸 읽는다.
+// Resend 연락처에도 따로 넣어 두지만(브로드캐스트용), 그쪽 키 권한과 상관없이 목록은 여기가 기준이다.
+model Subscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  createdAt      DateTime  @default(now())
+  unsubscribedAt DateTime?
+
+  @@index([createdAt])
+}

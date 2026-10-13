@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { addSubscriber } from '@/lib/email';
+import { addSubscriber } from '@/lib/subscribers';
 import { isValidEmail } from '@/lib/validation';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 

@@ -13,7 +13,7 @@ const fmt = (iso) => {
     : d.toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 };
 
-// Field Notes 구독자 — 푸터에서 신청한 이메일(Resend 연락처에 저장된 것)을 본다.
+// Field Notes 구독자 — About의 숫자에서 신청한 이메일(DB에 바로 저장된 것)을 본다.
 export default function AdminSubscribers() {
   const { data: session, status: authStatus } = useSession();
   const router = useRouter();

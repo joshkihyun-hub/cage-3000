@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth-guards';
-import { listSubscribers } from '@/lib/email';
+import { listSubscribers } from '@/lib/subscribers';
 
 function csvEscape(value) {
   if (value === null || value === undefined) return '';
@@ -11,7 +11,7 @@ function csvEscape(value) {
   return s;
 }
 
-// GET /api/admin/subscribers — Field Notes 구독자(Resend 연락처). ?format=csv면 내려받기.
+// GET /api/admin/subscribers — Field Notes 구독자(DB). ?format=csv면 내려받기.
 export async function GET(req) {
   const { error } = await requireAdmin();
   if (error) return error;
@@ -22,7 +22,7 @@ export async function GET(req) {
   } catch (err) {
     console.error('[admin/subscribers] list failed', { message: err?.message });
     return NextResponse.json(
-      { error: 'Resend에서 구독자 목록을 불러오지 못했어요. API 키에 연락처(Contacts) 권한이 있는지 확인해 주세요.' },
+      { error: '구독자 목록을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.' },
       { status: 502 }
     );
   }
