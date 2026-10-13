@@ -2,8 +2,13 @@ import { Suspense } from 'react';
 import { LOOKBOOK_COLLECTIONS } from '@/shared/constants/lookbook';
 import ShopContent, { ShopView } from './shop-content';
 
-const HIDE_FALLBACK_FOR_QUERY =
-  "if(/[?&](category|collection)=/.test(location.search))document.currentScript.parentElement.setAttribute('data-query','')";
+// 서버 HTML에 문자열로만 심는다 — React가 <script>를 직접 그리면 브라우저 쪽 렌더(클라이언트 이동 등)에서
+// "스크립트는 실행되지 않는다" 경고가 뜬다. innerHTML로 들어간 스크립트는 처음 페이지를 읽을 때만 돌고,
+// 브라우저에서 다시 그릴 땐 조용히 무시된다(원래 의도와 같다).
+const HIDE_FALLBACK_FOR_QUERY = {
+  __html:
+    "<script>if(/[?&](category|collection)=/.test(location.search))document.currentScript.closest('[data-shop-fallback]').setAttribute('data-query','')</script>",
+};
 
 export default function ShopPage() {
   // 구역의 이름·날짜·공개 예정 여부는 룩북 데이터 한 곳에서 가져온다. 룩북 파일은 사진을
@@ -30,7 +35,7 @@ export default function ShopPage() {
             // 바뀌었다 — 그런 주소일 때만 이 자리를 화면이 준비될 때까지 비워 둔다(globals.css).
             // 스크립트는 바로 아래 내용보다 먼저 읽혀서 처음 그려질 때부터 숨는다.
             <div data-shop-fallback>
-              <script dangerouslySetInnerHTML={{ __html: HIDE_FALLBACK_FOR_QUERY }} />
+              <div hidden dangerouslySetInnerHTML={HIDE_FALLBACK_FOR_QUERY} />
               <ShopView collections={collections} />
             </div>
           }
