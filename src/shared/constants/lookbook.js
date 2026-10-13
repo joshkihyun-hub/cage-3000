@@ -43,12 +43,27 @@ export const LOOKBOOK_COLLECTIONS = [
     images: [Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8],
     // 펼친 격자에서 혼자 한 줄을 차지하며 가장 크게(줄 높이의 두 배) 놓이는 사진(0부터 센 번호) — 06, 위에서 내려다본 침대.
     feature: 5,
+    // 펼친 격자 위에 작게 붙는 크레딧 — 인스타그램 게시물 캡션 그대로(@는 인스타그램 링크가 된다).
+    credits: [
+      ['Direction, Design and Making, Video', '@choppycocky (CAGE3000 @cage3k)'],
+      ['Concept Development, Frame Design & Fabrication', '@woo_junhee'],
+      ['Photography', '@youngikyoun'],
+      ['Styling', '@choppycocky @bluevereal'],
+      ['Performers', '@suny0u @monkgru'],
+    ],
+    creditNote: 'collaborative project by Kihyun Kim and Junhee Woo',
   },
   {
     slug: 'green',
     title: 'GREEN',
     date: '2025.12',
     cover: '/asset/details/lookbook/9hat/A3.jpeg',
+    credits: [
+      ['Design, Production', '@choppycocky'],
+      ['Photography', '@youngikyoun'],
+      ['Styling', '@bluevereal'],
+      ['Model', '@simleeje @choppycocky'],
+    ],
     images: [A1, A2, A3, B1, B3, C1, C2, D1, D2, D3, E1, E2, E3, F1, F2, G1, G2, H1, H2, H3],
   },
 ];

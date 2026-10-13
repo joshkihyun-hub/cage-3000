@@ -43,12 +43,49 @@ const SOFT = [0.33, 1, 0.68, 1];
 // 사진은 원본 비율 그대로(자르지 않음) — 한 줄의 사진들이 같은 높이로 서고 가로 폭은 각자 비율대로
 // 늘어나 줄을 채운다(기준의 1.15배까지만, 남으면 가운데로 모은다). 읽는 순서도 그대로.
 // 기준 높이(--h)는 모든 컬렉션이 같다(GREEN과 같은 크기).
+// 크레딧 한 줄 — '@아이디'는 인스타그램 링크로, 나머지(괄호·브랜드명)는 글자 그대로.
+function CreditNames({ text }) {
+  return text.split(/(@[\w.]+)/).map((part, i) =>
+    part.startsWith('@') ? (
+      <a key={i} href={`https://instagram.com/${part.slice(1)}`} target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors">
+        {part}
+      </a>
+    ) : (
+      part
+    )
+  );
+}
+
+// 펼친 격자 맨 위의 크레딧 — 이름 줄과 같은 왼쪽 선에서, 사진보다 작고 옅게.
+function Credits({ collection }) {
+  if (!collection.credits?.length) return null;
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.7, ease: SOFT }}
+      className="pt-8 md:pt-10 text-[10px] md:text-[11px] leading-[1.6] tracking-[0.01em] text-zinc-400"
+    >
+      <dl className="grid grid-cols-[auto_1fr] gap-x-3 md:gap-x-4">
+        {collection.credits.map(([role, names]) => (
+          <div key={role} className="contents">
+            <dt>{role}</dt>
+            <dd className="text-zinc-600"><CreditNames text={names} /></dd>
+          </div>
+        ))}
+      </dl>
+      {collection.creditNote && <p className="mt-3">{collection.creditNote}</p>}
+    </motion.div>
+  );
+}
+
 function CollectionGrid({ collection, onOpen }) {
   return (
     <motion.div
       exit={{ height: 0, opacity: 0, transition: { duration: 0.4, ease: SOFT } }}
       className="overflow-hidden"
     >
+      <Credits collection={collection} />
       <div
         className="flex flex-wrap justify-center gap-x-2 gap-y-4 md:gap-x-3 md:gap-y-5 pt-10 md:pt-14 pb-16 md:pb-24 [--h:120px] md:[--h:220px]"
       >
