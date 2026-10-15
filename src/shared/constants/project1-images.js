@@ -36,6 +36,7 @@ export const PROJECT1_ITEMS = [
     id: 10,
     slug: 'nmixx-strange-muse',
     category: 'custom',
+    scale: 1.3, // 가로 단체 사진이라 목록에서 작게 보여 한 치수 키운다
     description_ko: 'Origami shoes, ring, ribbon shoes & bag made for NMIXX Strange Muse concept photo',
     title: 'NMIXX STRANGE MUSE',
     subtitle: 'CONCEPT PHOTO / 2026',

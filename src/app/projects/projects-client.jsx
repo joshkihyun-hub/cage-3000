@@ -38,8 +38,9 @@ const TRAITS = Object.fromEntries(
     PROJECT1_ITEMS.map((item) => {
         const r = seeded(item.id * 7919 + 13);
         return [item.id, {
-            wDesk: item.featured ? 0.35 : 0.19 + r() * 0.07,
-            wMob: item.featured ? 0.66 : 0.36 + r() * 0.08,
+            // scale: 작업마다 따로 키울 때(예: 가로로 긴 사진이 작게 뽑힌 경우) — 칸보다 커지진 않는다.
+            wDesk: (item.featured ? 0.35 : 0.19 + r() * 0.07) * (item.scale ?? 1),
+            wMob: (item.featured ? 0.66 : 0.36 + r() * 0.08) * (item.scale ?? 1),
             jx: r(),
             jy: r(),
             marker: Math.floor(r() * 4), // 0 위-오른쪽 · 1 아래-왼쪽 · 2 아래-오른쪽 · 3 위-왼쪽
@@ -79,7 +80,7 @@ function computeLayout(items, imageSizes, cfg) {
         for (const { item, cost } of row.items) {
             const t = TRAITS[item.id];
             const cellW = cost * unit;
-            const w = t[cfg.width];
+            const w = Math.min(t[cfg.width], cellW - 2 * cfg.margin);
             const x = cellStart + cfg.margin + t.jx * Math.max(0, cellW - w - 2 * cfg.margin);
             const top = y + t.jy * cfg.jitterY;
             const size = imageSizes[item.image];
