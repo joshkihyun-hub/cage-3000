@@ -33,6 +33,26 @@ export const PROJECT1_ITEMS = [
     ],
   },
   {
+    id: 10,
+    slug: 'nmixx-strange-muse',
+    category: 'custom',
+    description_ko: 'Origami shoes, ring, ribbon shoes & bag made for NMIXX Strange Muse concept photo',
+    title: 'NMIXX STRANGE MUSE',
+    subtitle: 'CONCEPT PHOTO / 2026',
+    image: '/asset/details/strange-muse/strange-muse1.jpg',
+    image_hover: '/asset/details/strange-muse/strange-muse5.jpg',
+    subImages: [
+      '/asset/details/strange-muse/strange-muse1.jpg',
+      '/asset/details/strange-muse/strange-muse2.jpg',
+      '/asset/details/strange-muse/strange-muse3.jpg',
+      '/asset/details/strange-muse/strange-muse4.jpg',
+      '/asset/details/strange-muse/strange-muse5.jpg',
+    ],
+    credits: [
+      { role: 'Origami Shoes, Ring, Ribbon Shoes & Bag Design, Making', name: 'CAGE3000 (@cage3k)' },
+    ],
+  },
+  {
     id: 9,
     slug: 'apro-profile',
     category: 'sponsored',
