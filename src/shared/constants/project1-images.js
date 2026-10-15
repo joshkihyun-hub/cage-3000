@@ -33,6 +33,27 @@ export const PROJECT1_ITEMS = [
     ],
   },
   {
+    id: 9,
+    slug: 'apro-profile',
+    category: 'sponsored',
+    description_ko: '프로듀서·DJ 아프로(APRO) 프로필 사진에 CAGE3000 04 모자 협찬.',
+    title: 'APRO PROFILE',
+    subtitle: 'ARTIST PROFILE / 2026',
+    image: '/asset/details/apro/apro1.jpg',
+    image_hover: '/asset/details/apro/apro2.jpg',
+    subImages: [
+      '/asset/details/apro/apro1.jpg',
+      '/asset/details/apro/apro2.jpg',
+    ],
+    links: [
+      { label: 'CAGE3000 04', href: '/shop/4' },
+    ],
+    credits: [
+      { role: 'Headwear 04', name: 'CAGE3000 (@cage3k)' },
+      { role: 'Artist', name: '@aproavenue' },
+    ],
+  },
+  {
     id: 8,
     slug: 'aiweo-00ff00-be-my-hug',
     category: 'sponsored',
