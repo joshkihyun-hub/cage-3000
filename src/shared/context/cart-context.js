@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { items } from '@/shared/constants/shop-items';
+import { items, isPurchasable } from '@/shared/constants/shop-items';
 
 const CartContext = createContext();
 
@@ -31,10 +31,12 @@ function readStoredCart() {
         // Stored entries are a snapshot from when the item was added, so a price
         // change would leave the old price on screen while checkout charges the
         // current catalog price (the server recomputes it). Re-resolve against the
-        // catalog and keep only the quantity; drop products that no longer exist.
+        // catalog and keep only the quantity; drop products that no longer exist
+        // or can no longer be bought (taken off sale, price withdrawn) — the order
+        // API would refuse them at checkout anyway.
         .map((stored) => {
           const product = items.find((item) => String(item.id) === String(stored.id));
-          return product ? { ...product, quantity: stored.quantity } : null;
+          return product && isPurchasable(product) ? { ...product, quantity: stored.quantity } : null;
         })
         .filter(Boolean)
     );

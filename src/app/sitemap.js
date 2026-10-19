@@ -5,9 +5,9 @@ import { SITE_URL, absoluteUrl } from '@/lib/seo';
 
 // Auto-generated sitemap (Next App Router serves this at /sitemap.xml).
 // Image entries let Google/Naver image search index product and project shots.
+// lastModified는 적지 않는다 — 예전엔 빌드 시각(new Date())을 모든 주소에 찍어서, 배포할 때마다
+// 사이트 전체가 "방금 바뀜"으로 보였다. 그러면 구글은 이 값을 믿지 않고 무시한다.
 export default function sitemap() {
-  const now = new Date();
-
   const staticRoutes = [
     { path: '', priority: 1.0, changeFrequency: 'weekly', images: ['/asset/details/shop/quarters/f01/f01v2_01.jpg'] },
     { path: '/shop', priority: 0.9, changeFrequency: 'weekly' },
@@ -32,7 +32,6 @@ export default function sitemap() {
     { path: '/refund', priority: 0.3, changeFrequency: 'yearly' },
   ].map(({ path, priority, changeFrequency, images = [] }) => ({
     url: `${SITE_URL}${path}`,
-    lastModified: now,
     changeFrequency,
     priority,
     images: images.map(absoluteUrl),
@@ -40,7 +39,6 @@ export default function sitemap() {
 
   const projectRoutes = PROJECT1_ITEMS.map((project) => ({
     url: `${SITE_URL}/projects/${project.slug}`,
-    lastModified: now,
     changeFrequency: 'yearly',
     priority: 0.7,
     images: (project.subImages?.length ? project.subImages : [project.image]).map(absoluteUrl),
@@ -48,7 +46,6 @@ export default function sitemap() {
 
   const productRoutes = items.map((item) => ({
     url: `${SITE_URL}/shop/${item.id}`,
-    lastModified: now,
     changeFrequency: 'weekly',
     priority: 0.8,
     images: (item.images?.length ? item.images : [item.imageUrl]).map(absoluteUrl),

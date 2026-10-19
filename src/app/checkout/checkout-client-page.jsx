@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import * as PortOne from '@portone/browser-sdk/v2';
 import DaumPostcode from 'react-daum-postcode';
 import { BUY_NOW_FLAG, useCart } from '../../shared/context/cart-context';
-import { items as catalog } from '@/shared/constants/shop-items';
+import { items as catalog, isPurchasable } from '@/shared/constants/shop-items';
 import { formatKrPhone, isValidEmail, isValidKrPhone } from '@/lib/validation';
 import { Block } from '@/components/block';
 
@@ -25,13 +25,18 @@ const CheckoutClientPage = () => {
   const { cart: bag, clearCart } = useCart();
   // 상품 상세의 Buy Now는 /checkout?buy=<id>로 온다 — 그 한 점만 결제하고 장바구니는 그대로 둔다.
   // 이 컴포넌트는 브라우저에서만 그려진다(page.jsx의 ssr: false) — window를 바로 읽어도 된다.
-  const [buyNowItem] = useState(() => {
+  // 판매하지 않거나 가격이 아직 없는 피스는 주소로 들어와도 결제 화면에 올리지 않는다(₩0으로 보였다) —
+  // 그럴 땐 장바구니로 바꿔치기하지 않고 빈 주문으로 둔다.
+  const [buyNow] = useState(() => {
     const id = new URLSearchParams(window.location.search).get('buy');
-    return id ? catalog.find((item) => String(item.id) === id) || null : null;
+    if (!id) return null;
+    const item = catalog.find((entry) => String(entry.id) === id);
+    return { item: item && isPurchasable(item) ? item : null };
   });
+  const buyNowItem = buyNow?.item ?? null;
   const cart = useMemo(
-    () => (buyNowItem ? [{ ...buyNowItem, quantity: 1 }] : bag),
-    [buyNowItem, bag]
+    () => (buyNow ? (buyNowItem ? [{ ...buyNowItem, quantity: 1 }] : []) : bag),
+    [buyNow, buyNowItem, bag]
   );
 
   const isAuthed = authStatus === 'authenticated';
@@ -192,13 +197,16 @@ const CheckoutClientPage = () => {
       });
       const verifyData = await verifyRes.json();
 
+      // 결제 확인 뒤 완료 화면은 전체 이동으로 띄운다(의도된 동작이라 린트 경고만 끈다).
       if (verifyRes.ok && verifyData.status === 'success') {
         if (!buyNowItem) clearCart();
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
         window.location.href = `/checkout/success?order=${encodeURIComponent(orderNumber)}`;
       } else if (verifyData.status === 'processing') {
         // PG가 아직 승인을 마무리 중 — 웹훅이 서버에서 정산하므로 실패가 아니다.
         // 소프트 접수 화면으로 보낸다.
         if (!buyNowItem) clearCart();
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
         window.location.href = `/checkout/success?order=${encodeURIComponent(orderNumber)}&soft=1`;
       } else {
         setError(verifyData.message || '결제 검증에 실패했습니다.');

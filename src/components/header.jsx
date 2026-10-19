@@ -66,12 +66,14 @@ const navItemsRight = [
 
 function CartIcon() {
   const { cart } = useCart();
+  const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+  // 아이콘뿐인 링크라 화면 읽기 도구가 부를 이름을 따로 붙인다(다른 아이콘들의 title과 같은 역할).
   return (
-    <Link href="/cart" className="relative group p-2">
+    <Link href="/cart" className="relative group p-2" title="Cart" aria-label={count > 0 ? `Cart, ${count}` : 'Cart'}>
       <IconBag className="w-6 h-6 text-zinc-800 group-hover:text-black transition-colors" />
-      {cart.length > 0 && (
+      {count > 0 && (
         <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-[10px] font-medium rounded-full h-4 w-4 flex items-center justify-center">
-          {cart.reduce((acc, item) => acc + item.quantity, 0)}
+          {count}
         </span>
       )}
     </Link>
