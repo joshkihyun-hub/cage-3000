@@ -9,7 +9,7 @@ export default function PrivacyPage() {
     <div className="bg-white min-h-screen pt-32 md:pt-40 pb-24">
       <div className="max-w-2xl mx-auto px-6 md:px-12">
         <h1 className="text-3xl text-black mb-2 tracking-widest uppercase">개인정보처리방침</h1>
-        <p className="text-[10px] text-zinc-400 mb-12 tracking-wide">최종 업데이트: 2025년 07월 27일</p>
+        <p className="text-[10px] text-zinc-400 mb-12 tracking-wide">최종 업데이트: 2026년 10월 24일</p>
 
         <div className="space-y-10 text-[13px] text-zinc-600 leading-relaxed">
 
@@ -49,7 +49,12 @@ export default function PrivacyPage() {
                   <tr>
                     <td className="py-2 pr-4 align-top">선택 (작업 소식 구독)</td>
                     <td className="py-2 pr-4 align-top">이메일</td>
-                    <td className="py-2 align-top">사이트 하단 Field Notes 구독 신청</td>
+                    <td className="py-2 align-top">About 페이지 Field Notes 구독 신청</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 pr-4 align-top">선택 (제작 문의)</td>
+                    <td className="py-2 pr-4 align-top">이름, 이메일, 소속·프로젝트(선택), 문의 내용</td>
+                    <td className="py-2 align-top">제작 문의 양식</td>
                   </tr>
                   <tr>
                     <td className="py-2 pr-4 align-top">자동 수집</td>
@@ -69,6 +74,7 @@ export default function PrivacyPage() {
               <li>소비자 불만 및 분쟁 기록: 전자상거래법에 따라 3년 보관</li>
               <li>접속 로그: 통신비밀보호법에 따라 3개월 보관</li>
               <li>작업 소식 구독 이메일: 구독 해지 시까지 (메일 하단 링크로 언제든 해지)</li>
+              <li>제작 문의 내용: 문의 처리 완료 시까지</li>
             </ul>
           </section>
 
@@ -133,6 +139,12 @@ export default function PrivacyPage() {
                     <td className="py-2 pr-4 align-top">웹사이트 호스팅·운영</td>
                     <td className="py-2 align-top">위탁계약 종료 시까지</td>
                   </tr>
+                  <tr>
+                    <td className="py-2 pr-4 align-top">Neon, Inc. (미국 법인, 저장 서버 싱가포르)</td>
+                    <td className="py-2 pr-4 align-top">회원 정보, 주문·배송 정보, 작업 소식 구독 이메일</td>
+                    <td className="py-2 pr-4 align-top">데이터베이스 보관·운영</td>
+                    <td className="py-2 align-top">위탁계약 종료 시까지 (각 정보는 제3조의 기간이 지나면 파기)</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -161,7 +173,28 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제9조 (개인정보 보호책임자)</h2>
+            <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제9조 (개인정보의 파기 절차 및 방법)</h2>
+            <p className="mb-2">회사는 보유기간이 지나거나 처리 목적이 달성된 개인정보를 지체 없이 파기합니다. 법령에 따라 보존해야 하는 정보는 해당 기간 동안 보관한 뒤 파기합니다.</p>
+            <ul className="list-disc list-inside space-y-1.5">
+              <li>전자적 파일: 복구할 수 없는 방법으로 영구 삭제</li>
+              <li>종이 문서: 분쇄하거나 소각</li>
+              <li>회원 탈퇴 시 회원 정보(이름·연락처·주소 등)는 즉시 삭제하며, 법령상 보존 의무가 있는 주문·결제 기록은 제3조의 기간 동안 보관한 뒤 파기합니다.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제10조 (개인정보의 안전성 확보 조치)</h2>
+            <ul className="list-disc list-inside space-y-1.5">
+              <li>비밀번호는 복호화할 수 없는 방식(단방향 암호화)으로 저장하며, 회사도 원문을 알 수 없습니다.</li>
+              <li>이메일 인증·비밀번호 재설정 링크의 값은 원문이 아닌 변환된 값으로만 저장합니다.</li>
+              <li>모든 통신은 암호화(HTTPS)되어 전송됩니다.</li>
+              <li>개인정보를 다루는 관리자 화면은 권한이 확인된 관리자만 접근할 수 있습니다.</li>
+              <li>로그인·인증 요청에 시도 횟수 제한을 두어 무단 접근을 막습니다.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제11조 (개인정보 보호책임자)</h2>
             <div className="bg-zinc-50 rounded p-4 text-[12px] space-y-1">
               <p><span className="text-zinc-800 font-medium">성명</span> &nbsp;김기현</p>
               <p><span className="text-zinc-800 font-medium">직위</span> &nbsp;대표</p>
@@ -170,9 +203,20 @@ export default function PrivacyPage() {
             </div>
           </section>
 
+          <section>
+            <h2 className="text-sm font-semibold text-black mb-3 uppercase tracking-widest">제12조 (권익침해 구제 방법)</h2>
+            <p className="mb-2">개인정보 침해에 대한 신고나 상담이 필요하시면 아래 기관에 문의하실 수 있습니다.</p>
+            <ul className="list-disc list-inside space-y-1.5">
+              <li>개인정보분쟁조정위원회: (국번없이) 1833-6972 (www.kopico.go.kr)</li>
+              <li>개인정보침해신고센터: (국번없이) 118 (privacy.kisa.or.kr)</li>
+              <li>대검찰청: (국번없이) 1301 (www.spo.go.kr)</li>
+              <li>경찰청: (국번없이) 182 (ecrm.police.go.kr)</li>
+            </ul>
+          </section>
+
           <section className="pt-6 border-t border-zinc-100">
             <p className="text-[11px] text-zinc-400">
-              본 방침은 2025년 07월 27일부터 적용됩니다. 개인정보 관련 문의는{' '}
+              본 방침은 2026년 10월 24일부터 적용됩니다. (이전 방침: 2025년 07월 27일 ~ 2026년 10월 23일) 개인정보 관련 문의는{' '}
               <a href="mailto:contact@cage3000.com" className="underline hover:text-black transition-colors">
                 contact@cage3000.com
               </a>
