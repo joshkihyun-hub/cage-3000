@@ -11,6 +11,10 @@ import { issueEmailToken } from '@/lib/email-tokens';
 import { sendVerificationEmail } from '@/lib/email';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
+// 선택 입력(주소) — 문자열이 아니면 버리고, 길이는 주문서(/api/orders)와 같게 묶는다.
+// 주소는 로그인 세션 쿠키에도 실려서, 길이를 안 묶으면 아주 긴 값 하나로 쿠키가 터진다.
+const optional = (value, max) => (typeof value === 'string' ? value.trim().slice(0, max) || null : null);
+
 export async function POST(req) {
   // 가입마다 인증 메일이 나가므로 IP당 가입 시도를 묶어 둔다.
   const limited = await rateLimit(`register:${getClientIp(req)}`, { limit: 5, windowMs: 10 * 60_000 });
@@ -101,9 +105,9 @@ export async function POST(req) {
         email: normalizedEmail,
         hashedPassword,
         phoneNumber: normalizedPhone,
-        address: address?.trim() || null,
-        detailAddress: detailAddress?.trim() || null,
-        zipCode: zipCode?.trim() || null,
+        address: optional(address, 200),
+        detailAddress: optional(detailAddress, 200),
+        zipCode: optional(zipCode, 10),
         marketingConsent: Boolean(marketingConsent),
         termsAgreedAt: now,
         privacyAgreedAt: now,

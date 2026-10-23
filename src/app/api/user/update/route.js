@@ -49,9 +49,11 @@ export async function POST(req) {
     data.phoneNumber = formatted;
   }
 
-  if (typeof body.address === 'string') data.address = body.address.trim() || null;
-  if (typeof body.detailAddress === 'string') data.detailAddress = body.detailAddress.trim() || null;
-  if (typeof body.zipCode === 'string') data.zipCode = body.zipCode.trim() || null;
+  // 주소는 세션 토큰(쿠키)에도 실린다 — 길이를 묶지 않으면 아주 긴 값 하나로 쿠키가 터져 로그인이 깨진다.
+  // 길이는 주문서(/api/orders)와 같다.
+  if (typeof body.address === 'string') data.address = body.address.trim().slice(0, 200) || null;
+  if (typeof body.detailAddress === 'string') data.detailAddress = body.detailAddress.trim().slice(0, 200) || null;
+  if (typeof body.zipCode === 'string') data.zipCode = body.zipCode.trim().slice(0, 10) || null;
   if (typeof body.marketingConsent === 'boolean') {
     data.marketingConsent = body.marketingConsent;
     if (body.marketingConsent) data.marketingAgreedAt = new Date();
