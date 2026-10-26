@@ -12,9 +12,32 @@ import { formatKrPhone, isValidEmail, isValidKrPhone } from '@/lib/validation';
 import { Block } from '@/components/block';
 
 const STORE_ID = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || '';
-// 단일 KCP V2 채널로 카드 + 간편결제(KakaoPay/NaverPay/TossPay/...) 모두 처리.
-// 환경에 따라 테스트연동/실연동 채널 키를 환경변수로 주입한다.
+// 신용카드는 KCP V2 채널. 환경에 따라 테스트연동/실연동 채널 키를 환경변수로 주입한다.
 const CHANNEL_KCP = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KCP || '';
+// KCP 채널로 받을 간편결제 — KCP에 간편결제를 추가 계약한 뒤에만 넣는다(예: "KAKAOPAY,NAVERPAY,TOSSPAY").
+// 계약 전에 KCP로 보내면 결제창이 [DR02] 가맹점 설정정보 오류로 끝난다(2026-05 실제로 그랬다).
+const KCP_EASY_PAY = new Set(
+  (process.env.NEXT_PUBLIC_PORTONE_KCP_EASY_PAY || '')
+    .split(',')
+    .map((s) => s.trim().toUpperCase())
+    .filter(Boolean)
+);
+// 간편결제 — 직접 계약한 채널(포트원 콘솔에서 따로 연결)이 있으면 그 채널, 없으면 위 목록에 있을 때만 KCP 채널.
+// 둘 다 없는 수단은 화면에 띄우지 않는다. 계약이 끝나 채널이 생기면 환경변수만 넣으면 나타난다.
+const EASY_PAY_OPTIONS = [
+  { label: '카카오페이', provider: 'KAKAOPAY', channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KAKAOPAY },
+  { label: '네이버페이', provider: 'NAVERPAY', channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_NAVERPAY },
+  { label: '토스페이', provider: 'TOSSPAY', channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_TOSSPAY },
+  { label: '페이코', provider: 'PAYCO' },
+  { label: '삼성페이', provider: 'SAMSUNGPAY' },
+  { label: '애플페이', provider: 'APPLEPAY' },
+]
+  .map((option) => ({
+    ...option,
+    direct: Boolean(option.channelKey),
+    channelKey: option.channelKey || (KCP_EASY_PAY.has(option.provider) ? CHANNEL_KCP : ''),
+  }))
+  .filter((option) => option.channelKey);
 
 const inputClass =
   'w-full border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none';
@@ -99,8 +122,10 @@ const CheckoutClientPage = () => {
     setIsPostcodeOpen(false);
   };
 
-  const handlePayment = async (payMethod, easyPayProvider) => {
+  // easyPay는 EASY_PAY_OPTIONS의 한 항목 — 카드 결제면 비어 있다.
+  const handlePayment = async (payMethod, easyPay) => {
     setError('');
+    const channelKey = easyPay ? easyPay.channelKey : CHANNEL_KCP;
     if (cart.length === 0) {
       setError('장바구니가 비어 있습니다.');
       return;
@@ -117,7 +142,7 @@ const CheckoutClientPage = () => {
       setError('주문 제작 상품의 환불 제한 안내에 동의해 주세요.');
       return;
     }
-    if (!STORE_ID || !CHANNEL_KCP) {
+    if (!STORE_ID || !channelKey) {
       setError('결제 채널이 설정되지 않았습니다. 관리자에게 문의해 주세요.');
       return;
     }
@@ -159,18 +184,32 @@ const CheckoutClientPage = () => {
       const { id: orderId, orderNumber, totalAmount } = orderData;
 
       // 2) PortOne payment with the server-issued orderNumber/totalAmount.
-      // 단일 KCP V2 채널 — payMethod로 카드/간편결제를 분기한다.
-      // EASY_PAY는 KCP V2에서 easyPayProvider를 반드시 함께 보내야 동작한다.
+      // 결제 수단마다 채널이 다르다. KCP 채널의 EASY_PAY는 easyPayProvider를 반드시 함께 보내야 하고,
+      // 직접 계약 채널(카카오페이·네이버페이·토스페이)은 그 값을 무시한다.
       const response = await PortOne.requestPayment({
         storeId: STORE_ID,
-        channelKey: CHANNEL_KCP,
+        channelKey,
         paymentId: orderNumber,
         orderName,
         totalAmount,
         currency: 'KRW',
         payMethod,
-        ...(payMethod === 'EASY_PAY' && easyPayProvider
-          ? { easyPay: { easyPayProvider } }
+        ...(easyPay ? { easyPay: { easyPayProvider: easyPay.provider } } : {}),
+        // 네이버페이 직접 채널은 상품 정보를 여기로 받는다(일반 상품 = PRODUCT/GENERAL).
+        ...(easyPay?.direct && easyPay.provider === 'NAVERPAY'
+          ? {
+              bypass: {
+                naverpay: {
+                  productItems: cart.map((item) => ({
+                    categoryType: 'PRODUCT',
+                    categoryId: 'GENERAL',
+                    uid: String(item.id),
+                    name: `CAGE3000 ${item.name}`,
+                    count: item.quantity,
+                  })),
+                },
+              },
+            }
           : {}),
         redirectUrl: `${window.location.origin}/checkout/success`,
         customer: {
@@ -181,8 +220,9 @@ const CheckoutClientPage = () => {
         customData: { orderId },
       });
 
+      // 결제사가 준 오류 문구는 고치지 않고 그대로 보여 준다(네이버페이는 이게 계약 조건이다).
       if (response.code) {
-        setError(`결제 실패: ${response.message || response.code}`);
+        setError(response.message || `결제가 완료되지 않았습니다. (${response.code})`);
         return;
       }
 
@@ -384,26 +424,31 @@ const CheckoutClientPage = () => {
               </label>
             </Block>
 
-            <Block>
-              <button
-                disabled={payDisabled}
-                data-sound="firm"
-                onClick={() => handlePayment('CARD')}
-                className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed disabled:no-underline"
-              >
-                {submitting ? '결제 진행 중…' : '신용카드로 결제 →'}
-              </button>
-            </Block>
-            <Block>
-              <button
-                disabled={payDisabled}
-                data-sound="firm"
-                onClick={() => setIsEasyPayOpen(true)}
-                className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed disabled:no-underline"
-              >
-                간편결제 →
-              </button>
-            </Block>
+            {/* 채널이 연결된 수단만 보인다 — 계약 전 수단은 눌러도 결제창에서 오류가 나기 때문. */}
+            {CHANNEL_KCP && (
+              <Block>
+                <button
+                  disabled={payDisabled}
+                  data-sound="firm"
+                  onClick={() => handlePayment('CARD')}
+                  className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed disabled:no-underline"
+                >
+                  {submitting ? '결제 진행 중…' : '신용카드로 결제 →'}
+                </button>
+              </Block>
+            )}
+            {EASY_PAY_OPTIONS.length > 0 && (
+              <Block>
+                <button
+                  disabled={payDisabled}
+                  data-sound="firm"
+                  onClick={() => setIsEasyPayOpen(true)}
+                  className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed disabled:no-underline"
+                >
+                  간편결제 →
+                </button>
+              </Block>
+            )}
 
             <p className="text-xs text-zinc-400 leading-relaxed pl-3">
               결제 진행 시{' '}
@@ -435,9 +480,7 @@ const CheckoutClientPage = () => {
           </div>
         )}
 
-        {/* Easy-pay provider selector. KCP V2 requires easyPayProvider to be
-            specified when payMethod is EASY_PAY — the modal collects that
-            choice before kicking off the PortOne flow. */}
+        {/* 간편결제 선택 — 채널이 연결된 수단(EASY_PAY_OPTIONS)만 나온다. */}
         {isEasyPayOpen && (
           <div
             className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-6"
@@ -458,22 +501,18 @@ const CheckoutClientPage = () => {
               <Block>
                 <p className="text-sm mb-4">간편결제 선택</p>
                 <div className="space-y-3">
-                  {[
-                    { label: '카카오페이', provider: 'KAKAOPAY' },
-                    { label: '네이버페이', provider: 'NAVERPAY' },
-                    { label: '토스페이', provider: 'TOSSPAY' },
-                  ].map(({ label, provider }) => (
+                  {EASY_PAY_OPTIONS.map((option) => (
                     <button
-                      key={provider}
+                      key={option.provider}
                       disabled={submitting}
                       data-sound="firm"
                       onClick={() => {
                         setIsEasyPayOpen(false);
-                        handlePayment('EASY_PAY', provider);
+                        handlePayment('EASY_PAY', option);
                       }}
                       className="block text-sm md:text-base hover:underline disabled:text-zinc-400"
                     >
-                      {label} →
+                      {option.label} →
                     </button>
                   ))}
                 </div>
