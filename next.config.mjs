@@ -15,6 +15,10 @@ const nextConfig = {
     // Next 16 only serves qualities that are explicitly allowed; the hero and
     // product shots request 85, everything else defaults to 75.
     qualities: [75, 85],
+    // 변환본을 31일 동안 다시 만들지 않는다. 기본값이면 /asset의 하루 캐시를 따라가 매일 다시 변환해
+    // Vercel 무료 플랜 한도(월 5천 회)를 넘겼다. Vercel은 원본 파일 내용으로 캐시를 구분하므로
+    // 같은 이름으로 사진을 바꿔도 새 사진은 바로 다시 만들어진다.
+    minimumCacheTTL: 2678400,
   },
   compiler: {
     // 결제·웹훅 오류 로그(console.error/warn)는 프로덕션에서도 남겨야

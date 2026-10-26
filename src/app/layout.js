@@ -170,10 +170,16 @@ const siteJsonLd = {
   '@graph': [organizationJsonLd, websiteJsonLd],
 };
 
+// 최적화 이미지(/_next/image)가 실패하면 깨진 자리 대신 원본 파일을 띄운다. Vercel 무료 플랜은 이미지 변환
+// 한도(월 5천)를 넘기면 캐시에 없는 크기를 402로 돌려준다(2026-10 실제로 사진 60%가 깨졌다).
+// 이미지 오류는 위로 전파되지 않아 캡처 단계에서 받는다. 원본까지 실패하면 /_next/image가 아니라서 여기서 멈춘다.
+const IMAGE_FALLBACK = `addEventListener('error',function(e){var i=e.target;if(!i||i.tagName!=='IMG')return;var s=i.currentSrc||i.src;if(s.indexOf('/_next/image')<0)return;var o=new URL(s,location.href).searchParams.get('url');if(!o)return;i.removeAttribute('srcset');i.src=o},true);`;
+
 export default function RootLayout({ children }) {
   return (
     <html lang="ko" data-scroll-behavior="smooth">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: IMAGE_FALLBACK }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: toJsonLd(siteJsonLd) }}
