@@ -1,3 +1,5 @@
+import { KCP_TRANSFER_ENABLED } from '@/lib/escrow';
+
 export const metadata = {
   title: '환불 및 취소 정책',
   alternates: { canonical: '/refund' },
@@ -66,7 +68,10 @@ export default function RefundPage() {
               <li>회사 검토 후 환불 승인 안내 (영업일 기준 1~3일)</li>
               <li>상품 반송 (배송비는 사유에 따라 상이)</li>
               <li>상품 수령 및 검수 완료 후 환불 처리</li>
-              <li>결제 수단별 환불 완료 (카드: 3~5 영업일, 간편결제: 1~3 영업일 소요)</li>
+              <li>
+                결제 수단별 환불 완료 (카드: 3~5 영업일, 간편결제: 1~3 영업일
+                {KCP_TRANSFER_ENABLED && ', 계좌이체: 1~3 영업일'} 소요)
+              </li>
             </ol>
             <div className="mt-4 bg-zinc-50 rounded p-4 text-[12px] space-y-1">
               <p><span className="font-medium text-black">회사 귀책 사유</span> — 반품 배송비 회사 부담</p>

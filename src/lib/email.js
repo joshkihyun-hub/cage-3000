@@ -261,6 +261,12 @@ export async function sendOrderNotificationToSeller({
     ? `<span style="margin-left:8px;padding:2px 6px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#71717a;border:1px solid #e4e4e7;">Guest</span>`
     : '';
 
+  // 계좌이체는 에스크로 — 7영업일 안에 발송·운송장 입력을 놓치면 정산이 멈춘다.
+  const escrowReminder =
+    paymentMethod === 'Transfer'
+      ? '계좌이체(에스크로) 주문입니다. 결제일 포함 7영업일 안에 발송하고 어드민에 운송장을 입력해 주세요 — 입력하면 KCP에 배송정보가 등록되어 정산이 진행됩니다.'
+      : '';
+
   const body = `
     <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">New Order</p>
     <p style="margin:0 0 24px 0;font-size:14px;color:#27272a;">새 주문이 결제 완료되었습니다.</p>
@@ -283,6 +289,7 @@ export async function sendOrderNotificationToSeller({
         <td style="padding:10px 0;font-size:15px;color:#000;font-weight:600;">${formatKRW(totalAmount)}</td>
       </tr>
     </table>
+    ${escrowReminder ? `<p style="margin:0 0 24px 0;padding:10px 12px;font-size:12px;line-height:1.6;color:#27272a;background:#fafafa;border:1px solid #e4e4e7;">${escrowReminder}</p>` : ''}
 
     <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;">Customer ${guestBadge}</p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;">
@@ -321,7 +328,7 @@ export async function sendOrderNotificationToSeller({
     to: recipients,
     subject: `[CAGE3000] 새 주문 — ${orderNumber} · ${buyer?.name || '-'} · ${formatKRW(totalAmount)}`,
     html,
-    text: `새 주문 결제 완료\n주문번호: ${orderNumber}\n구매자: ${buyer?.name || '-'} (${buyer?.email || '-'} / ${buyer?.phone || '-'})\n배송지: ${joinAddress({ zipCode: shipping?.zipCode, address: shipping?.address, detail: shipping?.detail })}\n합계: ${formatKRW(totalAmount)}\n\n어드민: ${adminUrl}`,
+    text: `새 주문 결제 완료\n주문번호: ${orderNumber}\n구매자: ${buyer?.name || '-'} (${buyer?.email || '-'} / ${buyer?.phone || '-'})\n배송지: ${joinAddress({ zipCode: shipping?.zipCode, address: shipping?.address, detail: shipping?.detail })}\n합계: ${formatKRW(totalAmount)}\n${escrowReminder ? `\n${escrowReminder}\n` : ''}\n어드민: ${adminUrl}`,
   });
 }
 

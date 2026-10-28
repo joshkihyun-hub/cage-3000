@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-guards';
 import { isValidOrderStatus } from '@/lib/order-status';
 import { sendOrderProgressEmail } from '@/lib/email';
+import { syncEscrowLogistics } from '@/lib/order-payment';
 
 export async function GET(_req, { params }) {
   const { error } = await requireAdmin();
@@ -125,7 +126,18 @@ export async function PATCH(req, { params }) {
       }
     }
 
-    return NextResponse.json({ order: updated, notified, notifyError });
+    // 계좌이체(에스크로) 주문은 운송장이 들어오면 KCP에 배송정보를 등록해야 정산된다.
+    // 실패해도 저장은 유지하고 관리자 화면에 알린다 — 포트원 콘솔에서 직접 등록할 수도 있다.
+    let escrow = null;
+    let escrowError = null;
+    try {
+      escrow = await syncEscrowLogistics(updated);
+    } catch (escrowErr) {
+      console.error('[admin/orders] escrow logistics failed', { orderNumber: updated.orderNumber, message: escrowErr?.message });
+      escrowError = `에스크로 배송정보 등록에 실패했습니다 — 포트원 콘솔에서 직접 등록해 주세요. (${escrowErr?.message || '알 수 없는 오류'})`;
+    }
+
+    return NextResponse.json({ order: updated, notified, notifyError, escrow, escrowError });
   } catch (err) {
     console.error('Order update error:', err);
     return NextResponse.json({ error: 'Update failed' }, { status: 500 });

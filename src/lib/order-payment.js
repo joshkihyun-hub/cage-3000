@@ -131,6 +131,70 @@ export async function settleOrderPayment({ order, paymentId }) {
   return { ok: true, status: 'success' };
 }
 
+// 관리자 화면 택배사 이름(order-detail-drawer의 CARRIERS) → 포트원 물류사 코드.
+const ESCROW_LOGISTICS_COMPANY = {
+  CJ대한통운: 'CJ',
+  우체국: 'POST',
+  한진택배: 'HANJIN',
+  롯데택배: 'LOTTE',
+  로젠택배: 'LOGEN',
+  EMS: 'EMS',
+  DHL: 'DHL',
+};
+
+// 에스크로 발송자 — 푸터의 사업장 정보와 같다.
+const ESCROW_SENDER = {
+  name: '케이에이치엔(KHN)',
+  phoneNumber: '01048909497',
+  address: { addressLine1: '서울특별시 서대문구 연희로11사길 13', addressLine2: '(연희동)' },
+};
+
+/**
+ * 에스크로 결제(계좌이체)의 배송정보를 KCP에 등록하거나 고친다. 에스크로는 이 등록이 있어야
+ * 구매확정·정산이 진행된다(KCP 약관: 결제일 포함 7영업일 안에 발송·등록).
+ * 계좌이체가 아니거나 운송장이 비어 있으면 아무것도 하지 않고, 같은 운송장으로 다시 불러도 안전하다.
+ *
+ * @returns {Promise<'registered'|'updated'|null>} 실패하면 throw — 부른 쪽이 관리자에게 알린다.
+ */
+export async function syncEscrowLogistics(order) {
+  if (order.paymentMethod !== 'Transfer' || !order.paymentId) return null;
+  if (!order.trackingCarrier || !order.trackingNumber) return null;
+
+  const company = ESCROW_LOGISTICS_COMPANY[order.trackingCarrier];
+  if (!company) throw new Error(`${order.trackingCarrier}은(는) 에스크로에 등록할 수 없는 택배사입니다.`);
+
+  const client = getPortOneClient();
+  if (!client) throw new Error('PORTONE_API_SECRET이 설정되지 않았습니다.');
+
+  const payment = await client.payment.getPayment({ paymentId: order.paymentId });
+  const escrow = payment?.escrow;
+  // 에스크로 없이 결제된 건, 또는 배송완료·구매확정·취소처럼 등록 단계를 지난 건.
+  if (!escrow || !['BEFORE_REGISTERED', 'REGISTERED'].includes(escrow.status)) return null;
+  if (escrow.status === 'REGISTERED' && escrow.invoiceNumber === order.trackingNumber) return null;
+
+  const options = {
+    paymentId: order.paymentId,
+    sender: ESCROW_SENDER,
+    receiver: {
+      name: order.recipientName,
+      phoneNumber: order.recipientPhone.replace(/\D/g, ''),
+      zipcode: order.shippingZipCode || undefined,
+      address: { addressLine1: order.shippingAddress, addressLine2: order.shippingDetail || '' },
+    },
+    logistics: {
+      company,
+      invoiceNumber: order.trackingNumber,
+      sentAt: new Date(order.shippedAt || Date.now()).toISOString(),
+    },
+  };
+  if (escrow.status === 'BEFORE_REGISTERED') {
+    await client.payment.applyEscrowLogistics(options);
+    return 'registered';
+  }
+  await client.payment.modifyEscrowLogistics(options);
+  return 'updated';
+}
+
 /**
  * Sends the buyer receipt + seller notification for a settled order.
  * Each send is isolated so one failing address never blocks the other.

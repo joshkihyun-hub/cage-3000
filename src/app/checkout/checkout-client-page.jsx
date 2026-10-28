@@ -9,6 +9,7 @@ import DaumPostcode from 'react-daum-postcode';
 import { BUY_NOW_FLAG, useCart } from '../../shared/context/cart-context';
 import { items as catalog, isPurchasable } from '@/shared/constants/shop-items';
 import { formatKrPhone, isValidEmail, isValidKrPhone } from '@/lib/validation';
+import { ESCROW_NOTICE, KCP_TRANSFER_ENABLED } from '@/lib/escrow';
 import { Block } from '@/components/block';
 
 const STORE_ID = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || '';
@@ -181,7 +182,7 @@ const CheckoutClientPage = () => {
         return;
       }
 
-      const { id: orderId, orderNumber, totalAmount } = orderData;
+      const { id: orderId, orderNumber, totalAmount, items: orderItems = [] } = orderData;
 
       // 2) PortOne payment with the server-issued orderNumber/totalAmount.
       // 결제 수단마다 채널이 다르다. KCP 채널의 EASY_PAY는 easyPayProvider를 반드시 함께 보내야 하고,
@@ -207,6 +208,27 @@ const CheckoutClientPage = () => {
                     name: `CAGE3000 ${item.name}`,
                     count: item.quantity,
                   })),
+                },
+              },
+            }
+          : {}),
+        // 계좌이체는 에스크로(구매안전서비스)로만 받는다 — KCP 에스크로 계약이 있어야 승인된다.
+        // 상품 정보는 서버가 정한 가격 그대로 보내고, 결제창에 현금영수증 신청란을 띄운다.
+        // 예상 배송 소요일은 제작 4–6영업일 + 배송 1–3영업일의 끝인 9일.
+        ...(payMethod === 'TRANSFER'
+          ? {
+              isEscrow: true,
+              products: orderItems.map((item) => ({
+                id: item.productId,
+                name: `CAGE3000 ${item.productName}`,
+                amount: item.unitPrice,
+                quantity: item.quantity,
+              })),
+              bypass: {
+                kcp_v2: {
+                  shop_user_id: session?.user?.id || orderNumber,
+                  disp_tax_yn: 'Y',
+                  deli_term: '09',
                 },
               },
             }
@@ -435,6 +457,20 @@ const CheckoutClientPage = () => {
                 >
                   {submitting ? '결제 진행 중…' : '신용카드로 결제 →'}
                 </button>
+              </Block>
+            )}
+            {/* 계좌이체 — KCP 에스크로 승인 뒤 스위치(KCP_TRANSFER_ENABLED)를 켰을 때만. */}
+            {CHANNEL_KCP && KCP_TRANSFER_ENABLED && (
+              <Block>
+                <button
+                  disabled={payDisabled}
+                  data-sound="firm"
+                  onClick={() => handlePayment('TRANSFER')}
+                  className="text-sm md:text-base hover:underline disabled:text-zinc-400 disabled:cursor-not-allowed disabled:no-underline"
+                >
+                  계좌이체 →
+                </button>
+                <p className="mt-1 text-xs text-zinc-400 leading-relaxed">{ESCROW_NOTICE}</p>
               </Block>
             )}
             {EASY_PAY_OPTIONS.length > 0 && (

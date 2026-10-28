@@ -86,8 +86,13 @@ export default function OrderDetailDrawer({ orderId, onClose, onUpdated }) {
       if (!res.ok) throw new Error(json.error || '저장 실패');
       setOrder(json.order);
       onUpdated?.(json.order);
-      if (json.notified) setNotice(`고객에게 '${ORDER_STATUS_LABEL[json.notified]}' 알림 메일을 보냈습니다.`);
-      if (json.notifyError) setError(json.notifyError);
+      const notices = [];
+      if (json.notified) notices.push(`고객에게 '${ORDER_STATUS_LABEL[json.notified]}' 알림 메일을 보냈습니다.`);
+      if (json.escrow === 'registered') notices.push('KCP 에스크로에 배송정보를 등록했습니다.');
+      if (json.escrow === 'updated') notices.push('KCP 에스크로 배송정보를 고쳤습니다.');
+      if (notices.length) setNotice(notices.join(' '));
+      const problems = [json.notifyError, json.escrowError].filter(Boolean);
+      if (problems.length) setError(problems.join(' '));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -243,6 +248,12 @@ export default function OrderDetailDrawer({ orderId, onClose, onUpdated }) {
                     />
                   </div>
                 </div>
+                {order.paymentMethod === 'Transfer' && (
+                  <p className="text-[11px] text-zinc-600 leading-relaxed bg-zinc-50 border border-zinc-100 px-3 py-2">
+                    계좌이체(에스크로) 주문 — 결제일 포함 7영업일 안에 발송하고 운송장을 저장해야 정산됩니다.
+                    저장하면 KCP에 배송정보가 자동으로 등록됩니다.
+                  </p>
+                )}
 
                 <div>
                   <label className="block text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Admin note</label>

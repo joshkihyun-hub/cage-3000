@@ -8,6 +8,7 @@ import UISound from '../components/ui-sound';
 import UICursor from '../components/ui-cursor';
 import { CartProvider } from '../shared/context/cart-context';
 import { OPEN_GRAPH_BASE, SITE_NAME, SITE_URL, toJsonLd } from '@/lib/seo';
+import { KCP_TRANSFER_ENABLED } from '@/lib/escrow';
 
 // 본문용 폰트 설정
 const bodoni = Bodoni_Moda({
@@ -221,6 +222,10 @@ export default function RootLayout({ children }) {
                     {/* 전자상거래법상 사이버몰 표시 의무 항목 — PG(KCP) 심사에서도 확인한다. */}
                     <p><span className="text-zinc-600 font-medium">전화</span> &nbsp;010-4890-9497</p>
                     <p><span className="text-zinc-600 font-medium">이메일</span> &nbsp;contact@cage3000.com</p>
+                    {/* 현금성 결제(계좌이체)를 받으면 구매안전서비스 가입 사실을 초기 화면에 표시해야 한다. */}
+                    {KCP_TRANSFER_ENABLED && (
+                      <p><span className="text-zinc-600 font-medium">구매안전서비스</span> &nbsp;NHN KCP 에스크로 (계좌이체 결제 시 적용)</p>
+                    )}
                   </div>
 
                   {/* Policy Links */}

@@ -168,6 +168,8 @@ export async function POST(req) {
         id: true,
         orderNumber: true,
         totalAmount: true,
+        // 에스크로 결제(계좌이체)는 상품 정보를 결제사에 함께 보낸다 — 서버가 정한 가격 그대로.
+        items: { select: { productId: true, productName: true, unitPrice: true, quantity: true } },
       },
     });
 
