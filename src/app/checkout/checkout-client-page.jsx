@@ -10,35 +10,10 @@ import { BUY_NOW_FLAG, useCart } from '../../shared/context/cart-context';
 import { items as catalog, isPurchasable } from '@/shared/constants/shop-items';
 import { formatKrPhone, isValidEmail, isValidKrPhone } from '@/lib/validation';
 import { ESCROW_NOTICE, KCP_TRANSFER_ENABLED } from '@/lib/escrow';
+import { CHANNEL_KCP, EASY_PAY_OPTIONS } from '@/lib/payment-methods';
 import { Block } from '@/components/block';
 
 const STORE_ID = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || '';
-// 신용카드는 KCP V2 채널. 환경에 따라 테스트연동/실연동 채널 키를 환경변수로 주입한다.
-const CHANNEL_KCP = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KCP || '';
-// KCP 채널로 받을 간편결제 — KCP에 간편결제를 추가 계약한 뒤에만 넣는다(예: "KAKAOPAY,NAVERPAY,TOSSPAY").
-// 계약 전에 KCP로 보내면 결제창이 [DR02] 가맹점 설정정보 오류로 끝난다(2026-05 실제로 그랬다).
-const KCP_EASY_PAY = new Set(
-  (process.env.NEXT_PUBLIC_PORTONE_KCP_EASY_PAY || '')
-    .split(',')
-    .map((s) => s.trim().toUpperCase())
-    .filter(Boolean)
-);
-// 간편결제 — 직접 계약한 채널(포트원 콘솔에서 따로 연결)이 있으면 그 채널, 없으면 위 목록에 있을 때만 KCP 채널.
-// 둘 다 없는 수단은 화면에 띄우지 않는다. 계약이 끝나 채널이 생기면 환경변수만 넣으면 나타난다.
-const EASY_PAY_OPTIONS = [
-  { label: '카카오페이', provider: 'KAKAOPAY', channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KAKAOPAY },
-  { label: '네이버페이', provider: 'NAVERPAY', channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_NAVERPAY },
-  { label: '토스페이', provider: 'TOSSPAY', channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_TOSSPAY },
-  { label: '페이코', provider: 'PAYCO' },
-  { label: '삼성페이', provider: 'SAMSUNGPAY' },
-  { label: '애플페이', provider: 'APPLEPAY' },
-]
-  .map((option) => ({
-    ...option,
-    direct: Boolean(option.channelKey),
-    channelKey: option.channelKey || (KCP_EASY_PAY.has(option.provider) ? CHANNEL_KCP : ''),
-  }))
-  .filter((option) => option.channelKey);
 
 const inputClass =
   'w-full border-b border-zinc-900 py-1 text-sm md:text-base focus:outline-none bg-transparent rounded-none';

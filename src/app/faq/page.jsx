@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { items } from '@/shared/constants/shop-items';
 import { SITE_URL, pageMetadata, toJsonLd } from '@/lib/seo';
+import { PAYMENT_METHOD_NAMES } from '@/lib/payment-methods';
 
 export const metadata = pageMetadata({
   title: 'FAQ',
@@ -16,6 +17,11 @@ function buildFaqs() {
   // 가격이 아직 없는 상품(priceNum null)은 범위에서 뺀다.
   const prices = [...new Set(items.map((item) => item.priceNum).filter(Boolean))].sort((a, b) => a - b);
   const priceRange = prices.map((price) => `₩${price.toLocaleString('ko-KR')}`).join(', ');
+  // 결제 수단은 결제 화면과 같은 설정에서 — 간편결제·계좌이체가 켜지면 문구도 함께 늘어난다.
+  const methodsKo = PAYMENT_METHOD_NAMES.map((method) => method.ko).join(', ');
+  const namesEn = PAYMENT_METHOD_NAMES.map((method) => method.en);
+  const methodsEn =
+    namesEn.length > 1 ? `${namesEn.slice(0, -1).join(', ')} and ${namesEn.at(-1)}` : namesEn[0];
 
   return [
     {
@@ -55,8 +61,8 @@ function buildFaqs() {
     },
     {
       q: '결제 수단은 무엇이 있나요?',
-      a: '신용카드와 카카오페이, 네이버페이 등을 이용하실 수 있습니다.',
-      en: 'Credit card, KakaoPay and NaverPay are accepted.',
+      a: `${methodsKo}로 결제하실 수 있습니다.`,
+      en: `${methodsEn[0].toUpperCase()}${methodsEn.slice(1)} ${namesEn.length > 1 ? 'are' : 'is'} accepted.`,
     },
     {
       q: 'CAGE3000은 어떤 브랜드인가요?',

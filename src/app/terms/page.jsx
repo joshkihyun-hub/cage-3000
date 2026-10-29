@@ -1,3 +1,6 @@
+import { KCP_TRANSFER_ENABLED } from '@/lib/escrow';
+import { PAYMENT_METHOD_NAMES } from '@/lib/payment-methods';
+
 export const metadata = {
   title: '이용약관',
   alternates: { canonical: '/terms' },
@@ -9,7 +12,7 @@ export default function TermsPage() {
     <div className="bg-white min-h-screen pt-32 md:pt-40 pb-24">
       <div className="max-w-2xl mx-auto px-6 md:px-12">
         <h1 className="text-3xl text-black mb-2 tracking-widest uppercase">이용약관</h1>
-        <p className="text-[10px] text-zinc-400 mb-12 tracking-wide">최종 업데이트: 2025년 07월 27일</p>
+        <p className="text-[10px] text-zinc-400 mb-12 tracking-wide">최종 업데이트: 2026년 10월 29일</p>
 
         <div className="space-y-10 text-[13px] text-zinc-600 leading-relaxed">
 
@@ -51,7 +54,14 @@ export default function TermsPage() {
             <ul className="list-disc list-inside space-y-1.5">
               <li>이용자는 사이트에서 제공하는 방법으로 상품을 주문하고 결제할 수 있습니다.</li>
               <li>회사는 이용자의 주문에 대하여 주문 확인 메일 또는 기타 방법으로 확인 통보를 합니다.</li>
-              <li>결제는 신용카드, 카카오페이, 네이버페이 등 사이트에서 정한 결제 수단을 이용할 수 있습니다.</li>
+              {/* 결제 수단은 결제 화면과 같은 설정에서 — 간편결제·계좌이체가 켜지면 함께 늘어난다. */}
+              <li>
+                결제는 사이트에서 정한 결제 수단(현재 {PAYMENT_METHOD_NAMES.map((method) => method.ko).join(', ')})을
+                이용할 수 있습니다.
+              </li>
+              {KCP_TRANSFER_ENABLED && (
+                <li>계좌이체 결제에는 NHN KCP의 구매안전서비스(에스크로)가 적용됩니다.</li>
+              )}
               <li>모든 상품은 주문 제작 방식으로 운영되며, 결제 완료 후 4~6 영업일 이내에 제작이 진행됩니다.</li>
             </ul>
           </section>
