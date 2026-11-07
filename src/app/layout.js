@@ -224,7 +224,7 @@ export default function RootLayout({ children }) {
                     <p><span className="text-zinc-600 font-medium">이메일</span> &nbsp;contact@cage3000.com</p>
                     {/* 현금성 결제(계좌이체)를 받으면 구매안전서비스 가입 사실을 초기 화면에 표시해야 한다. */}
                     {KCP_TRANSFER_ENABLED && (
-                      <p><span className="text-zinc-600 font-medium">구매안전서비스</span> &nbsp;NHN KCP 에스크로 (계좌이체 결제 시 적용)</p>
+                      <p><span className="text-zinc-600 font-medium">구매안전서비스</span> &nbsp;NHN KCP 에스크로 확인번호 제A11-260526-0667호 (계좌이체 결제 시 적용)</p>
                     )}
                   </div>
 
