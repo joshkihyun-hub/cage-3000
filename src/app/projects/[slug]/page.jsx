@@ -100,6 +100,9 @@ export default async function ProjectPage({ params }) {
           {category && (
             <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-zinc-400">{category.label}</p>
           )}
+          {project.caption && (
+            <p className="text-[10px] md:text-xs text-zinc-600 leading-relaxed">{project.caption}</p>
+          )}
 
           {project.credits?.length > 0 && (
             <div className="space-y-1">

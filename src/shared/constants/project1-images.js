@@ -54,6 +54,26 @@ export const PROJECT1_ITEMS = [
     ],
   },
   {
+    id: 11,
+    slug: 'singles-alpha-drive-one',
+    category: 'sponsored',
+    description_ko: 'SANGHYEON, ARNO, XINLONG and LEO of ALPHA DRIVE ONE in @cage3k headwear for SINGLES Korea',
+    // 상세 페이지 제목 아래에 그대로 보이는 한 줄
+    caption: 'SANGHYEON, ARNO, XINLONG and LEO of ALPHA DRIVE ONE in @cage3k headwear for SINGLES Korea',
+    title: 'SINGLES KOREA ALPHA DRIVE ONE',
+    subtitle: 'EDITORIAL / 2026',
+    image: '/asset/details/singles-alpha-drive-one/singles1.jpg',
+    image_hover: '/asset/details/singles-alpha-drive-one/singles2.jpg',
+    subImages: [
+      '/asset/details/singles-alpha-drive-one/singles1.jpg',
+      '/asset/details/singles-alpha-drive-one/singles2.jpg',
+      '/asset/details/singles-alpha-drive-one/singles3.jpg',
+    ],
+    credits: [
+      { role: 'Headwear', name: 'CAGE3000 (@cage3k)' },
+    ],
+  },
+  {
     id: 9,
     slug: 'apro-profile',
     category: 'sponsored',
